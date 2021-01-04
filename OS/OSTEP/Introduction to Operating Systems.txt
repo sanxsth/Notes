@@ -1,0 +1,76 @@
+Introduction to Operating Systems
+
+	Operating System is a program that provides a favorable environment for other programs to execute and users to interact with the system. The operating system achieves this via a technique known as 'virtualization'.
+
+	'Virtualization' is a general technique in which the OS takes physical resources (like CPU, memory, or disks) and transforms them into a more general, powerful, and easy-to-use virtual form of itself. Therefore, we sometimes refer to the OS as a 'virtual machine'.
+
+	OS provides libraries of APIs that other programs can use to make 'system calls'. Therefore, OS is said to provide standard libraries to applications.
+
+	Because 'virtualization' allows multiple programs to run and share resources (CPU, memory, disks, etc) concurrently, OS is also referred to as a 'Resource Manager'.
+
+CPU Virtualization
+
+	Consider a single processor system. Since we have only one CPU, we would assume we can execute only one program at a time. But operating systems allow us to run multiple programs at the same time, thus giving an illusion that the system has a large number of virtual CPUs. Turning a CPU into a large number of infinite virtual CPUs is what we call 'Virtualizing the CPU'.
+
+	The ability to run multiple programs concurrently raises many questions. One, for example, if two programs want to run at the same time, which one should be run? These are answered by the 'Policies' of the system.
+
+Memory Virtualization
+
+	The model of physical memory in modern machines is simple. They are considered as an array of bytes. To read and write data, we need to specify the address. Each byte has its physical address.
+
+	Consider a program that allocates a block of memory, outputs the address of the allocated memory, assigns a value to it, and then, infinitely keeps incrementing its value.
+
+	When we run multiple instances of the same program, concurrently, we observe the following:
+		i. Each instance is allocated memory at the same address.
+		ii. The incrementation done by one program doesn't affect the other.
+
+	It is as if the running programs has their own private memory, instead of sharing the same physical memory with other running programs.
+	This is called 'Memory Virtualization'. Each process has its own private virtual address space which is somehow mapped onto the physical memory of the machine. Memory reference within one program doesn't affect other programs or the OS.
+
+
+Concurrency
+
+	Concurrency is when two or more tasks (processes/threads) start, execute, and complete in overlapping time-periods. It doesn't necessarily mean they'll ever be running at the same time. 'Parallelism' is pure 'concurrency', we have tasks running literally at the same time. Concurrency problems don't necessarily arise because of multiple processes. It can arise even when the same process works on multiple things at once.
+
+	Concurrency leads to a host of problems.
+
+	Consider a program, which creates two threads. These threads will then access a shared counter, initialized to zero. Now, these two threads would increment the counter, say 'x' times. Logically, the final output of the counter should be '2x'. But when you run the program for large 'x', say x = 100000, the final result won't be 200000 but will be different all the time. This happens so since the increment operation is composed of three sub-operations:
+		i. load ii. increment iii. store
+	These sub-operations are not executed atomically.
+
+	This is an example of a concurrency problem.
+
+Persistence
+
+	Since main memory is volatile, we need a way to persist data for long term user. For this, we make use of i/o devices like hard drives and SSDs.
+	The software in the OS that usually manages the disk is called the 'file system'. It is responsible for creating user files reliably and effectively.
+	Unlike the abstractions provided by the OS for the CPU and memory, the OS does not create a private, virtualized disk for each application. The disk and its resources are expected to be shared among programs.
+
+	The disk-related system calls are routed to the file system. The process of writing and reading from disk isn't trivial, it involves a lot of complex mechanisms and data-structures (from simple linked-lists to b-trees). These are abstracted from an application developer, who can make use of libraries provided by the OS. The OS is sometimes seen as a 'Standard library'.
+
+	The Crux of the Problem:
+
+		How does OS achieve virtualization? What policies and mechanisms are implemented? How to do this efficiently? What hardware support is needed?
+
+		How can we resolve concurrency problems? What primitives from the OS are needed? What mechanisms should be provided by the hardware?
+
+		What techniques are needed to correctly and efficiently persist data? What mechanisms and policies are required for high performance? How is reliability achieved in the face of hardware and software failure?
+
+Design Goals.
+
+	The Operating system is designed and implemented by keeping various things in mind, apart from virtualization, concurrency, and persistence. An Operating System needs to provide a few more features:
+
+		It should have abstractions to make the OS convenient and easy to use. The OS should have high performance. We also need to minimize overheads. Protection of programs and OS from each other is achieved through process isolation. Also, Security from outside threats (malicious programs). Since OS is so crucial for the proper functioning of the system and other programs in it, it should be highly reliable. 
+
+	Other desirable features are energy-efficiency and mobility.
+
+Resources and References:
+
+	https://teaching.csse.uwa.edu.au/units/CITS2230/handouts/Lecture09/lecture9.pdf
+	https://sceweb.uhcl.edu/helm/RationalUnifiedProcess/process/workflow/ana_desi/co_cncry.htm
+
+
+
+
+
+

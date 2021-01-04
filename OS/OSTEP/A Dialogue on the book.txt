@@ -1,0 +1,12 @@
+A Dialogue on the book
+
+'Three Easy Pieces' is inspired by Richard Feynmann's iconic book on physics called 'Six Easy Pieces'. This book would be about 'Operating Systems'.
+
+The three pieces considered are:
+	i. Virtualization.
+	ii. Concurrency.
+	iii. Persistence.
+
+As we study these concepts, we'll get to know more about Operating systems. Like how it choose a program to be executed by the CPU, how it handles memory overloads in a virtual memory system, how to manage information on disks, etc.
+
+Each chapter comes with its homework and projects, which is essential for a student to do.
