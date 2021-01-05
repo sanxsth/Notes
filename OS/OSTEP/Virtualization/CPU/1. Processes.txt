@@ -1,0 +1,53 @@
+The Abstraction: Process
+
+	A process is one of the most fundamental abstractions that the OS provides to its users.
+
+	A process is not just a program under execution, but it's much more. We'll see what constitutes a process.
+
+	The OS allows its users to run a lot of programs as if there are infinitely many processors/CPUs. This is achieved via virtualization.
+
+	Crux: How does the OS 'virtualize' the CPU?
+
+	The basic technique used is 'time-sharing'. Each process is allotted a specific quantum of time to use a resource, in this case, the 'CPU'.
+
+	To implement virtualization, the OS makes use of some low-level machinery and some high-level intelligence. The low-level machinery is called a 'mechanism'. They are low-level methods or protocols that implement a needed piece of functionality. For example, the 'context switch' is implemented by a mechanism.
+	The high-level intelligence is the policies. They are the algorithms for making decisions within the OS. For example, if we have multiple programs to run, the 'Scheduling policy' in the OS makes the decision, based on some factors, on whom to run.
+
+	A common design paradigm is to separate high-level policies from low-level mechanisms. This is done to decouple them, which will allow us to modify one without impacting the other.
+
+	To understand what constitutes a process, we need to understand its machine state.
+
+	The memory allocated to a process is part of the machine state. The code and data of the running process are in this memory. This allocated memory is what we call 'Address Space' of the process.
+
+	The registers, more specifically, the values in the registers are also part of the machine state. Program Counter (Instruction pointer), stack pointer, and frame pointer are special registers that are part of the machine state.
+
+	Other resources like files opened also forms part of the machine state.
+
+Process API
+
+	There are a few APIs that the OS offers that are related to processes. A few of them are:
+
+		i. Creation ii. Deletion iii. Wait iv. Misc Operations (like pause) v. Status.
+
+Process Creation: A little more detail
+
+	How exactly does the OS get a program up and running?
+
+	First, the OS loads the executable code and static data (eg, initialized variables) into the process's address space. The program initially resides in the disk, usually as an executable. The loading process is eager in the old/simple OSes, modern ones load lazily (i.e. Load the code and data only when required).
+
+	Once this is done, OS allocates memory for the run-time stack. In C programs, stacks are used for storing local variables, function parameters, and return addresses. It may also allocate some memory for the heap. In C programs, the heap is used for explicitly requested dynamically allocated data. Usually using malloc() and freed using free().
+
+	Once all this is done, the OS calls the entry point of the program. Usually, this is the main() routine. With this call, the OS transfers its control of the CPU to the newly created process.
+
+Process States
+
+	Once a program is loaded and initialized, it's in 'Ready State'. Once the CPU/short-term scheduler allocates the CPU, the process is now running.
+	When an event like an i/o request occurs, the OS stops its execution and the process goes into a 'Blocked'/'Waiting' state. Once this event completes, the process moves back into the 'Ready' state.
+
+	Apart from the states mentioned above, there are a few other states. One notable one is 'zombie'. This is when a process is completed, but an entry still exists in the process table/list. These processes are called 'zombies'. The entry will be removed when the parent process calls wait().
+
+Data Structures
+
+	The OS makes use of a lot of data structures to function efficiently. One related to processes is the 'process-list', which is a list of processes represented by a structure called 'Process Control Block (PCB or Process Descriptor'). 'PCB' has all the necessary information about the process like its status, PID, parent's PID, the contents of its registers. PCBs are very crucial for context switching.
+
+
