@@ -1,0 +1,46 @@
+Interlude: Process API
+
+	Interludes are to cover more practical aspects of the OS. Usually based on concepts we have learned earlier.
+
+	Crux: What interfaces should the OS provide for process creation and control? How should be these interfaces be designed to enable powerful	functionality, ease of use, and high performance?
+
+	We'll now take a look at few APIs offered by the OS which is related to Process Creation and Control.
+
+fork() System Call.
+
+	Fork() creates a replica of the calling program. The newly created program would be a child of the caller. Though the child will be an exact copy, it will have its own private address space, which will be an exact copy of the parent's address space during the fork() call.
+
+	The child process's execution doesn't start from the main, but starts with the fork() call returning a value '0' and continues from there. The parent will also continue its execution after the fork() call, but fork() will return the child process's PID.
+
+	This difference in the return value of fork() can be utilized to create separate workflows for the parent and child.
+
+	The order of execution of parent and child after fork() is non-deterministic.
+
+wait() System Call
+
+	With wait(), the parent can wait till the child completes its execution. If the parent happens to have multiple children, the 'wait()' will only wait for the completion of one of these children. Wait() returns the PID of the terminated child.
+
+exec() System Call
+
+	'fork()' creates a replica of the calling process, but 'exec()' can be used to create a different process. Given the name of the program to be executed and some other arguments, OS loads the code and static data of the supplied program by overwriting the current program's code and data segment. It will also re-initialize the stack and heap segment of the old program. Thus, it does not create a new process, rather transforms the current process into a different one.
+
+	Note that after calling exec(), the process that runs will have the same parent as the process who called 'exec()'.
+
+Why? Motivating the API 
+
+	'fork()' and 'exec()' combinations lead to a lot of interesting possibilities. 
+
+	The parent process can call fork(), then the child can do a few changes to the environment before calling exec(). This way, proper environments can be set before the actual program (argument of exec()) gets executed.
+	 
+	Let's understand this with an example.
+
+	"prompt> wc p3.c > newfile.txt". 
+
+	When you execute the above command in a shell. The shell first creates a fork() and then wait() for the child to complete. The child will call exec() and run w3 with "P3.c" as the input. But before the exec() call is made. The child process closes the standard output (shell console) and opens the file "newfile.txt". The file descriptors are preserved during exec() calls. Therefore, when we start execution, all the output would be to the file "newfile.txt".
+
+	'pipe()' also works similarly, the output of one process is connected to an in-kernel pipe (queue) and the input of another process is connected to the same pipe. Thus the output of one process is used as input for another. Thus, multiple programs can be chained this way.
+
+Process Control and Users
+
+	Apart from fork(), exec() and wait(). There are a lot of other interfaces/calls that we can use to control and communicate with processes. 'Signal' is one such mechanism for communicating events. You can cover more about them outside this note, for this, the book recommends “Advanced Programming in the UNIX Environment".
+
