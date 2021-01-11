@@ -1,0 +1,107 @@
+Introduction
+
+	The following lines can be added to make your i/o faster in CPP.
+		ios::sync_with_studio(0);
+		cin.tie(0);
+
+	Also, "\n" works faster than 'endl', since 'endl' always causes a flush operation.
+
+	To read a whole line containing spaces, use:
+		string s;
+		getline(cin, s);
+
+	If the amount of data is unknown, use the following loop:
+		while( cin>>x )
+		{
+			// code
+		}
+
+	Some contest requires i/o using files. Add the following code to use standard streams:
+
+		freopen("input.txt", "r", stdin);
+		freopen("output.txt", "w", stdout);
+
+		now you can use our standard 'cin', 'cout' for i/o.
+
+	Integers
+
+		int: 32bit; range: -2^31 - ((2^31)-1) or -2.10^9 - 2.10^9
+		long long: 64bit; -2^63 - ((2^63)-1) or -9.10^18 - 9.10^18
+		__int128_t 128bit; -2^127 - ((2^127)-1) or -10^38 - 10^38
+
+	Mod
+		(a+b) % m = ((a%m) + (b%m)) % m;
+		(a-b) % m = ((a%m) - (b%m)) % m;
+		(a*b) % m = ((a%m) - (b%m)) % m;
+
+		(a/b) % m is a bit different.
+
+		(a/b) % m = (a * (b^(-1))) % m; and the inv(b) can be found using extended gcd method. We'll discuss this further in our 'modular arithmetic' section.
+
+		We want the reminder to be between {0-(m-1)}. But in CPP and other languages, the mod of a negative number is either 0 or another negative number.
+		Use the following to make it positive:
+			if(x < 0) x += m;
+
+	Floating point numbers
+
+		double: 64bit;
+		long double: 80bit;
+
+		Use 'printf' to output floating point number:
+
+			printf("%.9f\n", n); // prints 'n' with 9 decimal places.
+
+		Some numbers cannot be represented accurately as floating-point numbers due to round errors. 
+
+		double x = 0.3 * 0.3 + 0.1;
+		printf("%.20f\n", x); // 0.99999999999999988898
+
+		Therefore, it's risky to compare float using '=='. 
+
+		We usually do:
+
+			if( abs(a - b) < 1e-9)
+			{
+				// a == b
+			}
+
+
+	Shortening Code
+
+		In competitive programming it's always ideal to write short code. There are ways in which you can shorten your code. Let's have a look at few:
+
+			Using 'typedef':
+				typedef long long ll; // ll a, b;
+				typedef vector<int> vi; // vi a, b;
+				typedef pair<int, int> pi; // pi a, b;
+
+			Using 'Macros':
+			In this case, certain strings will be replaced before compilation. 
+				#define mp make_pair // no semi-colons required. eg: mp(1,1); is equal to make_pair(1,1);
+
+			A macro can have a parameter, which allows us to shorten functions and loops.
+
+			#define Rep(i, a b) for(int i = a; i<=b; i++)
+
+			for(int i=0; i<=b; i++)
+			{
+				// do something
+			}
+
+			The above can be re-written as:
+
+			Rep(i, 0, n);
+
+			Since macros are just string substitutions they can cause issues. For example, 
+
+			#define Sq(a) a*a
+
+			cout<<Sq(3+3); // expected: 36, output: 15; 
+
+			This happens because, after the preprocessing, the above code is replaced by "cout<<3+3*3+3;". Which is evaluated to 15.
+
+	Logarithm
+
+		An interesting way to look at logarithms is, logk(a) is the number of times we have to divide a by x to get '1'.
+
+		I'm skipping a few sections especially the mathematics section: sets, functions, logic, logarithms, some common formulas, etc as they are very basic. You can refer the text for this.
