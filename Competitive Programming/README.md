@@ -8,7 +8,7 @@
 The notes are based on Antti Laaksonen's ["Competitive Programmer’s Handbook"](https://cses.fi/book/book.pdf).
 
 ### TOC
-1. [Basic Techniques]()
+1. [Basic Techniques](https://github.com/satheess/Notes/tree/main/Competitive%20Programming/Basic)
 
 #### References
 * Algorithms & Data structures course works:
