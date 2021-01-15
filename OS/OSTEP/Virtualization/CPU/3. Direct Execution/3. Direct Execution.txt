@@ -1,0 +1,154 @@
+Mechanism: Limited Direct Execution
+
+	OS does CPU virtualization via 'Time Sharing'. 
+
+Crux:
+	How can we achieve virtualization efficiently without having serious overheads? How can the OS still be in control while running user programs so that the programs don't run forever and take over the machine?
+
+Basic Technique: Limited Direct Execution
+
+	'Direct Execution' refers to directly running the program on the CPU, which makes the execution faster.
+
+	Direct Execution without limits:
+
+	OS                                        Program
+	--------------------------------------------------------------------
+	Create entry for process list
+	Allocate memory for program
+	Load program into memory
+	Setup stack with argc/argv
+	Clear registers
+	Execute 'call' main()
+											Run Main
+											Execute 'return' from main()
+	Free memory of process
+	Remove from process list
+
+
+	The above process is simple but doesn't give control to the OS while the user program is being executed. Therefore, this mechanism is very unsafe.
+
+	The software and hardware have to work together to overcome this obstacle. This is done by introducing 'restricted operations'. The processor will have two modes: 'kernel' and 'user'. The OS runs in 'kernel' mode and user programs in 'user' mode. 'Restricted operations' can only be executed under the 'kernel' mode. The operation to switch mode itself is a restricted operation.
+
+	Most of the i/o operations are restricted.
+
+	So how will the user program execute these restricted operations?
+
+	Let's understand a few terms. Based on http://www.cs.cornell.edu/courses/cs3410/2012sp/lecture/22-traps-i-g.pdf
+
+	Traps: Any kind of control transfer to the OS
+	SysCall: Synchronous program-to-kernel transfer. SysCalls internally makes use of 'trap' instructions.
+	Exceptions: Synchronous program-to-kernel transfer
+	Interrupt: Asynchronous, device initiates the transfer
+
+	Syscall and exceptions by software and interrupt by hardware.
+
+	User programs make special trap instructions to transfer the control to the OS. Once the OS is done executing the privileged/restricted instructions, it issues 'return-from-trap' instruction to return to the user program that initiated the trap. Before the transfer takes place, the processor mode is switched to 'user' from 'kernel'.
+
+	When the system is booting up, the OS constructs a special 'trap table'. This can only be done in 'kernel' mode. This table will tell the hardware about the location of the 'trap handler'. The hardware remembers this table until the system is rebooted. This instruction that tells the hardware where the 'trap table' is located is a 'privileged' instruction.
+
+Limited Execution Protocol
+
+	OS@boot(kernel mode)                         Hardware
+	--------------------------------------------------------------------------------------------------------
+	'initialize trap table'                     
+												remember address of system handler 
+	
+
+	Os@run(kernel mode)                          Hardware                                            Program
+	-----------------------------------------------------------------------------------------------------------
+
+	Create an entry for the process list
+	Allocate memory for the program
+	Load the program into memory
+	Setup user stack with argv
+	Fill kernel stack with reg/PC
+	'return-from-trap'
+
+												restore regs(from kernel stack)
+												move to user mode
+												jump to main()
+																									Run main()
+																									Make 'SysCall'
+																									'trap' into OS
+												save regs(to kernel stack)
+												move to kernel mode
+												jump to trap handler
+	Handle trap
+	Do work of syscall
+	'return-from-trap'
+												restore regs(from kernel stack)
+												move to user mode
+												jump to PC after trap
+																									return from main
+																									'trap' (via exit())
+	Free memory of process
+	Remove from process list
+
+	'LDE' protocol has two phases. First, the OS initializes the trap table and the hardware remembers its location for subsequent use. The kernel does this via privileged instructions. In the second phase, the OS does more initialization related to the program to be executed and, finally, issues a 'return-from-trap' to run the process. When the process issues a syscall, it traps back into the OS. Once the syscall is handled, the process continues its execution once the OS issues a 'return-from-trap' instruction.
+
+
+Switching between processes
+
+	Crux: When a process is running, how can the OS(which at this moment isn't running) regain control?
+
+	Since the OS isn't running while other user processes are being executed, how can the OS do anything at all?
+
+	We have two approaches to tackle this challenge.
+
+	A co-operative approach: Wait for System calls.
+
+		In this approach, the OS trusts the processes to give back the control periodically via system calls. A process may make the call as part of some i/o operation or when it performs some action that raises an exception (like, dividing by zero, etc.).
+		The problem is when a malicious or buggy program doesn't make any system call (for example, the program gets stuck in an infinite loop). In these scenarios, the only way to regain control for a cooperation OS is to reboot the machine.
+
+	A non-cooperative approach: The OS takes control.
+
+		The non-cooperative approach requires hardware support. The CPU has a timer device that's set to raise an interrupt after some interval. When such interrupts occur, the running process is halted and the interrupt handler in the OS is called. The 'timer interrupt' handler is part of the trap table initialized by the OS. During the boot sequence, it's the responsibility of the OS to start the timer (this is a privileged operation). The timer can also be turned off (privileged operation).
+
+		It is the responsibility of the hardware to save enough of the state of the current process in the event of an interrupt, such that the subsequent 'return-from-trap' instruction will be able to resume the running program correctly.
+
+	Context Switching
+
+		Once the interrupt is handled, the OS can choose to execute the currently running process or a different one. If the decision is to switch, the OS executes a low-level code which we refer to as a context switch. Conceptually, 'Context Switch' is simple. All the OS has to do is to save a few register values of the executing process onto its kernel stack and restore a few register values of the to-be-run process from its kernel stack.
+
+		The below table describes the context switching process in more detail:
+
+		OS@boot(kernel mode)              	Hardware
+		----------------------------------------------------------------------------------------------------
+		'initialize trap table'
+											remeber address of trap handlers
+		'start interrupt timer'
+											start timer
+											interrupt CPU in x ms
+
+		OS@run(kernel mode)					hardware 								Program(user mode)
+		----------------------------------------------------------------------------------------------------
+																					Process A
+											'timer interrupt'
+											save regs(A) -> k-stack(A)
+											move to kernel mode
+											jump to trap handler
+		Handle the trap
+		Call switch() routine
+			save regs(A) -> proc_t(A)
+			restore regs(B) <- proc_t(B)
+			switch to k-stack(B)
+			'return-from-trap' (into B)
+											restor regs(B) <- k-stack(B)
+											move to user mode
+											jumpt to B's PC
+																					Process B
+
+
+		There are two types of register saves that happen. The first one is done by the hardware when an interrupt occurs. Registers of the executing process are saved onto its kernel stack. The second one is done by the OS, when it's switching from process A to B. Registers are saved into memory in the process structure of the process.
+
+		The above paragraph deals with 'kernel' registers and 'user' registers. To further understand what they are, read this article
+		https://cs.stackexchange.com/questions/96550/whats-the-difference-between-user-registers-and-kernel-registers
+
+Some Concurrency issues:
+
+	What happens when an interrupt occurs when a previously occurred interrupt is being handled. The OS has few approaches to tackle these challenges. One, the OS will disable interrupts, but this isn't a desirable solution as there is a chance of losing an interrupt.
+	The second is via 'locks', which allows the OS to do multiple activities and the 'locks' would protect the internal data-structures from concurrent access. This is very ideal in the case of multi-processor systems. 
+
+Summary
+
+'Limited direct execution' is like 'baby proofing' the OS. So that the user processes can be run efficiently and securely.
