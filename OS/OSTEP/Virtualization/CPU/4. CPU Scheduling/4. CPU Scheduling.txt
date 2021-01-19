@@ -1,0 +1,74 @@
+Scheduling: Introduction
+
+	OS has some high-level policies/disciplines for scheduling processes. The origins of schedule predate computer systems, early approaches were taken from the field of operations management.
+
+The Crux:
+	How to develop scheduling policies? What are the key assumptions? What metrics are important?
+
+Workload Assumptions:
+
+	Running processes are collectively known as 'workload'. We make some assumptions for now about 'workload'.
+
+	Assumptions:
+
+		1. Each job runs for the same amount of time.
+		2. All jobs arrive at the same time.
+		3. Once started, a process executes till completion.
+		4. All jobs only use the CPU (i.e, no i/o)
+		5. The run-time of each job is known.
+
+Scheduling Metrics:
+
+	Scheduling metrics enable us to compare different scheduling algorithms. Let's have a look at our first, simple scheduling metric: 'turn-around time'.
+
+	turn-around time of a job = completion time - arrival time.
+
+	Turn-around time is a performance metric. Another metric of interest is fairness, which we measure by 'Jain's Fairness Index'. Performance and fairness are always at odds in scheduling. Usually, performance optimization is done by preventing a few jobs from running, which decreases fairness.
+
+First In, First Out
+
+	FIFO is also called 'First Come, First Serve' (FCFS). FIFO is a simple algorithm that's easy to implement. FIFO is ideal for scheduling, given all the above assumptions are true. 
+
+	Now, let's relax assumption # 1. Jobs can have varying execution times. It can be seen that FIFO isn't optimal in this scenario. FIFO gives a suboptimal result when we schedule a job with a long completion time before jobs with a shorter completion time. The average turn-around time would be very high in this scenario. The suboptimal performance is due to the 'convoy effect'.
+
+	So we need to do better scheduling.
+
+Shortest Job First
+
+	SJF schedules the shorted job first. It's very easy to show that, the average turn-around time would be minimized in scenarios where all the assumptions are true, except #1.
+
+	But if we relax assumption #2, we see that the performance of SJF isn't optimal. Consider a scenario where we have a job with a long completion time. Just when we start the job, two new jobs with comparatively shorter completion time comes in. In these scenarios, the shorter jobs will still have to wait and thereby we get to see the 'convoy effect' in action.
+
+Shortest Time-To-Completion First
+
+	For this policy, we need to relax assumption #3.
+
+	STCF is a preemptive policy. While a job is being executed, if a new job comes in with a shorter completion time than the one being executed. The scheduler stops the current execution and schedules the job with a shorter completion time. STCF is also called 'Preemptive Shortest Job First'. SJF is a non-preemptive scheduler. 
+
+A New Metric: Response Time
+
+	Given, we know the job length(total execution time) and that the jobs only used CPU, and our only metric was turn-around time, STCF would be a great policy. In older batch processing systems, these scheduling algorithms made sense. But after the introduction of time-sharing systems, where you have a user sitting at the terminal demanding interactive performance, these fail to perform well. Thus, we have a new metric: 'Response Time'.
+
+	T(response) = T(first run) - T(arrival).
+
+	If three jobs with the same running time arrive at the same time, STFC would schedule them one after the other. While great for turn-around time performance, STFC is a bad approach for response time and interactivity. In the given scenario, the third process has to wait until the completion of the first two. Say, this total wait duration is 10 seconds and the third process happens to be some text editor. Now, the user wouldn't want to wait 10 secs to get a response from the editor after pressing in a key.
+
+Round Robin
+
+	We target responsiveness and interactivity through the 'Round Robin' scheduling algorithm. The basic idea is simple, instead of running a process till completion, RR runs a job for a 'time slice'(aka scheduling quantum) and switch to the next job in the run queue. This is done repeatedly until all the jobs are completed. RR is also known as the 'time-slicing' algorithm. The length of 'time slice' should be a multiple of the CPU 'timer-interrupt'.
+
+	The shorter the 'time slice' better the performance of RR in terms of response time. But if we make the 'time slice' too small, the cost of context switching would dominate performance. If we make it loo large, the responsiveness of the algorithm comes down. Therefore, the system designer should make the 'time slice' long enough to 'amortize' the cost of switching without making it too long and bringing down the responsiveness.
+
+	'Fair' policies like RR, improves the responsiveness at the cost of 'turnaround time'. SJF and STCF improve 'turn around' time at the cost of responsiveness and interactivity. This is a trade-off we need to make while designing systems. 
+
+Incorporating I/O
+
+	Let's relax our assumption #4. A process can now make an i/o request as well. When a process raises an i/o request, the scheduler has to make a decision. Since the current process, will be 'blocked' waiting for the i/o completion, the CPU would be left idle. Thus the scheduler should probably schedule another process.
+
+	The scheduler also has to make a decision when the i/o completes. An interrupt is raised upon completion and the scheduler should move the process that raised the i/o from 'blocked/waiting' to 'ready' state. It can also choose to run the concerned process.
+
+	So how should the scheduler incorporate i/o in order to better utilize the system resources? This is done via 'overlap'. The CPU will be used by one process while another waits for the i/o completion. This way resources are not wasted and the system is better utilized. Thus the CPU incorporates i/o by treating CPU bursts as jobs (you call'em sub-jobs).
+
+No More Oracle
+
+	We still have our 5th assumption, which seems to be the most far-fetched of them all. A general OS would not know the execution time of a process beforehand. So how can we create a scheduler that can efficiently schedule jobs, considering both our metrics in mind, whose execution time is unknown for the OS? This is where the 'multi-level feedback' queue comes in. We'll have a look at it in our next chapter.
