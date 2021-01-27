@@ -1,0 +1,65 @@
+The Multi-Level Feedback Queue
+
+	MLFQ tries to address two fundamental problems.
+	It tries to minimize 'turn-around' time. Algorithms like SJF and STCF does the same, but a general OS doesn't know the running time of algorithms beforehand. MLFQ aims to minimize the 'response time'. Algorithms like RR does the same but at the cost of performance/'turn-around' time.
+
+	Given that we in general don't know anything about a process, how can we build a scheduler to achieve these goals?
+
+	The Crux: How to schedule without perfect knowledge? How to design a scheduler that minimizes 'turn-around' time without losing on interactivity?
+
+	MLFQ: Basic Rules
+
+		MLFQ has several distinct queues, each assigned a different priority level. A job that's 'ready' will reside in one of these queues. 
+
+		Rule 1: if Priority(A) > Priority(B), A runs (B doesn't)
+		Rule 2: if Priority(A) = Priority(B), A and B run in RR fashion.
+
+		The key to MLFQ scheduling lies in how we assign priorities to processes. The priority is set based on 'observed' behavior.
+
+		If a process often relinquishes the CPU to perform i/o, then this process is likely an interactive process and will be given higher priority. If it happens to be CPU intensive, it is given a lower priority.
+
+		Now, we need to understand how job priority changes over time.
+
+	Attempt #1: How to change the priority
+
+		Rule 3: When a job enters the system, it's given the highest priority and is assigned the topmost queue.
+		Rule 4a: If a job uses up the entire time slice while running, it's the priority is reduced.
+		Rule 4b: If it gives up the CPU before the time slice is up, it stays at the same priority level.
+
+		So, long-running jobs after a while end up in the bottom queue. While short jobs stay at the top with high priority. This way MLFQ approximates SJF.
+
+		Rule 4b intends to keep interactive jobs (which require high response time) at high priority since it's these jobs that would relinquish the CPU often.
+	
+	Problems with our current MLFQ
+
+		The current rules expose lower priority jobs to starvation. This can happen if the system has a high influx of short jobs which keep the CPU occupied and starves the lower priority jobs.
+
+		A smart user could rewrite the program to use the allotted time slice till the end but would initiate an i/o request just before the time slice expires. This way, the user could game the scheduler and have his program be at the top even though the program happens to be CPU intense.
+
+		Finally, a job may also change its behavior over time. A low priority CPU intense job can transition into an interactive one. With the current approach, it would be still at the bottom and would be treated as a CPU intense job even though it isn't anymore.
+
+	Attempt #2: Priority Boost.
+
+		Rule 5: After a while, say 'S', move all the jobs in the system to the topmost queue.
+
+		This will solve the problem of starvation. Also, CPU-bound jobs that transitioned into interactive jobs will now be treated accordingly.
+
+		The period 'S' is a voodoo constant, since it required some form of black magic to set the correct value. Too large and the low priority jobs might starve. Set it too short and interactive jobs might not get a proper share of CPU. 
+
+		We have solved two problems, now we need to address the problem of 'gaming the scheduler'.
+
+	Attempt #3: Better Accounting
+
+		We will now replace Rule 4a and 4b with the following singe rule:
+
+		Rule #4: Once a job uses up it's allotted time slice at a given level, its priority is reduced.
+
+		This prevents the scheduler from being gamed.
+
+	Tuning MLFQ and other issues.
+
+		How many queues should we have, what should be the time slice, etc has no single answer. It depends on the system and the kind of workload it gets. Therefore these 'voodoo' values are added to the config and are then tweaked by an experienced system admin to cater to the current needs.
+
+	Summary:
+
+		Instead of demanding 'priori' knowledge about the jobs, it observers them and prioritizes them accordingly. In this way, it manages to achieve the best of both worlds. It can deliver excellent overall performance to short-running interactive jobs and is fair and makes progress for long-running CPU intense jobs.
