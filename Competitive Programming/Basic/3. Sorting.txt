@@ -1,0 +1,124 @@
+Sorting
+
+	Sorting is fundamental to the algorithm design problem. Many algorithms use sorting as a sub-routine because it's often easier to process sorted data.
+
+Sorting Theory:
+	Given an array containing 'n' elements. Sort the array in increasing order.
+
+	O(n^2)
+
+	The bubble sort algorithm sorts the array in O(n^2).
+
+	for(int i=0; i<n; i++)
+	{
+		for(int j=1; j<n; j++)
+		{
+			if(arr[j-1] > arr[j])
+				swap(arr[j-1], arr[j]);
+		}
+	}
+
+	After the first iteration of the algorithm, the largest number would be placed at the last spot. After 'k' rounds, the largest 'k' numbers would be at their correct position. Each round takes 'n' operations and there are 'n' rounds in total. Therefore, the time complexity is O(n*n).
+
+Inversions
+
+	A useful concept when analyzing sorting algorithms is an 'inversion'. It's a pair of array elements, (arr[i], arr[j]) such that i < j and arr[i] > arr[j], i.e, the elements are in wrong order.
+
+	A completely sorted array has zero inversions and an array can have maximum (1 + 2 + 3 + ..... + n-1) = O(n^2) inversions.
+
+	Swapping two consecutive elements in the wrong positions reduces one inversion. Therefore we would require O(n^2) swaps to sort the array.
+
+O(nlogn) algorithms
+
+	Merge sort sorts the array in O(nlogn). Merge sort is based on the 'divide and conquer' technique. 
+
+	The lower bound for comparison-based sorting is O(nlogn).
+
+Counting Sort
+
+	Counting sort is a non-comparison based sort. It's ideal for sorting an array having all the elements within a range 'c' (c should be small).
+	It sorts the array in O(n).
+
+Sorting in C++
+	
+	Vectors: 
+		vector<int> v = {4, 2, 4, 3, 1,};
+
+		sort(v.begin(), v.end()); // non-decreasing order
+
+		sort(v.rbeing(), v.rend()); // non-increasing order 
+
+	Arrays:
+		An ordinary array can be sorted as follows:
+
+			int n = 7;
+			int a[] = {1, 4, 2, 6, 5, 8, 2};
+			sort(a, a+n);
+
+	strings:
+		string s = "cab";
+		sort(s.begin, s.end()); // s = "abc"
+
+	The 'sort' function requires that a 'comparison operator' is defined for the data type of the elements to be sorted. Most built-in data types already have a 'comparison operator' defined. 
+
+	Eg: pair<int, int> would be sorted based on the first element, if they happen to be equal then on the second value. The same logic extends to 'tuples'.
+
+	User-Defined Struct
+
+		User-defined structs have no comparison operator by default. The operator should be defined inside the struct as a function.
+
+		Struct P { // represenst a 2d point
+			int x, y;
+
+			bool operator<(const P &p) {
+				if(x != p.x) return x < p.x;
+				return y < p.y;
+			}
+		};
+
+	Comparison function
+
+		It's also possible to give a comparison function as a callback to sort().
+
+		bool comp(string a, string b) {
+			if(a.size != b.size()) return a.size() < b.size();
+			return a < b;
+		}
+
+		vector<string> v = {"abc", "aaa", "bdd"};
+		sort(v.begin(), v.end(), comp); //sorts v based on the length of the string, if same length 'lexiographical sort' is done.
+
+	Binary search:
+
+	Binary search enables us to efficiently search a sorted list of elements. The time complexity is O(logn).
+
+	Method 1:
+		int a = 0, b = n-1;
+		while( a<= b) {
+			int mid = (a+b)/2;
+
+			if(arr[mid] == k) {
+				//element found at mid
+			}
+			if(k < arr[mid]) b = mid-1;
+			else a = mid + 1;
+		}
+
+	Method 2:
+
+		int k = 0;
+		for(long b = n/2; b>=1; b/=2) {
+			while(k+b <n && arr[k+b]<=x) k += b;
+		}
+
+		if(arr[k] == x) {
+			//element 'x' found
+		}
+
+	C++ functions
+
+		lower_bound: returns a pointer to the first element whose value is at least 'x'.
+		upper_bound: returns a pointer to the first element whose value is larger than 'x'.
+		equal_range: returns both pointers.
+
+		If no such element exists, the pointer points to the element after the last array element (i.e, v.end())
