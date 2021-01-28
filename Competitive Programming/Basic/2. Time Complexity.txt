@@ -1,0 +1,18 @@
+Time Complexity
+
+	The efficiency of an algorithm is calculated by analyzing its time and space complexity. Unlike a computer science theorist, you don't need to dive deep into algorithm analysis. You just need to know what time complexity denotes and what should be the expected complexity based on the input size.
+
+	Time complexity denotes the growth of execution time of the algorithm as the input grows.
+
+	I'm skipping a lot of materials from this chapter as they are very basic.
+
+	The following table contains some useful estimates assuming a time limit of one second:
+
+		n<=10      -> O(n!)
+		n<=20      -> O(2^n)
+		n<=500     -> O(n^3)
+		n<=5000    -> O(n^2)
+		n<=10^6    -> O(n) or O(nlogn)
+		n is large -> O(1) or O(logn)
+
+	CLRS has a good section on algorithm analysis (eg: master theorem for recurrence relations, etc.). You may refer to that if you want to know more about algorithm analysis.
