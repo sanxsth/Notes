@@ -1,0 +1,98 @@
+Homework (Simulation)
+
+	1. Run a few randomly-generated problems with just two jobs and two queues; compute the MLFQ execution trace for each. Make your life easier by limiting the length of each job and turning off I/Os.
+
+		Answer:
+
+			Given command: python mlfq.py -n 2 -M 0 -j 2 -m 3 -q 1 -c
+
+			OPTIONS jobs 2
+			OPTIONS queues 2
+			OPTIONS allotments for queue  1 is   1
+			OPTIONS quantum length for queue  1 is   1
+			OPTIONS allotments for queue  0 is   1
+			OPTIONS quantum length for queue  0 is   1
+			OPTIONS boost 0
+			OPTIONS ioTime 5
+			OPTIONS stayAfterIO False
+			OPTIONS iobump False
+
+
+			For each job, three defining characteristics are given:
+			  startTime : at what time does the job enter the system
+			  runTime   : the total CPU time needed by the job to finish
+			  ioFreq    : every ioFreq time units, the job issues an I/O
+			              (the I/O takes ioTime units to complete)
+
+			Job List:
+			  Job  0: startTime   0 - runTime   2 - ioFreq   0
+			  Job  1: startTime   0 - runTime   1 - ioFreq   0
+
+
+			Execution Trace:
+
+			[ time 0 ] JOB BEGINS by JOB 0
+			[ time 0 ] JOB BEGINS by JOB 1
+			[ time 0 ] Run JOB 0 at PRIORITY 1 [ TICKS 0 ALLOT 1 TIME 1 (of 2) ]
+			[ time 1 ] Run JOB 1 at PRIORITY 1 [ TICKS 0 ALLOT 1 TIME 0 (of 1) ]
+			[ time 2 ] FINISHED JOB 1
+			[ time 2 ] Run JOB 0 at PRIORITY 0 [ TICKS 0 ALLOT 1 TIME 0 (of 2) ]
+			[ time 3 ] FINISHED JOB 0
+
+			Final statistics:
+			  Job  0: startTime   0 - response   0 - turnaround   3
+			  Job  1: startTime   0 - response   1 - turnaround   2
+
+			  Avg  1: startTime n/a - response 0.50 - turnaround 2.50
+
+	2. How would you run the scheduler to reproduce each of the examples in the chapter?
+
+		Answer: 
+
+			Example 1: A Single Long-Running Job
+
+			Command: python mlfq.py -n 4 -M 0 -j 1 -m 10 -q 1 -c
+
+			Example 2: Along Came A Short Job
+			Command: python mlfq.py -n 3 -q 10 -l 0,180,0:100,20,0 -c
+
+			Example 3: What About I/O?
+			Command: python mlfq.py -n 3 -q 10 -l 0,200,0:50,50,1 -i 3 -S -c
+
+	3. How would you configure the scheduler parameters to behave just like a round-robin scheduler?
+
+		Answer:
+
+			Trivial case: We only have one queue
+
+			Multiple queues: 
+
+				With multiple queues, we need to configure MLFQ in such a way that once the first job in the highest priority goes down to a lower priority, all the other succeeding jobs should also be moved to the lower queue in the same iteration.
+
+	4. Craft a workload with two jobs and scheduler parameters so that one job takes advantage of the older Rules 4a and 4b (turned on with the -S flag) to game the scheduler and obtain 99% of the CPU over a particular time interval.
+
+		Answer:
+
+			Command: python mlfq.py -n 3 -q 8 -l 0,32,0:0,32,7 -i 1 -S -c
+
+	5. Given a system with a quantum length of 10 ms in its highest queue, how often would you have to boost jobs back to the highest priority level (with the -B flag) in order to guarantee that a single longrunning (and potentially-starving) job gets at least 5% of the CPU?
+
+		Answer:
+
+			10ms/'x'ms * 100 = 5%
+
+			x = 200ms
+
+			-B should be 200
+
+	6. One question that arises in scheduling is which end of a queue to add a job that just finished I/O; the -I flag changes this behavior for this scheduling simulator. Play around with some workloads and see if you can see the effect of this flag.
+
+		Answer:
+
+			-I: if specified, jobs that finished I/O move immediately to the front of the current queue.
+
+			Commands:
+				python mlfq.py -n 2 -q 8 -l 0,50,0:0,50,9 -i 1 -S -c
+				python mlfq.py -n 2 -q 10 -l 0,50,0:0,50,9 -i 1 -S -I -c
+
+			We observe that moving the jobs to the front of the queue increases the turnaround time.
