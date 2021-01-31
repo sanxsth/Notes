@@ -1,0 +1,255 @@
+Data Structures
+
+	Vector (Dynamic Array)
+
+		vector<int> v; // creates an empty vector
+		v.push_back(1); // inserts element '1' into the vector
+		v[0]; // access the elements
+
+		for(auto x : v) { // a shorter way to iterate vector elements
+			cout<<x<<"\n"; 
+		}
+
+		vector<int> v = {1, 2, 3, 4, 5}; // creates a vector with 5 elements.
+
+		v.back(); // returns that last element in the vector. In this case,'5'.
+
+		vector v(10); // creates a vector of size 10, with initial value 0.
+		vector v(10, 5) // creates a vector of size 10 with initial value 5.
+
+		Internally the vector makes use of an ordinary array. If the current size becomes too small, a new array is allocated and all the elements are moved to this new array. This is done in a way to get the average complexity of push_back as O(1).
+
+	String 
+
+		The string structure can be used similar to a vector. Strings can be combined using the '+' operator. 
+
+		string a = "lol";
+		string b = a + a; // lollol
+		b[3] = 'b'; // lolbol
+		string c = b.substr(2, 2); // lb
+		b.find("lb"); // find the position of first occurence of the given substring. In this case, 2.
+
+	Set
+
+		Common operations: insertion, search, and removal.
+
+		STL has two implementations of a set. 
+
+			i. 'set' is an ordered structure based on a balanced binary search tree. The operations work in O(logn).
+			ii. 'unorder_set' is based on hashing and the operations work in O(1).
+
+
+			set<int> s; // creates a empty ordered set.
+			s.insert(3);
+			s.insert(2);
+			s.insert(5);
+			s.count(3); // returns the count, will be 0 or 1. In this case it's 1.
+			s.count(1); // 0
+			s.erase(3); // removes 3
+			s.count(3); // 0
+
+			It's not possible to access elements of the set using '[]'.
+
+			set<int> s = {3, 2, 5}; // creates a set with the given elements.
+			s.size(); // 3
+
+			We cannot have duplicates in a set.
+
+			multiset and unordered_multiset are sets that support duplicates.
+
+				multiset<int> ms;
+				ms.insert(1);
+				ms.insert(1);
+				ms.insert(1);
+				ms.count(1); // 3
+				ms.erase(1); // 0, erase removes all the instances of the give element.
+				ms.erase(ms.find(1)); // 2, removes only one instance of the given element.
+
+	Map
+
+		A map is like a generalized array of key-value pairs. While the keys in an ordinary array are consecutive integers, the keys of a map can be of any type and they need not be consecutive.
+
+		Maps have two implementations:
+
+			i. map is an ordered data structure based on a self-balancing binary tree. Operations take O(logn).
+			ii. unordered_map is an unordered data structure based on hashing. Operations take O(1).
+
+		map<string, int> m;
+		m["monkey"] = 4;
+		m["banana"] = 1;
+		m["hippo"] = 1;
+
+		m["monkey"]; // evaluates to 4.
+
+		If the value of a key is requested but the map doesn't contain it, the key is automatically added with a default value.
+		m["tiger"]; // The key 'tiger' is automatically added with a default value of 0.
+
+		m.count("cat"); // returns 0, can be used to check the key's existence.
+
+		for(var x: m) {
+			cout<<x.first<<" "<<x.second<<"\n";
+		}
+
+	Iterators & Ranges
+
+		An iterator is a variable that points to an element in a data structure. Iterators can be used to traverse a data structure and also to define a range.
+
+		begin: an iterator that points to the first element in the data structure.
+		end: an iterator that points to a position after the last element in the data structure.
+
+		Eg: { 3, 4, 5, 6, 7 }
+			  ^             ^
+		      |				|
+		    begin          end
+
+		The range defined by begin and end is half-open.
+
+		Most of the functions in STL expects a range. We can make use of iterators for this as follows:
+
+			sort(v.begin(), v.end());
+			reverse(v.begin(), v.end());
+			random_shuffle(v.begin(), v.end());
+
+		These functions can also be used with ordinary arrays. In this case, the functions are given pointers to the array instead of iterators.
+
+			sort(a, a+n);
+			reverse(a, a+n);
+			random_shuffle(a, a+n);
+
+	Set Iterators
+
+		set<int>::iterator it = s.begin(); or auto it = s.begin();
+
+		We can access the pointed element using '*', eg: cout<<*it<<"\n";
+
+		Iterators can be moved using the ++ and -- operators, meaning the iterator moves to the next and previous elements in the set.
+
+			for(auto it = s.begin(); it != s.end(); i++) {
+				cout<<*it<<"\n";
+			}
+
+		set.find(x); // returns an iterator pointing to the element 'x'. If 'x' doesn't exist, it returns 'end'.
+
+		set.lower_bound(x) & set.upper_bound(); // These perform the standard lb and ub on a set.
+
+		unordered_set doesn't maintain order, therefore doesn't support these methods.
+
+	Other Structures
+
+		Bitset
+
+			Bitset is used to represent an array of bits memory efficiently.
+
+			bitset<10> s(string("1000110110")); // from right to left
+			cout<<s[4]; // 1
+			cout<<s[5]; // 0
+
+			s.count(); // returns the number of set bits
+
+			Following opertaions can be performed on a bitset:
+
+				a&b, a|b, a^b
+
+
+		Deque
+
+			Deque is a queue, where you can add elements on both ends. 
+
+				It supports the following operations:
+
+					push_back, pop_back, push_front(), pop_front();
+
+		Stack
+
+			Stack is a data structure that provides two O(1) operations:
+				i. Adding an element on the top
+				ii. Removing an element from the top
+
+			It is only possible to access the topmost element.
+
+			stack<int> s;
+			s.push(1);
+			s.push(2);
+			cout<<s.top(); // 2;
+			s.pop();
+			cout<<s.top(); //1
+
+		Queue
+
+			A queue provides two O(1) operation.
+				i. Adding an element to the back of the queue.
+				ii. Removing an element from the front of the queue.
+
+		Priority Queue
+
+			A priority Queue maintains a set of elements. It supports the following operations:
+				i.	insertion
+				ii. retrieval 
+				iii. removal
+
+			insertion and removal take O(logn) time, removal takes O(1).
+
+		Though a set can efficiently perform all the operations of a priority_queue, the benefit of using a priority_queue is that it has smaller constant factors. A priority_queue is usually implemented using a heap that is much simpler to implement than a BST used in a set.
+
+		By default, the elements are sorted in decreasing order (max heap).
+
+		Eg: 
+			priority_queue<int> q;
+			q.push(4);
+			q.push(3);
+			q.push(7);
+
+			cout<<q.top(); // 7
+			q.pop();
+			cout<<q.top(); // 4
+
+
+			You can create a priority_queue<int> that supports finding and removing the smallest element:
+				priority_queue<int, vector<int>, greater<int>> q;
+
+	Policy-based data structures
+
+		g++ supports some data structures that are not part of the STL. Such data structures are called 'policy-based' data structures.
+
+		To use these structures, the following lines must be added:
+
+			#include <ext/pb_ds/assoc_container.hpp>
+			using namespace __gnu_pbds;
+
+			'indexed_set' is a policy-based structure. It is similar to a set but can be indexed like an array.
+
+			indexed_set s;
+			s.insert(2); 
+			s.insert(3);
+			s.insert(7);
+			s.insert(9);
+
+			auto x = s.find_by_order(2); // returns an iterator to the element at a given position.
+			cout<<*x; // 7
+
+			cout<<s.order_of_key(7); // 2
+
+			If the element does not appear in the set, we get the position that the element would have in the set:
+
+				cout<<s.order_of_key(6); // 2
+				cout<<s.order_of_key(8); // 3
+
+	Comparision to sorting
+
+		It is often possible to solve a problem using a data structure or sorting.
+
+		Problem: Given lists A and B, find the common elements in both.
+
+			Approach 1: using unordered_set. O(n).
+			Approach 2: sorting and two pointers. O(nlogn).
+
+			  n 	 Approach 2 	  Approach 3
+	     -----------------------------------------
+			10^6 		0.3 s 			0.2 s
+			2·10^6 		0.8 s 			0.3 s
+			3·10^6 		1.3 s 			0.5 s
+			4·10^6 		1.7 s 			0.7 s
+			5·10^6 		2.3 s 			0.9 s
+
+		Though approach 1 has lower complexity, approach 2 is efficient in a practical sense. This is because sorting is a simple procedure
+		and is done only once. On the other hand
