@@ -1,0 +1,58 @@
+Homework (Simulation)
+
+	Questions:
+
+		1. Compute the solutions for simulations with 3 jobs and random seeds of 1, 2, and 3.
+			answer:
+
+				Commands
+
+					python lottery.py -j 2 -s 1
+					python lottery.py -j 2 -s 2
+					python lottery.py -j 2 -s 3
+
+		2. Now run with two specific jobs: each of length 10, but one (job 0) with just 1 ticket and the other (job 1) with 100 (e.g., -l 10:1,10:100). What happens when the number of tickets is so imbalanced? Will job 0 ever run before job 1 completes? How often? In general, what does such a ticket imbalance do to the behavior of lottery scheduling?
+
+			answer:
+
+				Command: python lottery.py -l 10:1,10:100
+
+				We observe that the possibility of job 0 running before job 1 completes is very rare. Such imbalances lead to starvation among jobs.
+
+		3. When running with two jobs of length 100 and equal ticket allocations of 100 (-l 100:100,100:100), how unfair is the scheduler? Run with some different random seeds to determine the (probabilistic) answer; let unfairness be determined by how much earlier one job finishes than the other.
+
+			answer:
+
+				Fairness = time the first job completes / time the second job completes
+
+				Run 1:
+
+					Command: python lottery.py -s 1 -l 100:100,100:100 -c
+
+					Fairness = 196/200 = 0.98
+
+				Run 2:
+
+					Command: python lottery.py -s 2 -l 100:100,100:100 -c 
+
+					Fairness = 190/200 = 0.95
+
+				Run 3:
+
+					Command: python lottery.py -s 3 -l 100:100,100:100 -c 
+
+					Fairness = 196/200 = 0.98
+
+				We observe that with an equal number of ticket allocations the scheduler does fair scheduling.
+
+		4. How does your answer to the previous question change as the quantum size (-q) gets larger?
+
+			answer:
+
+				We observe that as quantum size increases the fairness decreases. This happens since a higher quantum size means a lesser number of randomization and therefore fairness gets skewed.
+
+		5. Can you make a version of the graph that is found in the chapter? What else would be worth exploring? How would the graph look with a stride scheduler?
+
+			answer:
+
+				With stride scheduler, the graph would be a lot different. Unlike lottery scheduler, stride scheduler will be able to achieve high fairness even with short job length.

@@ -1,0 +1,132 @@
+Scheduling: Proportional Share
+
+	Proportional-share schedulers (aka Fair-share schedulers) are schedulers that optimize 'fairness' instead of 'turn-around' time. A lottery scheduler is a type of Proportional-share scheduler. 
+
+Crux: How can we design a scheduler to share CPU in a proportional manner? What are the key mechanisms for doing so? How effective are they?
+
+Basic  Concepts: Tickets Represent Your Share
+
+	Underlying the lottery scheduler is a basic concept: 'tickets', which are used to represent the share of a resource that a process should receive.
+	The percent of tickets a process has represents its share of the resource in question.
+
+	If there are 100 tickets and process A owns 75 and Process B owns 25. Thus, what we would like is process A to receive 75% of the CPU and the rest 25% to process B.
+
+	Lottery scheduler achieves this probabilistically, by holding lottery every so often (say, after a timeslice). The implementation is straight forward: the scheduler must know the total number of tickets present, say, 'n'. Now, the scheduler would randomly choose a number between 0-(n-1) and the process that owns the ticket with this number would be allocated the CPU.
+
+Ticket Mechanisms
+
+	Lottery scheduling also provides a number of mechanisms to manipulate tickets in different and useful ways:
+
+		Ticket Currency
+			Currency allows users with a set of tickets to allocate it among its own jobs in whatever currency (value) they would like, the system then automatically converts it into the correct global currency.
+
+			Let's consider a simple example to further understand this. Say, users A and B are allotted 100 tickets each. User A then allocates 500 tickets to process A1 and 500 to process A2 (out of the total 1000). The value of a ticket currency is 10x of the original value.
+
+			User B allocates 10 tickets (out of 10) to process B1. Here, user B's ticket is worth 1/10 of the original value.
+
+			The system would convert process A1's 500 to 50. Therefore, the global currency value of processes A1 and A2 will be 50. B1's 1 ticket is worth 10 global value, therefore, process B's 10 tickets would be converted to 100 tickets.
+
+			The scheduler will then chooses a process based on this final global value.
+
+		Ticket Transfer
+			This allows processes to temporarily hand off their tickets to other processes. This is really useful in client-server settings. The client can transfer its tickets to the server while requesting a service. This will speed up the service since the server can improve its performance with the borrowed tickets.
+
+		Ticket Inflation
+			This allows processes to temporarily increase or decrease the number of tickets it owns. This is useful in scenarios where a group of mutually trusting processes is executing and one process wants to increase its CPU time. This process would then increase the number of tickets it owns without communicating with other processes.
+
+Implementation
+	
+	The lottery scheduler is very simple to implement. All you need is a good random number generator, a data-structure to track all the processes (eg: a list), and the total number of tickets.
+
+	Following is a sample implementation:
+
+		// counter: used to track if we’ve found the winner yet
+		int counter = 0;
+
+		// winner: use some call to a random number generator to
+		// get a value, between 0 and the total # of tickets
+		int winner = getrandom(0, totaltickets);
+		
+		// current: use this to walk through the list of jobs
+		node_t *current = head;
+		while (current) {
+			counter = counter + current->tickets;
+			if (counter > winner)
+				break; // found the winner
+			current = current->next;
+		}
+		// ’current’ is the winner: schedule it...
+
+An Example
+
+	To understand the dynamics of lottery scheduling more understandable, we perform a brief study on the completion time of two competing processes each with the same number of tickets and same run time, R.
+
+	In this scenario, we want them to complete at roughly the same time. To quantify this, we define a simple 'fairness' metric, F which is simply the completion time of the first completing job by the completion time of the second job.
+
+	if R = 10, the first job completes at t=10 and the second at t=20, F=10/20 = 0.5. If the jobs happen to finish at the same time, F=1. Therefore, ideal 'fairness' is at F=1. If we run this over various completion time, R. We observe that for lower values of 'R', the fairness is also low. But as the execution time increases, the number of trials will also go up. As this happens the fairness also tends to increase.
+
+How to Assign Tickets?
+
+	Assigning tickets to jobs is important since how the system behaves is strongly dependent on how tickets are allotted. One simple approach would be to assume the user knows the best, and it's the responsibility of the user to assign tickets to jobs they run. But this isn't a proper solution and therefore the "ticket-assignment" problem remains open.
+
+Stride Scheduling
+
+	The lottery scheduler is based on randomness, which makes it very simple. But they fail to deliver correct output, especially over short time scales.
+
+	Stride scheduler is a deterministic fair-share scheduler. Stride scheduling is straightforward. Each job is given a stride, which is inversely proportional to the number of tickets it owns. The job also has a 'pass value' (initialized to '0'). Each time the process runs, we increment its value by the process's stride. 
+
+	At any given time, pick the process which has the lowest 'pass value'. Once running the process, increment the 'pass value' with its stride.
+
+	Pseudo-code:
+
+		curr = remove_min(queue); // pick client with min pass
+		schedule(curr); // run for quantum
+		curr->pass += curr->stride; // update pass using stride
+		insert(queue, curr); // return curr to queue
+
+	Given the precision of the stride scheduler, why should we go with a probabilistic lottery scheduler which does not produce the correct output all the time (when dealing with a short time span). Lottery scheduler has one nice property: It has no global state. When a new process enters the system using a stride scheduler, what should be its 'pass value'? Should it be 0? If set to 0, this new process would then monopolize the CPU. With lottery scheduling, there is no global state per process; we can simply add a new process with whatever tickets it has and update the single global variable to track the total number of tickets we have and go from there.
+
+The Linux Completely Fair Scheduler
+
+	Linux has its own 'fair-share' scheduler, called the 'Completely Fair Scheduler'. The scheduler implements fair-share scheduling but in a highly efficient and scalable manner.
+
+	To achieve its efficiency goals, CFS aims to spend very little time making scheduling decisions, both through its inherent design and clever use of data structures well suited for this task.
+
+	Basic Operation:
+
+		As each process runs, it accumulates 'vruntime'. In most cases, the 'vruntime' increases at the same rate, in proportion with physical(real) time.
+		When a scheduling decision occurs, CFS will pick the one with the lowest runtime.
+
+		CFS has no fixed time slice, this raises the question, how does the scheduler know when to stop a process? Also, if CFS switches too often, fairness is increased, but at the cost of performance (too many context switches). If the time slices are long, performance is improved, but at the cost of fairness. 
+
+		CFS has various parameters to control these? The first one is 'sched_latency'. CFS uses this to determine how long a process needs to be run before considering a switch. A typical value for 'sched_latency' is 48(milli-seconds). CFS divides 'sched_latency' with the number(n) of the process running in the CPU to find the time slice for a process. Having too many processes would lead to a smaller time slice. To avoid this CFS adds another parameter 'min_granularity', which is usually set to a value like 6ms. 'min_granularity' is used as a minimum bound for the calculated time slice.
+
+		time slice = min('sched_latency'/n, min_granularity)
+
+		CFS makes use of a periodic timer interrupt, meaning it can only make decisions at fixed time intervals. Once the interrupt goes off, the scheduler would wake up and determine if the current job has reached the end of its run.
+
+	Weighting (Niceness)
+
+		CFS enables users to set priority to processes. The mechanism used is a classic Unix mechanism known as the 'nice' level of a process. The nice parameter can be set anywhere between -20 to +19, with 0 being the default. Positive values imply lower priority, while negative values are used to give higher priority. When you are too nice, you don't get (scheduling) attention.
+
+		CFS maps each 'nice' value to a weight. The formula for calculating time slice is:
+
+			time_slice_k = (weight_k)/(total weight of all processes) * sched_latency.
+
+			'vruntime' of process 'i' is calculated as:
+
+				vruntime_i = vruntime_i + (weight_0/weight_i)*runtime_i
+
+		CFS makes use of red-black trees for storing and ordering running processes based on their 'runtime'. Red-black trees allow logarithmic operations like insertion, query, and removal.
+
+	Dealing with I/O and sleeping process
+
+		One problem with picking the lowest 'vruntime' is when we have a process that sleeps for a long period of time. Imagine two processes, A and B, one of which 'A' runs continuously, and the other (B) which has to sleep for a long period of time(say, 10 seconds). When B wakes up, it will be 10secs behind A in 'vruntime'. Now B would be given priority until it makes up for this 10secs, effectively starving A. 
+
+		CFS handles this by altering the runtime of a job when it wakes up, its new 'vruntime' would be the minimum runtime found among running processes. This way CFS avoids starvation, but with a cost, jobs that sleep for short periods of time would not get their fair share of CPU.
+
+Summary
+
+	We have considered three proportional share schedulers in this chapter: lottery scheduler, stride scheduler, and CFS of Linux. Lottery scheduler makes use of randomness in a clever way to achieve proportional share, stride does so deterministically and CFS is a bit of like weighted round-robin with dynamic time slices.
+
+	Fair-share schedulers have their own share of drawbacks, one which we have already seen. They don't give short sleeping jobs their fair share of CPU.
