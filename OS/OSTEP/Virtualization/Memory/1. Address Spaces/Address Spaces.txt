@@ -1,0 +1,82 @@
+The Abstraction: The Address Spaces
+
+	Introduction
+
+		Early machines had operating systems that were like libraries, and they only ran one process at a time. The memory left after loading the OS belonged to that single process.
+
+		Once multi-programming and time-sharing came into the picture, we had to run multiple processes at the same time. We have already seen how CPUs are virtualized to support this. But how do we deal with memory?
+
+		One simple way was to run one process giving it full access to the memory. Once we want to schedule another process, we'd stop the current process, save all of its states to some kind of disk and load the state of the process to be run from the disk.
+
+		The approach isn't performant. Therefore, the only way is to keep multiple processes in the memory at the same time.
+
+
+									 ------------------------------------
+									|               OS                   |
+									|        Code, data, etc.            |
+									|------------------------------------|
+									|               free                 |
+									|                                    |
+									|------------------------------------|
+									|            Process C               |
+									|        Code, data, etc.            |
+									|------------------------------------|
+									|            Process B               |
+									|        Code, data, etc.            |
+									|------------------------------------|
+									|                free                |
+									|                                    |
+									|------------------------------------|
+									|            Process A               |
+									|        Code, data, etc.            |
+									 ------------------------------------
+
+									    Three processes sharing memory
+
+
+	The Address Space
+
+		Memory handling is hard, especially when we are going to have multiple processes at the same time in it. We introduce an easy-to-use abstraction of physical memory called 'Address Space' and this will be the running program's view of the memory in the system.
+
+		The address space consist of the following components:
+
+			i. Code: The code of the process to which the address space belongs to 
+		   ii. Data: All the static variables, global variables reside here.
+		  iii. Heap: Heap is used for dynamically allocated memory (In C, we use 'malloc'. new objects in CPP and java reside also reside here).
+		   iv. Stack: Used to keep track of function calls. The parameters passed, the local variables created are all stored here.
+
+		Since the Heap and Stack grow and shrink over time as the process runs, they are allocated in such a manner that they can grow freely without being affected by the other
+
+
+
+						 ------------------------------------
+						|                Stack               |
+						|------------------------------------| 
+						|                                    |
+						|             free space             |
+						|                                    |
+						|                                    |
+						|------------------------------------|
+						|                Heap                |
+						|                                    |
+						|------------------------------------|
+						|                Data                |
+						|------------------------------------|
+						|                Code                |
+						 ------------------------------------
+
+		The arrangement need not be always like this. Also, the layout is a bit different when we are dealing with multi-threaded processes.
+
+		THE CRUX: HOW TO VIRTUALIZE MEMORY
+			How can the OS build this abstraction of a private, potentially large address space for multiple running processes (all sharing memory) on top of a single, physical memory?
+
+
+	Goals
+
+		We want our virtual memory to satisfy a few requirements:
+
+			i. Transparency: The OS should implement virtual memory in such a way that it should be invisible to the user process. The program shouldn't be aware that it's using virtual memory, rather the process should behave as it has its own private physical memory.
+
+		   ii. Efficiency: Memory virtualization shouldn't lead to any memory wastage, nor the operations on it should be slower.
+
+		  iii. Isolation and Protection: Each process should have its own private virtual memory and other programs shouldn't be able to access this.
