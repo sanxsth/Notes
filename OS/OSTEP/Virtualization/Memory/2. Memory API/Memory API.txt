@@ -1,0 +1,127 @@
+Interlude: Memory API
+
+	In this interlude, we will consider the memory allocation interfaces of the UNIX system.
+
+	Crux: HOW TO ALLOCATE AND MANAGE MEMORY
+		In UNIX/C programs, understanding how to allocate and manage memory is critical in building robust and reliable software. What interfaces are commonly used? What mistakes should be avoided?
+
+	Types of Memory
+
+		A running C program has two types of memory:
+
+			i. Stack: The allocation and deallocation are implicitly managed by the compiler. It is also called automatic memory. Variables created inside a function (irrespective of the variable type) is allocated inside the stack, so are the function parameters. Once you return from the function, the compiler deallocates this memory. 
+
+				eg: 
+
+					int func() {
+						int x = 5; // declares an integer on the stack
+					}
+
+		   ii. Heap: The allocation and deallocation are managed explicitly by the programmer.
+
+		   		eg:
+
+		   			int func() {
+		   				int  *x = (int*) malloc(sizeof(int)); // both, stack and heap allocation happen in this line
+		   			}
+
+		   			An integer pointer is created on the stack (for variable x). The malloc() call requests memory for an integer on the heap,
+		   			the malloc() returns the address of this reserved memory, 'NULL' if the allocation failed.
+
+	The Malloc() Call
+
+		malloc() call is quite simple, you pass it a 'size' asking for some room in the heap, and it either succeeds and gives you back a pointer to the newly allocated space, or it fails and returns NULL.
+
+
+		The malloc() takes a single parameter of type 'size_t' which describes how many bytes you need.
+
+		eg:
+
+			double * d = (double *) malloc(sizeof(double)); // requests memory equal to the 'double' type
+
+			The 'sizeof()' is a compile-time operator and not considered as a function (function call takes place at run time)
+
+			We can also pass a variable to sizeof() during malloc() call, but in some cases, we might not get the desired results.
+
+			int *x = malloc(10 * sizeof(int)); // we declare space for 10 integers
+			printf(sizeof(x)); // prints 4 bytes on 32 bit machines and 8 bytes on 64 bit machines
+
+			sizeof() returns 4 because it thinks we are simply asking for the size of an integer pointer, i.e 'x'.
+
+			int x[10];
+			printf("%d\n", sizeof(x));
+
+			In this case, there is enough static information for the compiler to know that 40 bytes have been allocated.
+
+			when declaring space for strings, we use the following idiom: malloc(strlen(s) + 1); // +1 to accommodate the end-of-string character. Therefore, using 'sizeof' may lead to trouble here.
+
+			The malloc() returns a pointer to type void. It is up to the programmer to cast it to the desired type he wants. 'cast' doesn't accomplish anything except tell the compiler and other programmers what the author intends.
+
+	The free() Call
+
+		As it turns out, allocating memory is the easiest part of the equation; knowing when, how, and even if to free memory is the hard part. To free memory, we use free()
+
+			eg:
+
+				int *x = (int *) malloc(sizeof(x));
+				free(x);
+
+
+	Common Errors
+
+		Forgetting To Allocate Memory
+
+			Many routines expect memory to be allocated before you call them. For example, the routine strcpy(dst, src) copies a string from a source pointer to a destination pointer.
+
+				char *src = "hello";
+				char *dst; // oops! unallocated
+				strcpy(dst, src); // segfault and die
+
+			The proper way to call strcpy():
+
+				char *src = "hello";
+				char *dst = (char *) malloc(strlen(src) + 1);
+				strcpy(dst, src); // work properly
+
+		Not Allocating Enough Memory
+
+			Buffer overflows are errors that arise due to not allocating enough memory. 
+
+				char *src = "hello";
+				char *dst = (char *) malloc(strlen(src)); // too small!
+				strcpy(dst, src); // work properly
+
+			Depending on how malloc() is implemented and many other details, the program will often run seemingly correctly. 
+
+			In some scenarios, the 'strcpy()' writes one byte too far past the allocated space. In some other cases, the malloc library might allocate some extra space and everything works fine. Yet in other cases, the program will indeed fault and crash.
+
+		Forgetting To Initialize Allocated Memory
+
+			After allocating some memory using 'malloc', if you don't initialize this, you might do an 'uninitialized read', where it reads from the heap some data of unknown value.
+
+		Forgetting To Free Memory
+
+			Not freeing memory would lead to a memory leak. Memory leaks in a long-running process would lead to run out of memory and thus forcing a restart of the service.
+
+			Even if you are using a language with a garbage collector, you should be careful. If you have a reference to allocated memory, it won't be collected even it's not used.
+
+		Freeing Memory Before You Are Done With It
+
+			Sometimes a program frees a memory before it is finished using; such a mistake is called a dangling pointer. Usage of a dangling pointer leads to crashes or memory overwrites.
+
+		Freeing Memory Repeatedly
+
+			Programs free memory more than once, this is called 'Double Free'. The result of this is undefined. As you can imagine, the memory-allocation library gets confused and does all sorts of weird things; crashes are a common outcome.
+
+		Calling Free Incorrectly
+
+			If you pass some invalid values to free(), this can lead to some unexpected errors.
+
+	Underlying OS Support
+
+		The malloc() and free() are library calls that make use of system calls internally. The 'brk()' is one such call, which is used to increase or decrease the memory allotment for the heap. You can also obtain memory from the OS using the mmap() call. This allocates an anonymous memory region within your program.
+
+	Other Calls
+
+		calloc(): can be used to allocate memory and is initialized with zeroes.
+		realloc(): can be used to reallocate an already allocated memory.
