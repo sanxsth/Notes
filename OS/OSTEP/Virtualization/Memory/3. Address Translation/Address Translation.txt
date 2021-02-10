@@ -1,0 +1,120 @@
+Mechanism: Address Translation
+
+	Through memory virtualization, we aim to achieve:
+
+		i. Easy of Use
+		ii. Isolation
+		iii. Protection
+
+	We want to achieve this without compromising on efficiency and control, like how we virtualized CPU.
+
+
+	The CRUX: HOW TO EFFICIENTLY AND FLEXIBLY VIRTUALIZE MEMORY
+
+		How can we build efficient virtualization of memory? How do we provide the flexibility needed by applications? How do we maintain control over which memory locations an application can access, and thus ensure that application memory accesses are properly restricted? How do we do all of this efficiently?
+
+	We use a technique known as 'Hardware-based address translation' to aid us in memory virtualization. With address translation, the hardware transforms each memory access, changing from virtual address to the actual physical address.
+
+	We can't virtualize memory with just the hardware, it only provides the low-level mechanism to do it efficiently. OS must set up the hardware to do the translation, it should also do memory management like keeping track of free space, deciding where to allocate memory and how much, etc.
+
+
+	Assumptions:
+
+		Before we attempt at virtualizing memory, let us make a few assumptions:
+
+			i. The user's address space must be placed continuously in physical memory.
+		   ii. The address space size isn't larger than the total physical memory.
+		  iii. Each address space has the same size.
+
+	Example
+
+		Let us consider a very simple example to see what goes on under-the-hood when we fetch and update a variable.
+
+			void function {
+				int x = 3000;
+				x += 3;
+				...
+			}		
+
+		The compiler turns this code into the following assembly code:
+
+			128: movl 0x0(%ebx), %eax ;load 0+ebx into eax
+			132: addl $0x03, %eax ;add 3 to eax register
+			135: movl %eax, 0x0(%ebx)
+
+		The above code snippet is straightforward:
+
+			The address of 'x' is placed in register 'ebx', we then load the value into the register 'eax'. The next instruction adds '3' to 'eax' and the final instruction writes the new value into the address of 'x'.
+
+		The following represents the state of memory when the above program is loaded:
+
+
+		0KB	 -----------------------------                           0KB ----------------------------
+			|          Operating          |                          128| movl 0x0(%ebx), %eax       |
+			|		    System			  |							 132| addl $0x03, %eax           |
+		16KB|-----------------------------|							 135| movl %eax, 0x0(%ebx)       |
+			|							  |								|							 |
+			|                             |							 2KB|----------------------------|
+		32KB|-----------------------------|								|			Heap			 |
+			|____________code_____________|								|                            |
+			|____________heap_____________|         				 4KB|----------------------------|
+			|                             |								|							 |
+			|_____________________________|								|           Free             |
+			|            statck           |								|                            |
+		48KB|-----------------------------|							14KB|----------------------------|
+			|                             |								|							 |
+			|                             |								|           Stack            |
+		64KB -----------------------------							16KB ----------------------------
+
+			Actual view of the memory                                     Program's view of the memory
+
+	As you can see, in the program's view: the memory starts at 0 and goes till 16, in reality, the actual location in the physical memory is from 32-48 KB.
+
+	How can we give the illusion that the memory starts at 0 and the whole of the memory is for the process alone?
+
+	Dynamic (Hardware) Relocation
+
+		This is an initial version of address translation. It is based on two registers: base and bound (limit). The technique is also called 'Dynamic relocation'.
+
+		In this setup, the program is written and compiled as if it is loaded at address zero. However, when the program runs, the OS decides where to load the program and sets the base register accordingly.
+
+		physical address = virtual address + base
+
+		Because the address space can be relocated during the runtime, this technique is also called 'dynamic relocation'.
+
+		The bound register is used to check if the memory access is within the bound. If not, an exception is raised by the hardware.
+
+		The component inside the CPU where these two registers reside is known as the 'memory management unit'.
+
+	The Hardware Support
+
+		The hardware should provide special instructions to modify the base and bound registers. These instructions should be privileged.
+
+		Following are the required hardware support for dynamic relocation:
+
+			i. Privileged mode : To protect user programs from executing privileged operations
+		   ii. Base/bound registers 
+		  iii. Ability to translate virtual addresses and check if within bounds
+		   iv. Privileged instructions to update base and bounds.
+		    v. Privileged instructions to register exception handlers.
+		   vi. Ability to raise exception.
+
+	Operating System Issues
+
+		The OS needs to keep track of free spaces. In our case, this isn't complicated due to our current assumptions. The OS maintains a data structure called the 'free list' to keep track of this. 
+
+		The OS also needs to do some work when a process is terminated, this includes: freeing the memory of the process, adding it back to the free list, etc.
+
+		During context-switching, the OS needs to save the base and bound register values for the process being stopped. It also needs to load these values of the process being run from its PCB.
+
+		OS requirements for dynamic relocation:
+
+			i. Memory management: Need to allocate memory for new processes; Reclaim memory from terminated processes; Generally manage memory via free list.
+		   ii. Base/Bound management: Must set base/bound upon a context switch.
+		  iii. Exception handling: should create the exception handler table and give it to the hardware.
+
+
+	Summary
+
+		This technique, though simple, has its inefficiencies:
+			i. Since the address spaces are allotted a fixed size, the space between the stack and the heap goes wasted. This is called internal-fragmentation as the wasted space is inside the allocated unit.
