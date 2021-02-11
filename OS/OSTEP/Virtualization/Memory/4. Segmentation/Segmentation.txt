@@ -1,0 +1,95 @@
+Segmentation
+
+	Our dynamic relocation approach based on base and bound has a few drawbacks:
+
+		i. Internal fragmentation
+	   ii. It also makes it hard to run programs when its entire address space doesn't fit into memory.
+
+    The Crux: HOW TO SUPPORT A LARGE ADDRESS SPACE
+
+    	How do we support a large address space with (potentially) a lot of free space between the stack and the heap? Note that in our examples, with tiny (pretend) address spaces, the waste doesn’t seem too bad. Imagine, however, a 32-bit address space (4 GB in size); a typical program will only use megabytes of memory, but still would demand that the entire address space be resident in memory.
+
+	Segmentation: Generalized Base/Bounds
+
+		We solve the above challenges using 'Segmentation'. A segment is a contiguous portion of the address space of a particular length. The address space is decomposed into multiple segments.
+
+		In our case, 'code', 'heap' and 'stack' will each be a segment.
+
+		The MMU would give each segment its own 'base' and 'bound'.
+
+		When an illegal operation requests access to an address outside the bounds of a segment, we encounter a 'segmentation fault'.
+
+	Which Segment Are We Referring To?
+
+		Given a virtual address, how do we know which segment it belongs to?
+
+		There are two approaches to solve this:
+
+			i. Explicit Approach:
+
+				In this approach, we use the top few bits of the virtual address to denote the segment it belongs to. In our case, we have three segments -- therefore, we need 2 bits.
+
+				In our example, if the first two bits are 00, the hardware knows the virtual address is in the code segment. 01 would mean heap and 10 the stack.
+
+				Once the hardware figures out the segment, the respective 'base' and 'bound' would be used to get the actual physical address.
+
+				Thus, if base and bounds were arrays, the hardware would do something like this to obtain the desired physical address:
+
+					// get top 2 bits of 14-bit VA
+					Segment = (VirtualAddress & SEG_MASK) >> SEG_SHIFT
+					// now get offset
+					Offset = VirtualAddress & OFFSET_MASK
+					if (Offset >= Bounds[Segment])
+					RaiseException(PROTECTION_FAULT)
+					else
+					PhysAddr = Base[Segment] + Offset
+					Register = AccessMemory(PhysAddr)
+
+				You would have noticed that when we use two bits and we have only three segments, one of the segments is wasted. To avoid this we can make code part of the heap and use only one bit.
+
+				Another disadvantage of this approach is that it limits the use of virtual address space. Each segment will have a maximum size and it can't grow beyond that.
+
+			ii. Implicit Approach:
+
+				In this approach, the hardware determines the segment by noticing how the address was formed. If, for example, the address was generated inside the program counter, then the address is within the code. If the address is based on the stack or base pointer, then it must be in the stack segment; any other address must be in the heap.
+
+	What About The Stack?
+
+		We have to notice that in our case, the stack grows backward. This needs some hardware support. For a segment, the hardware should track its direction of growth.
+
+
+	Support For Sharing?
+
+		One benefit of segmentation is 'code-sharing'. Multiple instances of the same program would now share the same code segment, i.e, multiple processes would be sharing the same code segment.
+
+		This requires additional hardware support, in the form of 'protection bits'. Basic support adds a few bits per segment, to indicate what all operations the process can perform on this segment, operations like read, write, execute, etc.
+
+		With this in place, the code segment can be shared. Its 'protection' would be 'Read-Execute' which will make sure that no process can modify this segment. 
+
+		Now, during access, the hardware not only does the bound validation but also has to check if the operation complies with the segment's protection level.
+
+	Fine-Grained vs Coarse-Grained Segmentation
+
+		In our case, we just have three segments. We can think of this as coarse segmentation, where you have large coarse chunks. In fine-grained segmentation, the address space is chopped into a large number of small segments.
+
+		Fine-grained segmentation requires additional hardware support like 'segmentation table'. This approach allows us to use segmentation more flexibly.
+
+	OS Support
+
+		Segmentation raises some new issues:
+
+			i. During context switching we need to handle multiple base & bound pairs, one for each segment of the process.
+		   ii. As each segment grows, the OS needs to allocate more memory. In UNIX, this is done via the sbrk() system call.
+		  iii. With segmentation, the physical memory isn't an array of fixed slots anymore. It is a bunch of segments of varying sizes and therefore the task of keeping track of free space is much harder.
+
+		Segmentation gives rise to tiny holes of free spaces in the physical memory, making it difficult to allocate new memory or grow existing ones, this problem is called 'external fragmentation'.
+
+		One solution would be to compact the physical memory by rearranging segments. But this operation is memory-intensive and also uses a fair amount of processor time. Compaction also makes it very difficult to grow segments, thus we might need to rearrange again to accommodate such requests.
+
+		A simpler approach would be to use of free-list management algorithm. We have a bunch of them like best-fit, worst-fit, first-fit, etc.
+
+	Summary
+
+		Definitely 'segmentation' is way better than our previous 'dynamic relocation' approach. But 'segmentation' also has its drawbacks:
+
+			Segmentation isn't flexible enough to support our fully generalized, sparse address space. For example, if we have a large but sparsely-used heap all in one logical segment, the entire heap must reside in memory for the heap to be accessed.
