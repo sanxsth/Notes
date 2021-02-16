@@ -1,0 +1,101 @@
+Free-Space Management
+
+	Free-space management can be easy if the free spaces are of a fixed size. But things get challenging when you have free spaces of varying lengths; this can arise in a user-level memory allocation library (eg: malloc) and in an OS managing physical memory. In either case, the problem that exists is called 'External fragmentation'.
+
+	The Crux:
+
+		How should free space be managed, when satisfying variable-sized requests? What strategies can be used to minimize fragmentation? What are the time and space overheads of alternate approaches?
+
+	The user-level memory allocation library usually manages the heap of a process and would maintain a data structure like 'free-list' to keep track of the free space.
+
+	It's interesting to note that when a user-level library hands out an allocation (eg: malloc), this cannot be relocated, unlike physical memory allocation.
+	Therefore, 'compaction' can't be applied to resolve external-fragmentation inside a heap. But this can be used to resolve external fragmentation in the physical memory managed by the OS.
+
+
+Low-level Mechanism
+
+	Before delving into some policy details, we'll consider some low-level mechanisms that are used in most allocators.
+
+	Splitting and Coalescing
+
+		A free-list contains a set of elements that describe the free space remaining in the heap.
+
+		When a request comes for some 'x' bytes and the allocator finds a free chunk of size 'y', where 'y' > 'x'. The allocator splits the free space into two pieces: one of size 'x', which is then allocated for the request; the other of size 'y-x' which is then left behind in the free-list.
+
+		Coalescing helps to merge free space that can be formed into a single continuous free space.
+
+	Tracking The Size Of Allocated Regions
+
+		You might have noticed that the interface to 'free(void *ptr)' does not take a size parameter; thus it is assumed that the library has the responsibility to find the size of an allocated region.
+
+		To accomplish this task, most allocators store a little bit of information in a header block which is kept in memory, usually just before the handed-out chunk of memory.
+
+		Here's a simple header block:
+
+			typedef struct {
+				int size; // size of the free block
+				int magic; // a magic number used to provide an additional integrity checking
+			} header_t;
+
+		During a call to free(ptr) the library would do some simple pointer arithmetic to find the header block.
+
+			void free(void *ptr) {
+				header_t *hptr = (header_t *) ptr - 1;
+			} 
+
+		After obtaining the header block, the library can do an integrity check and then calculate the total size to free it. The total size is the size of the header block + the allocated region.
+
+		Therefore, a request of 'x' bytes to malloc requires 'x + sizeof(header_t)' to satisfy the request.
+
+	Embedding A Free List
+
+		The free-list we use to manage free space should exist within this free space. So how do we create a list in the first place? We can't use malloc since it relies on a free-list to allocate memory.
+
+		Assume we have 4096KB of memory to manage. Initially, the list should have one entry, of size 4096 byte - size of one free-list node.
+
+		Now let's look at some code that initializes the heap and puts the first element of the list of the free-list inside that space:
+
+			node_t *head = mmap(NULL, 4096, PROT_READ| PROT_WRITE, MAP_ANON|MAP_PRIVATE, -1, 0);
+
+			head->size = 4096 - sizeof(node_t);
+			head->next = NULL;
+
+		Now we have a free-list with one entry. When a request comes in, this single space would be split and one of the resulting pieces would be used for the allocation. When we free an allocation, we insert a 'node_t' into this free space with the required data and this would then be added to the free-list.
+
+	Growing The Heap
+
+		When a heap runs out of memory the allocator can fail during allocation and return NULL. It can also request some more space from the OS and once the new region is mapped into the address space of the request's process, the allocator can now serve the request.
+
+Basic Strategies
+
+	We have a bunch of simple strategies for allocation
+
+	Best-fit
+
+		Finds a region that best fits the given request. This leads to splits that result in smaller free space.
+
+	Worst-fit
+
+		Finds a region that worst fits the given request. This leads to splits that result in larger free spaces, which is very desirable.
+
+	First-fit
+
+		Finds the first region that fits the given request. This strategy doesn't require an exhaustive search but might pollute the beginning of free-list with small objects.
+
+	Next-fit 
+
+		The allocator maintains a pointer pointing to the position where the last request was served, for the next request it starts the search for first-fit from this location instead of the start, this prevents splintering of the beginning of the list.
+
+Other Approaches
+
+	Apart from these basic algorithms, we have a few more:
+
+	Segregated Lists:
+
+		The idea is to have a special allocator to handle requests of a particular size (eg: the popular size), all the other requests would be handled by the general allocator, this way the fragmentation would be less and it's very easy to handle allocation and deallocation in these scenarios.
+
+		The slab allocator implements a segregated list. If the segregated list needs more memory, it would get it from the general allocator. Once the segregated list is empty, the generic allocator can reclaim the memory allocated to the segregated list.
+
+	Buddy Allocation
+
+		This algorithm is designed to keep coalescing in mind. The memory is divided into chunks of size 2^n. When a request is made, it is allocated a chunk that's big enough to satisfy the request. This kind of allocation leads to internal fragmentation. But the beauty of this algorithm is that we can perform coalescing very easily using recursion.
