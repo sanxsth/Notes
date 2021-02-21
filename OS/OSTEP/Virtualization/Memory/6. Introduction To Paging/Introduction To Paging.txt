@@ -1,0 +1,87 @@
+Paging: Introduction
+
+    There are two main approaches to the space-management problem:
+
+        i. Segmentation: The address space is divided into pieces of variable-sized pieces, this leads to fragmentation.
+       ii. Paging: The address space is divided into pieces of fixed-size called 'pages'. Correspondingly, we view the physical memory as an array of fixed-sized slots called 'page frames, each of which can hold a single virtual-memory page.
+
+    THE CRUX: HOW TO VIRTUALIZE MEMORY WITH PAGES
+
+        How can we virtualize memory with pages, to avoid the problems of segmentation? What are the basic techniques? How do we make those techniques work well, with minimal space and time overheads?
+
+    Since the physical memory can be seen as an array of fixed-size slots, free-space management becomes very easy. It is quite flexible, enabling the sparse use of virtual address spaces.
+
+    The OS maintains a per-process data structure called 'page table' to store address translation for each of the virtual pages of the address space, thus letting us know where in physical memory each page resides.
+
+
+    A Simple Example And Overview
+
+        Let's consider a small address space of size 64KB divided into 4 pages of 16KB each. The physical memory is 128KB consisting of 8 page-frames.
+
+        Given an instruction as follows, let us see how the virtual address is translated:
+
+            mov1 <virtual address>, %eax
+
+        To translate the virtual address, we need to split it into two components:
+
+            i. Virtual Page Number
+           ii. Offset
+
+        In our case, the virtual address will be 6 bits (2^6 = 64). Since we have 4 pages, the first two bits will be used to denote the page, while the rest of the 4 bits will be used to denote the offset within the page.
+
+        Using the 'virtual page number' and the page table, we'll find the physical page number' or the 'physical frame number' and prefix it to the 'offset' to get the physical address.
+
+    Where Are Page Tables Stored?
+
+        Pages can get large, much larger than small segment tables or base/bound pairs. For example, image a 32-bit address space, with 4KB pages. The virtual address space splits into a 20-bit VPN. A 20-bit VPN implies that there are 2^20 translations that the OS would have to manage for each process. Assuming we need 4KB for each entry in the page table, we get 4MB of memory for each page table. With 100 processes, that would be 400MB in total. That's a lot even by today's standards.
+
+        We don't have any on-chip hardware in MMU for storing the process table of the currently-running process. Instead, let's assume for now that the page table is stored in the physical memory.
+
+    What's Actually In the Page Table?
+
+        A page table is just a data structure used to map virtual addresses to a physical address. Thus, any data structure could work. The simplest form is called a 'linear page table', which is just an array. The virtual page number would be the index of this array.
+
+        As for the contents of each PTE, we have several different bits to understand at some level. A 'valid bit' is used to indicate if a particular translation is valid. We have already seen that there will be some free space between the heap and stack of a process in its address space. The 'valid bit' would be off for these pages and when the process tries to access these, a trap is generated.
+
+        'protection bits' are used to indicate the kind of operations that can be performed on the page, like read, write, etc. A 'present bit' is used to check if the page is currently in physical memory or has been swapped out.
+
+        A 'reference bit' is used to check if the page has been accessed. A 'dirty bit' is used to determine if a page has been modified since it was brought into memory.
+
+    Paging: Also Too Slow
+
+        Apart from being bulky, paging is also slow.
+
+        Let's see what goes into address translation:
+
+            To translate, the hardware must know where the page table is for the currently-running process. Let's assume the 'page-table base register' contains the physical address of the starting location of the page table. To find the desire PTE, the hardware will thus perform the following functions:
+
+            VPN = (Virtual Address & VPN_MASK) >> SHIFT
+            PTEAddr = PageTableBaseRegister + (VPN * sizeof(PTE))
+
+            Once the PTE is obtained, the hardware has to do the following to get the physical address:
+
+                offset = VirtualAddress & OFFSET_MASK
+                PhyAddr = (PFN << SHIFT) | offset
+
+            Accessing Memory With Paging:
+
+                // Extract the VPN from the virtual address
+                VPN = (VirtualAddress & VPN_MASK) >> SHIFT
+
+                // Form the address of the page-table entry (PTE)
+                PTEAddr = PTBR + (VPN * sizeof(PTE))
+
+                // Fetch the PTE
+                PTE = AccessMemory(PTEAddr)
+
+                // Check if process can access the page
+                if (PTE.Valid == False)
+                    RaiseException(SEGMENTATION_FAULT)
+                else if (CanAccess(PTE.ProtectBits) == False)
+                    RaiseException(PROTECTION_FAULT)
+                else
+                    // Access is OK: form physical address and fetch it
+                    offset = VirtualAddress & OFFSET_MASK
+                    PhysAddr = (PTE.PFN << PFN_SHIFT) | offset
+                    Register = AccessMemory(PhysAddr)
+
