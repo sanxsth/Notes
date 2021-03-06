@@ -1,0 +1,128 @@
+Paging: Faster Translations (TLBs)
+
+	Using paging as the core mechanism for memory virtualization can lead to high-performance overheads, mostly due to the large mapping information involved in paging. The Page-tables (mapping information) are stored in memory, so every virtual address translation involves an extra memory lookup. Going to memory for every translation is prohibitively slow.
+
+	The Crux: HOW TO SPEED UP ADDRESS TRANSLATION?
+
+		How can we speed up address translation, and generally avoid the extra memory reference that paging seems to require? What hardware support is required? What OS involvement is needed?
+
+	To speed up translation, we are going to add what is called a 'Translation-lookaside buffer', or 'TLB'. A TLB is part of the chip's Memory-Management-Unit and is simply a hardware cache of popular virtual-to-physical address translations.
+
+
+
+	TLB Basic Algorithm
+
+		TLB Control Flow
+
+			VPN = (VirtualAddress & VPN_MASK) >> SHIFT
+			(Success, TlbEntry) = TLB_Lookup(VPN)
+			if (Success == True) // TLB Hit
+				if (CanAccess(TlbEntry.ProtectBits) == True)
+					Offset = VirtualAddress & OFFSET_MASK
+					PhysAddr = (TlbEntry.PFN << SHIFT) | Offset
+					Register = AccessMemory(PhysAddr)
+				else
+					RaiseException(PROTECTION_FAULT)
+			else // TLB Miss
+				PTEAddr = PTBR + (VPN * sizeof(PTE))
+				PTE = AccessMemory(PTEAddr)
+				if (PTE.Valid == False)
+					RaiseException(SEGMENTATION_FAULT)
+				else if (CanAccess(PTE.ProtectBits) == False)
+					RaiseException(PROTECTION_FAULT)
+				else
+					TLB_Insert(VPN, PTE.PFN, PTE.ProtectBits)
+					RetryInstruction()
+
+
+
+	Example: Accessing An Array
+
+		Consider an array of 10 integers. Assume, the first 3 elements reside on page 6, the next four on page 7, and the rest on page 8.
+
+		We access this array as follows:
+
+			int sum = 0;
+			for(int i = 0; i<10; i++) {
+
+				sum += arr[i];
+			}
+
+		The hit activity during the ten array access is as follows:
+
+			Miss, hit, hit, miss, hit, hit, hit, miss, hit, hit. Thus, our hit rate is 70%. The TLB can improve the performance due to 'spatial-locality'. The elements of the array are packed tightly into pages that are close to one another in space.
+
+
+			Why is caching useful?
+
+				The idea behind hardware caching is to take advantage of locality in instruction and data references. 
+
+				There are two kinds of locality:
+
+					i. Temporal: An instruction or data that has been recently accessed will likely be re-accessed soon in the future.
+				   ii. Spatial: If a memory location 'x' is accessed, it is likely that a location near 'x' would be accessed soon in the future.
+
+		   		If caches are so good, why don't we make use of bigger caches? If you want a cache to be fast, it has to be slow. Any large cache by definition is slow, and thus defeats the purpose.
+
+
+
+   	Who Handles The TLB Miss?
+
+   		Hardware
+
+   			Hardware with CISC handles the TLB miss on its own. It has a 'page-table base register', to find the 'page table in memory. Once it has the required translation, it would update the cache with this and will retry the instruction which led to the TLB miss.
+
+   		Software
+
+   			Modern architecture making use of RISC has what is known as 'software-managed TLB'. On a TLB miss, the hardware would raise an exception, which pauses the current instruction stream, raises the privilege level to kernel mode, and jumps to a trap handler. The trap handler would find the required translation and will use a privileged instruction to update the TLB and return from the trap; at this point, the hardware would retry the instruction (resulting in a TLB hit).
+
+   			The 'return-from-trap' we see here is a bit different from the one involved in system calls. In the case of the latter, 'return-from-trap' should resume execution at the instruction after the trap into the OS. In the case of the former, returning from a TLB miss-handling trap, the hardware must resume the execution of the instruction that caused the trap, this retry results in a TLB hit.
+
+   			Second, when running the TLB-miss handling code, the OS needs to be extra careful not to cause an infinite chain of TLB misses to occur. Many solutions exist; for example, you could keep TLB miss handler in physical memory (where they are unmapped and not subjected to address translation) or reserve some entries in TLB for permanently valid translations and use these permanent translation slots for handler code itself.
+
+   			OS managed TLB miss-handling has its advantages:
+
+   				i. Flexibility: The OS can use any data structure it wants to implement the page table.
+   			   ii. Simplicity: The hardware doesn't do much after a TLB miss, just raise an exception and let the OS TLB miss handler do the rest.
+
+
+
+	TLB Contents: What's In There?
+
+		A typical TLB might have 32, 64, and 128 entries and be what is called 'fully associative'. A TLB entry might look like this:
+
+			VPN | PFN | other bits |ASID
+
+		The most commonly used 'other bits' are a valid bit (TLB valid bit), protection bit, etc.
+
+
+
+	TLB Issue: Context Switches
+
+		The Crux: HOW TO MANAGE TLB CONTENTS ON A CONTEXT SWITCH?
+
+			When context-switching between processes, the translations in the TLB for the last process are not meaningful to the about-to-be-run process. What should the hardware or OS do to solve this problem?
+
+		One solution is to simply flush the TLB on context switching, but this is not an optimal solution, especially when the OS does frequent context switches.
+
+		A better approach is provided with the help of hardware support. In particular, some hardware systems provide an address space identifier (ASID) field in the TLB. You can think of ASID as a process identifier (PID), but usually, it has fewer bits.
+
+		Thus, with ASID, the TLB can hold translations from different processes at the same time. Of course, the hardware also needs to know which process is currently running, to perform translations, and thus the OS must, on a context switch, must set some privileged register to the ASID of the current process.
+
+		During a context switch, all the TLB entries of the old process can be set to invalid to prevent the new process from accidentally accessing 'virtual-to-physical' translation of the old process.
+
+
+
+	Issue: Replacement Policy
+
+		THE CRUX: HOW TO DESIGN TLB REPLACEMENT POLICY
+			Which TLB entry should be replaced when we add a new TLB entry? The goal, of course, is to minimize the miss rate (or increase hit rate) and thus improve performance.
+
+		There are many policies for replacing TLB entries, 'Least Recently Used' or LRU is one such. LRU is based on temporal locality. Another approach is to randomly select an entry and evict it.
+
+
+	Summary
+
+		No doubt that TLBs are useful, but they have their drawbacks. If the number of pages a process accesses in a short period exceeds the number of pages that can be stored in the cache, the number of TLB misses would be high. We refer to this phenomenon as exceeding the TLB coverage.
+
+		TLB access can easily become a bottle-neck in the CPU pipeline, in particular with what is called a 'physically-indexed cache'.
