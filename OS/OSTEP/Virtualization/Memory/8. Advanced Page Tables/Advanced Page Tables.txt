@@ -1,0 +1,59 @@
+Paging: Smaller Tables
+
+	The second problem that paging introduces is that of space.
+
+	CRUX: HOW TO MAKE PAGE TABLES SMALLER?
+
+		Simple array-based page tables (usually called linear page tables) are too big, taking up far too much memory on typical systems. How can we make page tables smaller? What are the key ideas? What inefficiencies arise as a result of these new data structures?
+
+
+	Simple Solution: Bigger Pages
+
+		We reduce the size of a page table by increasing the size of a page which in turn leads to a fewer number of pages.
+		The major problem with this approach, however, is that big pages lead to wastage within each page, a problem known as internal fragmentation.
+
+
+	Hybrid Approach: Paging and Segmentation
+
+		Instead of having a single page table per process, why not have one per logical segment? Code, heap, and stack can have their own page table.
+		Each segment will have its base and bound pair, the base will be holding the physical address of the page table. The bound register is used to indicate the end of the page table.
+
+		To determine which segment an address refers to, we can use the top two bits of the address. The hardware does the following to fetch the page table entry for an address:
+
+			SN = (VirtualAddress & SEG_MASK) >> SN_SHIFT
+			VPN = (VirtualAddress & VPN_MASK) >> VPN_SHIFT
+			AddressOfPTE = Base[SN] + (VPN * sizeof(PTE))
+
+		Each bound holds the value of the maximum valid page per segment. This way we don't allocate invalid pages.
+
+		However, this approach is not without problems: 
+			First, it still requires us to use segmentation; and segmentation is not quite as flexible as we would like, as it assumes a certain usage pattern of the address space; if we have a large, but sparsely used heap, we can still end up with a lot of page table wastage.
+
+			Second, segmentation leads to external fragmentations. While most memory is managed in page-sized units, the page table now can be of arbitrary size.
+
+
+	Multi-level Page Tables
+
+		The basic idea behind the multi-level page table is simple. First, chop up the page table into page-sized units; then, if an entire page of page-table entries is invalid, don't allocate that page of page table at all. To track whether a page of the page table is valid, we use a new data structure called the 'page directory'. The 'page directory' can be used to tell where a page of the page table is, or that the entire page of the page table contains no valid pages.
+
+		The page directory, in a simple two-level table, contains one entry per page of the page table. It consists of several page directory entries, a PDE has a valid bit, and a page frame number.
+
+		Multi-level page tables have some obvious advantages:
+			i. The multi-level page table only allocates page-table space in proportion to the amount of the address space you are using; thus it is generally compact and supports sparse-address space.
+
+		   ii. If carefully constructed, each portion of the page table fits neatly within a page, making it easier to manage memory. Contrast this to a simple linear page table; with such a structure, the entire linear page must reside contiguously in physical memory.
+
+		The cost of a TLB miss is much higher than that of a linear page table. Thus, a multi-level page table is an example of a time-space trade-off.
+		Another negativity is the complexity. Whether it is the hardware or OS handling the page-table lookup, doing so is undoubtedly more involved than a simple linear-page lookup.
+
+
+	More Than Two Levels
+
+		Our goal in constructing a multi-level page table is to make each piece of the page table fit within a single page. What happens when the page-directory itself becomes too large? The remedy is to split the page-directory itself into multiple pages, and then adding another page directory on top of that, to point the pages of the page directory.
+
+
+	Inverted Page Tables
+
+		The idea is to keep a single page table instead of creating one per process. We will have an entry for each page frame, which will tell which process and which virtual page of this process is making use of this frame.
+
+		Find the correct entry is now a matter of searching through this data structure. A linear scan is expensive, and thus a hash table is often used.
