@@ -1,0 +1,83 @@
+Beyond Physical Memory: Mechanisms
+
+	To support large address spaces, the OS needs a place to stash away portions of address spaces that currently aren't in great demand.
+
+	THE CRUX: HOW TO GO BEYOND PHYSICAL MEMORY
+
+		How can the OS make use of a larger, slower device to transparently provide the illusion of large virtual address space?
+
+	Why do we want to support a single large address space for a process? With large address space, you don't have to worry about if there is room enough in memory for your program's data structures; rather, you just write the program naturally.
+
+	Beyond just a single process, the addition of swap space allows the OS to support the illusion of a large virtual memory for multiple concurrently running processes.
+
+
+	Swap Space
+
+		The first thing we need to do is to reserve some space on the disk for moving pages back and forth. In operating systems, we generally refer to such space as 'swap space'. We'll simply assume that the OS can read and write to the swap space, in page-sized units. To do so, the OS will have to remember the disk address of a given page.
+
+		We should note that the swap page is not the only on-disk location for swapping traffic. When a program runs, its code is loaded into memory from the disk. However, if the system needs to make room in physical memory for other needs, it can safely re-use the memory space for these code pages, knowing that it can later swap them in again from on-disk binary in the file system.
+
+	
+	The Present Bit
+
+		With page swap, a page can either be in memory or on the disk. The way the hardware determines this is through a new piece of information in each page-table entry, known as the 'present bit'. If the present bit is set to one, it means the page is in memory; if set to zero, the page is not in memory rather on the disk. The act of accessing a page that is not in physical memory is commonly referred to as 'page fault'.
+
+		Upon a page fault, the OS is invoked to service the page fault. A particular piece of code, known as the page-fault handler, runs and must service the page fault.
+
+
+	The Page Fault
+
+		Virtually all systems handle page faults in software (OS), even it makes use of hardware-managed TLB. When the OS receives a page fault for a page, it looks in the PTE to find the address and issues the request to disk to fetch the page into memory.
+
+		When the I/O completes, the OS will update the page table to mark the page as 'present', update the PFN field of the page table entry to record the in-memory location of the newly-fetched page, and retry the instruction.
+
+		Note that while the I/O is in flight, the process will be in the blocked state. Thus, the OS will be free to run other processes while the page fault is being serviced.
+
+
+	What If Memory Is Full?
+
+		Sometimes the memory might be full (or close to it). Thus, the OS might like to 'page out' one or more pages to make room for the new page(s) the OS is about to bring in. The process to pick a page to replace is known as 'page-replacement policy'.
+
+
+	Page Fault Control Flow
+
+		Page-Fault Control Flow Algorithm (Hardware)
+
+			VPN = (VirtualAddress & VPN_MASK) >> SHIFT
+			(Success, TlbEntry) = TLB_Lookup(VPN)
+			if (Success == True) // TLB Hit
+				if (CanAccess(TlbEntry.ProtectBits) == True)
+					Offset = VirtualAddress & OFFSET_MASK
+					PhysAddr = (TlbEntry.PFN << SHIFT) | Offset
+					Register = AccessMemory(PhysAddr)
+				else
+					RaiseException(PROTECTION_FAULT)
+			else // TLB Miss
+				PTEAddr = PTBR + (VPN * sizeof(PTE))
+				PTE = AccessMemory(PTEAddr)
+				if (PTE.Valid == False)
+					RaiseException(SEGMENTATION_FAULT)
+				else
+					if (CanAccess(PTE.ProtectBits) == False)
+						RaiseException(PROTECTION_FAULT)
+					else if (PTE.Present == True)
+						// assuming hardware-managed TLB
+						TLB_Insert(VPN, PTE.PFN, PTE.ProtectBits)
+						RetryInstruction()
+					else if (PTE.Present == False)
+						RaiseException(PAGE_FAULT)
+
+		Page-Fault Control Flow Algorithm (Software)
+
+			PFN = FindFreePhysicalPage()
+			if (PFN == -1) // no free page found
+				PFN = EvictPage() // run replacement algorithm
+			DiskRead(PTE.DiskAddr, PFN) // sleep (waiting for I/O)
+			PTE.present = True // update page table with present
+			PTE.PFN = PFN // bit and translation (PFN)
+			RetryInstruction() // retry instruction
+
+
+	When Replacement Really Occur
+
+		The OS wouldn't wait till the memory is full to start replacing pages. To keep a small amount of memory free, most operating systems thus have to keep some kind of 'high watermark'(HW) and 'low watermark'(LW) to help decide when to start evicting pages from memory. How this works is as follows: when the OS notices that there are fewer than LW pages available, a background thread that is responsible for freeing memory runs. The thread evicts pages until there are HW pages available. The background thread is sometimes called the 'swap daemon' or 'page daemon'.
