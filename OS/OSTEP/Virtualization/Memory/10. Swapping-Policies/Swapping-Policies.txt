@@ -1,0 +1,103 @@
+Beyond Physical Memory: Policies
+
+	Deciding which page to evict is encapsulated within the replacement policy of the OS.
+
+	THE CRUX: HOW TO DECIDE WHICH PAGE TO EVICT
+
+		How can the OS decide which page (or pages) to evict from memory? This decision is made by the replacement policy of the system, which usually follows some general principles (discussed below) but also includes certain tweaks to avoid corner-case behaviors.
+
+
+	Cache Management
+
+		The main memory can be viewed as a cache for virtual memory pages of the system. Thus, our goal in picking a replacement policy for this cache is to minimize the number of cache misses. Alternately, one can view ours as maximizing the number of cache hits.
+
+		Knowing the number of cache hits and misses let us calculate the 'average memory access time' for a program:
+
+			AMAT = Tm + (Pmiss * Td); Tm -> cost of accessing memory; Td -> cost of accessing disk; Pmiss -> Probability of cache miss.
+
+
+	The Optimal Replacement Policy
+
+		'The optimal replacement policy' leads to the fewest number of misses overall. The approach simply replaces the page that will be accessed furthest in the future.
+
+		The initial few misses (due to the cache being empty) are sometimes referred to as 'cold-start miss' (or compulsory miss).
+
+
+	A Simple Policy: FIFO
+
+		FIFO has one great strength: it is quite simple to implement. FIFO can't determine the importance of a page; therefore, compared to the ideal policy, FIFO isn't efficient.
+
+
+	Another Simple Policy: Random
+
+		The approach is very simple but isn't efficient.
+
+
+	Using History: LRU
+
+		One type of historical information that a page replacement policy could use is 'frequency'. More commonly used property is of a page is its 'recency' of access. This family of policies is based on the 'principle of locality.
+
+		'Least Frequently Used' and 'Least Recently Used' are two policies that make use of this property.
+
+
+	Workload Examples
+
+		Case 1: When the pages are referenced at random
+
+			We observe that FIFO, random, and LRU perform the same.
+
+		Case 2: 80-20 workload
+
+			80% of the references are made up of 20% of the pages, while the remaining 20% is made of the rest 80% of pages. For this workload, LRU performs better than FIFO and random.
+
+		Case 3: Looping sequential
+
+			We loop through a set of pages in a repeated fashion. This is a corner case for LRU and FIFO. Interestingly, Random performs better in such situations.
+
+
+	Implementing Historical Algorithms
+
+		To keep track of which pages have been least-and-most recently used, the system has to do some accounting work on every memory reference. Clearly, without great care, such accounting could greatly reduce performance.
+
+		One way would be to assign a current timestamp to a page each time it is accessed. To evict a page, we scan through the list of pages to find the oldest page. This approach is not scalable.
+
+		CRUX: HOW TO IMPLEMENT AN LRU REPLACEMENT POLICY
+
+			Given that it will be expensive to implement a perfect LRU, can we approximate it in some way, and still obtain the desired behavior?
+
+
+
+	Approximating LRU
+
+		It is possible to approximate LRU with hardware support, in the form of a 'use bit' (sometimes called the 'reference bit'). Whenever a page is referenced, the 'use bit' is set to 1 by the hardware. It is then the responsibility of the OS to clear the bit (set it to 0).
+
+		There are lots of ways to implement LRU approximation using the 'use bit'. One simple approach is the 'clock algorithm'.
+
+		Imagine all the pages of the system arranged in a circular list. A 'clock hand' points to some page, to begin with. When a replacement must occur, the OS checks if the currently pointed page is set to 0 or 1. If set to 1, the OS would set it to 0 and would move the hand to the next page. Once it finds a page with 'use bit' set to 0, this page would be selected for eviction.
+
+
+
+	Considering Dirty Pages
+
+		One small modification to the clock algorithm that is commonly made is the additional consideration of whether a page has been modified or not while in memory. If the page has been modified and thus dirty, it must be written back to disk while evicting, which is expensive. If it has not been modified, the eviction is free. This behavior is supported with an additional bit called 'dirty bit' (a.k.a 'modified bit'). Now, the clock would scan for pages with, both, 'use bit' and 'dirty bit' set to 0.
+
+
+	Other VM Policies
+
+		The OS has to decide when to bring a page into memory. This policy is sometimes called the 'page selection' policy. For most pages, the OS simply uses 'demand paging', which means the OS brings it back into memory when it is accessed. Of course, the OS could guess that a page is about to be used,  and thus bring it in ahead of time; this behavior is called 'prefetching' and should only be done if there's a reasonable chance of success.
+
+		Another policy determines how the OS writes pages out to disk, many systems collect several pending writes together in memory and write them to disk in one write. This behavior is called 'clustering' or 'grouping' of writes and is effective because of the nature of disk drives, which perform a single large write more efficiently than many small ones.
+
+
+	Thrashing
+
+		'Thrashing' is a condition in which the memory is oversubscribed and the memory demands of the running processes simply exceed the available physical memory, and due to this, the system will constantly be paging.
+
+		Some earlier OS had a fairly sophisticated set of mechanisms to both detect and cope with thrashing when it took place. For example, an OS could simply reduce the number of running processes, with the hope that the reduced set of processes working sets fit in memory and thus can make progress. This approach, generally known as 'admission control', states that it is sometimes better to do less work well than to do everything at once poorly.
+
+		Some current systems take extreme measures to approach memory overload. Some versions of Linux run an 'out-of-memory killer' when memory is oversubscribed; this daemon chooses a memory-intensive process and kills it. While successful at reducing memory, this approach can have problems, if, for example, it kills the X server and thus renders any applications requiring the display unusable.
+
+
+	Summary
+
+		Modern systems add some tweaks to straightforward LRU approximations like clock; for example, 'scan resistance' is an important part of many modern algorithms. Scan-resistant algorithms are like LRU, but also avoid the worst-case behavior of LRU, which we saw with the looping-sequential workload.
