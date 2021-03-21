@@ -1,0 +1,83 @@
+Complete Virtual Memory Systems
+
+	THE CRUX: HOW TO BUILD A COMPLETE VM SYSTEM
+
+		What features are needed to realize a complete virtual memory system? How do they improve performance, increase security, or otherwise
+		improve the system?
+
+
+	VAX/VMS Virtual Memory
+
+		Memory Management Hardware
+
+			The VAX-11 provided a 32-bit virtual address space per process, divided into 512-byte pages. Thus the address consists of a 23-bit VPN and a 9-bit offset. The upper two bits of the VPN were used to differentiate which segment the page resided within; thus the system was a hybrid of paging and segmentation as we saw previously.
+
+			The lower half of the address space was known as 'process space' and is unique to each process. In the first half of process space (known as P0), the user program is found, as well as the heap which grows downward. In the second half of process space, we define the stack which grows upwards.
+
+			The upper half of the address space is known as 'system space' (S), although only half of it is used. Protected OS code and data reside here, and the OS is in this way shared across processes.
+
+			One major concern of the VMS designers was the incredibly small size of pages in the VAX hardware (512 bytes), this makes the simple linear page tables excessively large.
+
+			The system reduced the pressure page tables place on memory in two ways. 
+
+				i. By segmenting the user address space into two (P0 and P1).
+			   ii. The places the user page tables (P0 and P1) in kernel virtual memory. Thus, when allocating or growing a page table, the kernel allocates space out of its virtual memory, in Segment S. When memory is under pressure, the kernel can swap pages out to disk.
+
+			
+		A Real Address Space
+
+			One neat aspect of studying VMS is that we can see how real address space is constructed. For example, the code segment never begins on page 0. This page is marked inaccessible to provide support for detecting null-pointer access. During a context switch, only the process space (P0 and P1) is switched and not the system space (S).
+
+			The kernel is mapped into each address space for several reasons. For example, when OS is handed over a pointer from the user program, it is very easy to copy data from that pointer to its own data structures.
+
+			The OS is naturally written and compiled, without the worry of where the data it is accessing comes from. If in contrast the kernel were located entirely in physical memory, it would be quite hard to do things like swap pages of the page table to disk; if the kernel were given its own address space, moving data between user applications and the kernel would be complicated and painful. With this construction, the kernel appears almost like a library to applications.
+
+			The OS does not want the user process to read and write OS data or code. The VAX protects by specifying 'protection bits' in the page table.
+
+
+		Page Replacement
+
+			The page table entry in VAX contains the following bits: a valid bit, a protection bit, a 'modify' (dirty) bit, a field reserved for OS use (5 bits), and finally a physical frame number to store the location of the page in physical memory. It has no 'reference bit', thus, the VMS replacement algorithm must make do without hardware support for determining which pages are active.
+
+			The developers were also concerned about 'memory hogs', the programs that use a lot of memory. Most of the policies we have looked at so far are susceptible to such hogging; for example, LRU is a global policy that doesn't share memory fairly among processes. To address these problems developers came up with a segmented FIFO replacement policy. The idea is simple, each process has a maximum of pages it can keep in memory, known as 'Resident Set Size'. To improve FIFO's performance, VMS introduced 'two second-chance lists' where pages are stored before getting evicted.
+			The lists are a global clean page free list and a dirty-page list.
+
+			If another process Q needs a free page, it takes the first page off the global clean list. However, if the original process 'P' faults on that page before it is reclaimed, 'P' reclaims it from the free/dirty list, thus avoiding costly disk access. To make page swaps efficient, VMS clusters pages together and does a single write to the disk.
+
+
+		Other Neat Tricks
+
+			'Demand Zeroing': When a process requests a new page for its heap, the OS responds by finding a new page, zeroing it, and mapping it to the address space. But this is costly, particularly if the page does not get used by the process. With demand zeroing, the OS does little work when the page is added to your address space. If the process reads/writes the page, a trap into the OS takes place. While handling the trap, the OS notices that the page is a demand-zero page  (usually through the 'reserved for OS' bits); at this point, the OS does the necessary work of finding a physical page, zeroing it; and mapping it to the address space of the process.
+
+			Another cool optimization is copy-on-write. When the OS needs to copy a page from one process to another, it would simply map this page into the target address space and mark it as read for both the process. If the target process just wants to read, no further action is taken. But if the process tries to write, it will trap into the OS. The OS will then notice that the page is a 'COW' page, and thus allocate a new page, fill it with the data, and map this new page into the address space of the faulting process. 'COW' is useful for several reasons. Shared libraries can be mapped COW into the address space of processes. It's also very beneficial for systems having operations like fork() and exec().
+
+
+	The Linux Virtual Memory System
+
+		The Linux Address Space
+
+			The Linux address space contains a user portion and a kernel portion. Upon context switch, the user portion changes, but the kernel portion remains the same. A program running in 'user mode' cannot access the kernel portion. In a classic 32 bit Linux, the split between user and kernel portions of the address space takes place at '0xC0000000'. Thus the virtual address 0 through '0xBFFFFFFF' is a virtual user address. 
+
+			One slightly interesting aspect of Linux is that it contains two types of kernel virtual addresses. The first one is called 'kernel logical addresses'. This is what you consider normal virtual address space of the kernel; to get more memory of this type, kernel code merely needs to call 'kmalloc'. Most kernel data structures live here, such as page tables, per-process kernel stacks, etc. Unlike other memory in the system kernel, logical memory cannot be swapped to disk.
+
+			The most important aspect of kernel logical address space is their connection to physical memory. Specifically, there is a direct mapping between kernel logical address and the first portion of physical memory. Thus, kernel logical address 0xC0000000 translates to physical address 0x00000000. 
+
+			This direct mapping has two implications:
+				i. The address translation is simple.
+			   ii. If a chunk of memory is contagious in kernel address space, it will also be contagious in physical memory. This makes memory allocated in this part of the kernel's address space suitable for operations that need contiguous physical memory to work correctly, such as I/O transfers via 'Direct Memory Access'.
+
+			The other type of kernel address is the 'kernel virtual address. To get the memory of this type, kernel code calls a different allocator, 'vmalloc', which returns the pointer to a virtually contiguous region of the desired size. In a 32-bit Linux, one other reason for the existence of kernel virtual address is that it enables the kernel to address more than 1GB of memory.
+
+		Large Page Support
+
+			Intel x86 allows us to use large page sizes, recent designs support 2-MB and even 1-GB pages in hardware. Using large pages has its benefits, doing so reduces the number of mappings. Huge pages are not without their costs. The biggest potential cost is 'internal fragmentation.' Swapping also does not work well with large pages
+ 
+		The Page Cache
+
+			The Linux page cache is unified, keeping pages in memory from three sources: memory-mapped files, file data and metadata from devices, and heap and stack pages that comprise each process. These entities are kept in a 'page cache hash table'. Linux makes use of a modified form of 2Q replacement policy:
+
+				Standard LRU replacement is effective but can be subverted by certain common access patterns. For example, if a process frequently accesses a large file, LRU will kick every other file out of memory. Even worse: retaining portions of this file in memory isn't useful, as they are never re-referenced before getting kicked out of memory. 2Q solves this by maintaining two queues. When a page is accessed for the first time, it is placed in one queue (called 'A1' in the original paper, but the 'inactive list' in Linux), when the page is re-referenced, the page is promoted to the other queue ('active' list). When replacement needs to take place, the candidate for replacement is taken from the 'inacitve' list. Linux will periodically move pages from the bottom of the 'active' list to 'inactive' list, keeping the active list to two-thirds of the total page cache size.
+
+		Security And Buffer Overflows
+
+			Linux does 'Address space layout randomization. 'ASLR' is such a useful defense for user-level programs that it also has been incorporated into the kernel	(KASLR). One avenue of increasing kernel protection was thus to remove as much as kernel address space from each user process and have a separate kernel page table for most of the kernel data.
