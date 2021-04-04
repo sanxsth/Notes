@@ -1,0 +1,86 @@
+Amazon Web Services: The Big Picture
+
+	Introduction
+
+		AWS is a collection of cloud computing services that can work together or independently.
+
+		Cloud computing is the delivery of computing services—including servers, storage, databases, networking, software, analytics, and intelligence—over the Internet (“the cloud”) to offer faster innovation, flexible resources, and economies of scale.
+
+		AWS service health dashboard: https://status.aws.amazon.com/
+
+		Security Groups are like light firewalls used for controlling application access.
+
+
+	Major Services
+
+		Elastic Cloud Compute (EC2)
+
+			EC2 provides virtual machines. Users can run applications on this machine, log in and use it as a virtual desktop, basically do any sort of computing on EC2 instances.
+
+			To start an instance, we do the following:
+ 
+				i. Select an 'Amazon Machine Image' (AMI). AMI: Operating system and software used on an EC2 instance.
+			   ii. Select an instance type
+			  iii. Configure the instance. We can create 'Auto Scaling Groups' that would automatically scale up/down according to the set rules.
+			   iv. Add storage. Storage is conceptualized by "Elastic Block Storage" (EBS). EBS is independent of the EC2 instance. EBS is specifically to use with EC2.
+			    v. Configure your 'Security Group'. Security Groups is an IP-based communication rule for a single or group of EC2 instances.
+
+
+		Simple Storage Service (S3)
+
+			S3 is used for storing files. The max file size is 5 TB. S3 can be used to host static websites. We use 'buckets' to store the files.
+			Buckets serve as the containers for objects and provide the mechanisms necessary to control access to them.
+
+
+		Relational Database Service (RDS)
+
+			RDS is a collection of managed relation DBs. It's called managed because AWS takes care of the backups, updates, and infrastructure. RDS is easier than setting up your own DB on an EC2 instance.
+
+			Some of the offered services are MySQL, PostgreSQL, SQL Server, MariaDB, Oracle DB, and Amazon Aurora.
+
+			AWS also takes care of the DB security.
+
+
+		Route53
+
+			Route53 is a scalable and highly available Domain Name System (DNS) service.
+
+
+	AWS Extended Services
+
+		Elastic BeanStack (EB)
+
+			An orchestration service for deploying applications that orchestrate various AWS services. Deploying applications manually on EC2 is challenging since there are a lot of things that you'd have to take care of. With EB, deploying your app is very easy.
+
+			The EB structure is as follows:
+
+				You have applications (should have a unique name). Inside an application, we would have multiple application versions. These application versions can be deployed onto 'environments'. Each environment can have its configuration. EB provides you with a monitoring dashboard
+
+		Lambda
+
+			Lambda provides function code execution as a service (Function as a service/serverless). Lambda does automatic scaling, you don't need to manage it. Lambda is very useful for small, irregular tasks.
+
+
+		DynamoDB
+
+			A managed NoSQL DB that supports, both, documents and key-value store models.
+
+		Virtual Private Cloud (VPC)
+
+			VPC allows us to secure our resources into groups that follow access rules and share a logical space. VPC gives us full control over routing tables and complete control over internal IP address allocation. Inside VPCs we have one or more subnets that allow us to group resources further and assign different rules each. Subnets can be public or private. Ideally, you'd keep your DBs and EC2 instances inside a private network.
+
+		CloudFront
+
+			A managed CND service
+		CloudWatch
+
+			CloudWatch is a monitoring, logging, and alarm service. The alarming service lets you monitor various metrics and automate some action (notification, auto-scale) when the set threshold is breached. 
+
+
+	Interacting With AWS
+
+		There are three ways to work with AWS: 
+
+			i. Web Console
+		   ii. CLI
+		  iii. SDK

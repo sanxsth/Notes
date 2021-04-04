@@ -62,7 +62,7 @@ Paging: Faster Translations (TLBs)
 					i. Temporal: An instruction or data that has been recently accessed will likely be re-accessed soon in the future.
 				   ii. Spatial: If a memory location 'x' is accessed, it is likely that a location near 'x' would be accessed soon in the future.
 
-		   		If caches are so good, why don't we make use of bigger caches? If you want a cache to be fast, it has to be slow. Any large cache by definition is slow, and thus defeats the purpose.
+		   		If caches are so good, why don't we make use of bigger caches? If you want a cache to be fast, it has to be small. Any large cache by definition is slow, and thus defeats the purpose.
 
 
 
