@@ -1,0 +1,232 @@
+Solid Principles
+
+	A set of fundamental OOP principles. Often, you'd be tempted to apply 'SOLID' principles all over your codebase. To prevent this 'premature optimization', we follow 'PDD' (Pain Driven Development), apply SOLID principles only to relieve the pain the current code makes.
+
+	1. Single Responsibility Principle
+
+		Each class/module should have a single responsibility, or reason to change. 
+
+		Benefits:
+
+			SRP helps to achieve high cohesion and low coupling. 
+			Keeps classes small, focused, and testable.
+
+
+	2. Open/Closed principle
+
+		Software entities (classes, modules, functions, etc.) should be open for extension but closed for modification. We can understand this with an example:
+
+			Assume that our initial requirement is to build an area calculator for rectangles.
+
+				class Rectangle {
+
+					int width, height;
+				}
+
+				class AreaCalc {
+
+					float Area(List<Rectangle> rectangles) {
+						float area = 0.0;
+
+						foreach(var rectangle in rectangles) {
+
+							area += (rectangle.width * rectangle.height);
+						}
+						return area;
+					}
+				}
+
+			Now when a new requirement comes to support circles, we'll have to make the following changes to AreaCalc
+
+				class AreaCalc {
+
+					float Area(List<Shapes> shapes) {
+						float area = 0.0;
+
+						foreach (var shape in shapes) {
+
+							if (shape is rectangle)
+								area += (rectangle.width * rectangle.height);
+							else
+								area += (circle.radius * Math.PI);
+						}
+
+						return area;
+					}
+				}
+
+			Here the class AreaCalc isn't closed for modifications.
+
+			Let's see a solution that abides by the Open/Closed principle
+
+				public abstract class Shape
+				{
+				    public abstract double Area();
+				}
+
+				public class Rectangle: Shape
+				{
+				    public double Width { get; set; }
+				    public double Height { get; set; }
+				    public override double Area()
+				    {
+				        return Width*Height;
+				    }
+				}
+
+				public class Circle: Shape
+				{
+				    public double Radius { get; set; }
+				    public override double Area()
+				    {
+				        return Radius*Radius*Math.PI;
+				    }
+				}
+
+				public double Area(Shape[] shapes)
+				{
+				    double area = 0;
+				    foreach (var shape in shapes)
+				    {
+				        area += shape.Area();
+				    }
+
+				    return area;
+				}
+
+			In case we want to add a new shape, we need to modify AreaCalc since now it is open for extension.
+
+			Different approaches to achieve OCP: parameters, inheritance & polymorphism, composition/injection
+
+			Ideally, packages/modules should follow OCP, they should be closed for modifications, but their consumers should be able to extend it.
+
+			Benefits:
+
+				New use-cases can be added without modifying existing code, which will help reduce the risk of breaking old code.
+
+
+	3. Liskov Substitution Principle
+
+		Subtypes must be substitutable for their base types. 
+
+		Inheritance describes an 'IS-A' relation. Class properties describe a 'HAS-A' relation. As per LSP, inheritance should be 'IS-SUBSTITUTABLE' relation.
+
+		Preconditions should not be strengthened in the subtype. Postconditions shouldn't be weakened. Invariants should hold.
+
+		Assume your base class works with a member int. Now your subtype requires that integer be positive. This is strengthened pre-conditions, and now any code that worked perfectly fine before with negative ints is broken.
+		Assume the same scenario, but the base class used to guarantee that the member would be positive after being called. Then the subtype changes the behavior to allow negative ints. Code that works on the object (and assumes that the post-condition is a positive int) is now broken since the post-condition is not upheld.
+
+		Detecting LSP violations in your code
+
+		 	i. Type checking with 'is' or 'as' in polymorphic code.
+		   ii. Null checks
+		  iii. NotImplementedExceptions
+
+		Fixing and preventing LSP violations
+
+			i. Follow the "Tell, Don't Ask" principle.
+		   ii. Minimize null checks with C# features, guard clauses, and null object design pattern.
+		  iii. Be sure to implement interfaces.
+
+		Benefits:
+
+			The code that follows LSP tends to be loosely coupled and encourages code reusability. The that violates this, are usually tightly coupled and created unnecessary entanglements.
+
+
+	4. Interface Segregation Principle
+
+		Clients should not be forced to depend on methods they do not use. Prefer small cohesive interfaces to large, fat ones. The 'client' is the code interacting with an instance of the interface. It's the calling code.
+
+		A simple example would be:
+
+			public interface IFileManager 
+			{
+				string Read();
+				void Write(strign content);
+			}
+
+			public class FileFormatter: IFileManger
+			{
+				string Read()
+				{
+					throw new NotImplemented();
+				}
+
+				void Write(string content)
+				{
+					// write formatted content to file
+				}
+			}
+
+		IFileFormatter has a dependency on 'Read' even though it does not use it.
+
+		A better approach would be to write as follows:
+
+			public interface IFileWrite 
+			{
+				void Write(string content);
+			}
+
+			public interface IFileRead
+			{
+				string Read();
+			}
+
+			public interface IFileManager: IFileRead, IFileWrite
+			{
+
+			}
+
+			public class FileFormatter: IFileWrite
+			{
+				void Write(string content)
+				{
+					// write formatted content to file
+				}
+			}
+
+		Detecting ISP violations in your code
+
+			i. Large interfaces.
+		   ii. NotImplementedExceptions.
+		  iii. Code uses just a small subset of a larger interface.
+
+		Fixing ISP violations
+
+			i. Break up large interfaces into smaller ones: Compose fat interfaces from smaller ones for backward compatibility.
+		   ii. To address large interfaces you don't control: Use the adapter design pattern
+		  iii. Clients should own and define their interfaces.
+
+		Benefits:
+
+			Enforcing ISP gives you the following bonuses:
+
+				High cohesion - better understandability, robustness
+				Low coupling - better maintainability, high resistance to changes
+				It makes it easier to follow LSP and SRP
+
+
+
+	5. Dependency Inversion Principle
+
+		High-level modules should not depend on low-level modules. Both should depend upon abstractions. Abstractions should never depend upon details. Details should depend upon abstractions.
+
+		Abstractions define 'what', for example: send a message, store a message, etc. Details specify 'how', for example: send an SMTP email over port 25, use SQL DB to store the messages, etc.
+
+		public interface IOrderDataAccess
+		{
+			SqlDataReader ListOrder(SqlParameters params);
+		}
+
+		This abstraction exposes implementation details. We can modify it as follows to make the abstraction independent of the implementation.
+
+		public interface IOrderDataAccess
+		{
+			List<Order> ListOrder(Dictionary<string, string> params);
+		}
+
+		Dependency Injection goes hand-in-hand with DIP. DI follows the 'Explicit Dependency Principle'.
+
+		Benefits:
+
+			The DIP reduces coupling between different pieces of code.
