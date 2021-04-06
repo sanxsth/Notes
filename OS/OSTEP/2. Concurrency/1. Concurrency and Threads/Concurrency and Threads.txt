@@ -1,0 +1,160 @@
+Concurrency: An Introduction
+
+	Threads are like lightweight processes that share the same address space and can access the same data. A multi-threaded process has more than one point of execution.
+
+	Each thread has its own 'Program Counter' and a set of private registers. The context switch between threads is similar to the context switch between processes. With processes, the process state is stored in its 'Program Control Block'. For threads, its state is stored in 'Thread Control Block'.
+
+	In a multi-threaded process, each thread runs independently and therefore has its stack in the address space. This stack is sometimes called "thread-local storage".
+
+
+							0KB	 ------------------
+								|    Program Code  |
+							1KB	|------------------|
+								|        Heap      |
+							2KB	|------------------|
+								|				   |
+								| 		(free)	   |
+								| 				   |
+								|------------------|
+								|      Stack 2     |
+								|----------------- |
+								|                  |
+								|       (free)     |
+								|------------------|
+								|      Stack 2     |
+								 ------------------
+
+
+	Why Use Threads?
+
+		Parallelism
+
+			Imagine you are writing a program that performs some operation on a very large array. If you are running this on a multi-processor system, you have the potential of speeding up the process by using processors to each perform a portion of the work. The process of transforming a single-threaded process into a program that does this sort of work on multiple processors is called 'parallelization'.
+
+		To avoid block programs due to slow I/O
+
+			We have seen that a process is blocked when it's waiting for some i/o operation to complete. Using threads is a natural way to avoid getting stuck; when one thread waits, the CPU scheduler can switch to some other thread that's ready to perform something useful.
+
+
+	Thread Execution
+
+		#include <stdio.h>
+		#include <assert.h>
+		#include <pthread.h>
+		#include "common.h"
+		#include "common_threads.h"
+		
+		void *mythread(void *arg) {
+			printf("%s\n", (char *) arg);
+			return NULL;
+		}
+		
+		int main(int argc, char *argv[]) {
+			pthread_t p1, p2;
+			int rc;
+			printf("main: begin\n");
+			Pthread_create(&p1, NULL, mythread, "A");
+			Pthread_create(&p2, NULL, mythread, "B");
+			// join waits for the threads to finish
+			Pthread_join(p1, NULL);
+			Pthread_join(p2, NULL);
+			printf("main: end\n");
+			return 0;
+		}
+
+		The two threads created above can be executed in any order and we have no way of predicting this.
+
+
+	Issues with Shared Data
+
+		#include <stdio.h>
+		#include <pthread.h>
+		#include "common.h"
+		#include "common_threads.h"
+		
+		static volatile int counter = 0;
+		
+		// mythread()
+		//
+		// Simply adds 1 to counter repeatedly, in a loop
+		// No, this is not how you would add 10,000,000 to
+		// a counter, but it shows the problem nicely.
+		//
+		void *mythread(void *arg) {
+			printf("%s: begin\n", (char *) arg);
+			int i;
+			for (i = 0; i < 1e7; i++) {
+				counter = counter + 1;
+			}
+			printf("%s: done\n", (char *) arg);
+			return NULL;
+		}
+		
+		// main()
+		//
+		// Just launches two threads (pthread_create)
+		// and then waits for them (pthread_join)
+		//
+		int main(int argc, char *argv[]) {
+			pthread_t p1, p2;
+			printf("main: begin (counter = %d)\n", counter);
+			Pthread_create(&p1, NULL, mythread, "A");
+			Pthread_create(&p2, NULL, mythread, "B");
+			
+			// join waits for the threads to finish
+			Pthread_join(p1, NULL);
+			Pthread_join(p2, NULL);
+			printf("main: done with both (counter = %d)\n",
+			counter);
+			return 0;
+		}
+
+		The above program creates two threads and updates a global variable (initialized to 0) 1 million times each. The expected result is 2 million, but the result is non-deterministic.
+
+
+	The Heart of the problem: Uncontrolled Scheduling
+
+		The increment statment (counter = counter + 1) isn't atomic. It might actually look like this (in x86):
+
+			mov 0x8049a1c, %eax
+			add $0x1, %eax
+			mov %eax, 0x8049a1c
+
+
+		When we have two running threads, their execution would overlap as follows:
+
+
+			mov 0x8049a1c, %eax (thread 1)   // current value of the counter = 0
+			add $0x1, %eax (T1)              // current value of the counter = 0
+			mov 0x8049a1c, %eax (thread 2)   // current value of the counter = 0; ideally, T2 should read the value after thread 1 is done writing its result
+			add $0x1, %eax (T2)              // current value of the counter = 0
+			mov %eax, 0x8049a1c (T1)         // current value of the counter = 1
+			mov %eax, 0x8049a1c (T2)         // current value of the counter = 1
+
+		Assume that the initial value is 0. The expected result is 2, but the actual value is 1.
+
+		What we see here is called a 'Race Condition' (more specifically, a 'Data Race'). The result depends on the order of execution and the order is non-deterministic in this case, therefore the result is also non-deterministic.
+
+		Because multiple threads executing this code can cause 'race condition', we call this code a 'critical section'. A 'critical section' is a piece of code that accesses a shared variable (more generally, a shared resource) and must not be concurrently executed by more than one thread.
+
+		'Data race' is a subset of 'race conditions'.
+
+		We can safeguard critical sections by making use of 'mutual exclusion'. These properties guarantee that if one thread is executing within the critical section, the others will be prevented from doing so.
+
+
+	The Wish For Atomicity
+
+		If the increment operation was atomic, we won't be facing this issue. We can easily make our three instructions atomic, but this approach isn't scalable. What if our need was to make an update to a B-tree atomic?
+
+		What we do instead is ask hardware for a few useful instructions upon which we build a general set of what we call 'synchronization primitives. By using this hardware support, in combination with some help from the OS, we will be able to build multi-threaded code that accesses critical sections in a synchronized and controlled manner.
+
+
+	THE CRUX: HOW TO SUPPORT SYNCHRONIZATION
+
+		What support do we need from the hardware to build useful synchronization primitives? What support do we need from the OS?
+		How can we build these primitives correctly and efficiently? How can programs use them to get the desired results?
+
+
+	One More Problem: Waiting For Another
+
+		Till now the interaction we have seen between threads is when they try to access some shared resource; but there is another common interaction that arises between threads, where one thread must wait for another to complete some action before it continues.
