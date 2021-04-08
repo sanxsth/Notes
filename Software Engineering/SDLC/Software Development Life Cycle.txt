@@ -1,0 +1,119 @@
+Software Development Life Cycle
+
+	Software Development Life Cycle is a process that produces software with the highest quality and lowest cost in the shortest time possible. SDLC provides a well-structured flow of phases that help an organization to quickly produce high-quality software which is well-tested and ready for production use.
+
+	SDLC has 6 phases, they are:
+
+		i. Requirement Gathering
+	   ii. Requirement Analysis/Planning
+	  iii. Design (like architecture)
+	   iv. Development
+	    v. Testing
+	   vi. Deployment
+
+
+		Requirement Gathering
+
+			In this stage, we get input from various stakeholders including customers, salespeople, industry experts, etc.
+
+		Requirement Analysis/Planning
+
+			In this phase, we clearly define and document the product requirements and get them approved by the customer or the market analysts. This is done through an SRS (Software Requirement Specification) document which consists of all the product requirements to be designed and developed during the project life cycle.
+
+			We also determine the resources (cost, time, people) required for implementing the analyzed requirements. It also details the risk involved and provides sub-plans for tackling those risks.
+
+		Design
+
+			In this phase, we build a design specification from the software specification. All the stakeholders review the design and offer feedback and suggestions.
+
+		Build
+
+			The actual development is done in this phase.
+
+		Test
+
+			In this stage, we test for defects and deficiencies. The issues are fixed until the product meets the original specifications.
+
+		Deployment
+
+			At this stage, the software is released to production so that the users can start using the product. 
+
+
+
+	Various SDLC Models
+
+		Waterfall
+
+			The oldest and most straightforward model, its also called the linear-sequential model. The model is simple - finish all parts of a phase before moving on to the next phases. Each phase has its rigid plan that finishes off with testing. It came from the construction/manufacturing industry. It is not ideal for software development.
+
+			Pros:
+
+				- Simple and easy to understand.
+				- Phases are processed and completed one at a time.
+
+			Cons:
+
+				- No working software is produced until late during the life cycle.
+				- High amount of risk and uncertanity.
+				- Not a good model for complex softwares.
+				- Poor model for long and on-going projects.
+				- Cannot accomodate changing requirements.
+
+
+		Iterative
+
+			Once we have the full requirements, the process starts with a simple implementation of a subset of these requirements and iteratively enhances the system until all the requirements are fulfilled. Each iteration involves the following phases:
+
+				i. Design
+			   ii. Implementation
+			  iii. Testing
+
+			Pros:
+
+				- Some functionalities can be developed early in the life cycle.
+				- Parallel development can be planned.
+				- Less cost to change the scope/requirements.
+				- Due to the small size, testing and debugging becomes easy.
+
+			Cons:
+
+				- Although cose of change is lesser (compared to waterfall), but is not very suitable for changing requirements.
+				- Not suitable for smaller projects.
+				- Management complexity is more.
+
+
+		Agile
+
+			Agile is a combination of iterative and incremental models with a focus on process adaptability and customer satisfaction by rapid delivery of working product. Agile breaks the product into smaller incremental builds. Every iteration involves the following phases:
+
+				i. Planning
+			   ii. Requirement Analysis
+			  iii. Design
+			   iv. Implementation
+			    v. Unit Testing
+			   vi. Acceptance testing
+
+			At the end of an iteration, a working product is displayed to the customer and important stakeholders.
+
+			It is highly advised to read the agile manifesto (https://agilemanifesto.org/) to understand its principles.
+
+			Pros:
+
+				- A more realistic approach for software developement.
+				- Functionality can be deployed rapidly and demonstrated.
+				- Suitable for changing requirements.
+				- Easy to manage.
+
+			Cons:
+
+				- Greater demands on developers and clients.
+				- Lack of necessary documentation.
+				- Teams get side tracked due to lack of process.
+
+
+	Other Models
+
+		- Spiral Model
+		- Big Bang Model
+		- RAD Model
+
