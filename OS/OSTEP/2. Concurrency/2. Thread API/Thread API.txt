@@ -1,0 +1,155 @@
+Interlude: Thread API
+
+	CRUX: HOW TO CREATE AND CONTROL THREADS
+
+		What interfaces should the OS present for thread creation and control? How should these interfaces be designed to enable ease of use as well as utility?
+
+
+	Thread Creation
+
+		In POSIX, it is easy:
+
+			#include <pthread.h>
+
+			int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine)(void*), void *arg);
+
+		arguments:
+
+			thread: Pointer to a structure of type 'pthread_t'. We'll use this structure to interact with this thread.
+			attr: To specify any attributes this thread might have, like stack-size, scheduling priority, etc.
+		 3rd arg: Pointer to a function that the thread should start running in. In our example code, we pass a pointer to a function taking one arg of type 'void *' and returns a value of the same type. The function argument and return value can be of any type.
+
+	Thread Completion
+
+		We can use 'pthread_join' to wait for a thread to complete its execution.
+
+			int pthread_join(pthread_t thread, void **value_ptr);
+
+		arguments:
+
+			1st arg: To specify which thread to wait for. This variable is initialized by pthread_create(). 
+			2nd arg: A pointer to the return value you expect to get back.
+
+
+		A sample program that creates and waits for a thread:
+
+			typedef struct { int a; int b; } myarg_t;
+			typedef struct { int x; int y; } myret_t;
+			
+			void *mythread(void *arg) {
+				myret_t *rvals = Malloc(sizeof(myret_t));
+				rvals->x = 1;
+				rvals->y = 2;
+				return (void *) rvals;
+			}
+			
+			int main(int argc, char *argv[]) {
+				pthread_t p;
+				myret_t *rvals;
+				myarg_t args = { 10, 20 };
+				Pthread_create(&p, NULL, mythread, &args);
+				Pthread_join(p, (void **) &rvals);
+				printf("returned %d %d\n", rvals->x, rvals->y);
+				free(rvals);
+				return 0;
+			}
+
+			We should never return a value that resides on the thread's call stack. If we do this, we'll end up using a deallocated memory.
+
+
+	Locks
+
+		POSIX library provides mutaul exclusion to a critical section via 'locks'. The most basic set of routines to use for this purpose is provided by the following:
+
+			int pthread_mutex_lock(pthread_mutex_t *mutex);
+			int pthread_mutex_unlock(pthread_mutex_t *mutex);
+
+		Usage:
+
+			pthread_mutex_t lock;
+			pthread_mutex_lock(&lock);
+			x += 1; // critical section
+			pthread_mutex_unlock(&lock);
+
+		The intend of the code is as follows: if no other thread holds the lock when pthread_mutex_lock() is called, the thread will acquire the lock and enter the critical section. If another thead holds the lock, the thread trying to grab the lock will not return from the call until it has acquired the lock.
+
+		The above 'usage' code is broken for two reasons. The first problem is a 'lack of proper initailization'. All locks must be properly initialized in order to guarantee that they have the correct values to begin with and thus works as desired when lock and unlock are called.
+
+		In POSIX, there are two ways to initialize locks:
+
+			i. pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+
+		   ii. int rc = pthread_mutex_init(&lock, NULL);
+       		   assert(rc == 0); // always check success!
+
+       		   a corresponding call to pthread_mutex_destroy() should also be made, when you are done with the lock.
+
+
+	    The second problem with the above code is that it fails to check error codes when calling lock and unlock. One simple way to tackle this is via wrappers.
+
+	    	// Keeps code clean; only use if exit() OK upon failure
+			void Pthread_mutex_lock(pthread_mutex_t *mutex) {
+				int rc = pthread_mutex_lock(mutex);
+				assert(rc == 0);
+			}
+
+		Lock and unlock aren't the only routines within the pthreads library to interact with locks. Two other routines of interest.
+
+			int pthread_mutex_trylock(pthread_mutex_t *lock); // throws an error when the lock isn't available
+			int pthread_mutex_timedlock(pthread_mutex_t *mutex, struct timespac *abs_timeout); // call returns after timeout or after acquiring the lock
+
+
+	Condition Variables
+
+		Condition variables are useful when some kind of signaling should take place between threads. Two primary routines used for this are:
+
+			i. int pthread_cond_wait(pthread_cond_wait *cond, pthread_mutex_t *mutex);
+		   ii. int pthread_cond_signal(pthread_cond_t *cond);
+
+		To use a condition variable, one should have the lock associated with that condition. When calling either of the above, the lock should be held.
+
+		The first routine puts the calling thread to sleep, and thus waits for some thread to signal it. A typical usage looks like this:
+
+			pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+			pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+
+			Pthread_mutex_lock(&lock);
+			while(ready == 0) // while loop is used to safeguard the thread from spurious wakes
+			{
+				Pthread_cond_wait(&cond, &lock);
+			}
+
+			Pthread_mutex_unlock(&lock);
+
+
+			Both wait and signal use lock to prevent race conditions.
+
+			wait takes in the lock as a param so that it can release the lock after putting the calling thread to sleep, else other threads won't be able to signal this thread to wake. Once the sleeping thread wakes up, it would be given this lock back.
+
+			Sometimes it's very tempting to use simple flagging mechanism to achieve synchronization. For example, 
+
+				waiting:
+
+					while (ready == 0)
+						; // spin
+
+				signal:
+
+					ready = 1;
+
+			Doing this isn't recommended due to the following reasons:
+
+				- The waiting thread wastes CPU cycles
+				- This mechanism is error prone
+
+
+	Some points to keep in mind while working with threads
+
+		- Keep it simple.
+		- Minimize thread interactions.
+		- Initialize locks and condition variables.
+		- Check your return code.
+		- Be careful with how you pass arguments to, and return values from, threads.
+		- Each thread has its own stack.
+		- Always use condition variables to signal threads.
+		- Use the manual pages!
