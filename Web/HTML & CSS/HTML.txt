@@ -1,0 +1,7 @@
+HTML
+
+	I'm not covering the syntax of HTML, there are better resources for that on the web. What I would like to do is to document what I think is the 'purpose' or philosophy of HTML.
+
+	HTML is for defining the logical structure of a document and not for defining its appearance. We use HTML to provide semantic to the document. The target audience is software. Use HTML to markup the data so that it can be understood by these programs.
+
+	As developers, we should write semantic HTML.	
