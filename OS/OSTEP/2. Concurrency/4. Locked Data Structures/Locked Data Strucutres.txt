@@ -1,0 +1,251 @@
+Lock-based Concurrent Data Structures
+
+	CRUX: HOW TO ADD LOCKS TO DATA STRUCTURES
+
+		When given a particular data structure, how should we add locks to it, to make it work correctly? Further, how do we add locks such that the data structure yields high performance, enabling many threads to access the structure at once, i.e., concurrently?
+
+	Concurrent Counters
+
+		Non-concurrent counter:
+
+			typedef struct __counter_t {
+				int value;
+			} counter_t;
+			
+			void init(counter_t *c) {
+				c->value = 0;
+			}
+			
+			void increment(counter_t *c) {
+				c->value++;
+			}
+			
+			void decrement(counter_t *c) {
+				c->value--;
+			}
+			
+			int get(counter_t *c) {
+				return c->value;
+			}
+
+
+		Concurrent Counter:
+
+			typedef struct __counter_t {
+				int value;
+				pthread_mutex_t lock;
+			} counter_t;
+			
+			void init(counter_t *c) {
+				c->value = 0;
+				Pthread_mutex_init(&c->lock, NULL);
+			}
+			
+			void increment(counter_t *c) {
+				Pthread_mutex_lock(&c->lock);
+				c->value++;
+				Pthread_mutex_unlock(&c->lock);
+			}
+			
+			void decrement(counter_t *c) {
+				Pthread_mutex_lock(&c->lock);
+				c->value--;
+				Pthread_mutex_unlock(&c->lock);
+			}
+			
+			int get(counter_t *c) {
+				Pthread_mutex_lock(&c->lock);
+				int rc = c->value;
+				Pthread_mutex_unlock(&c->lock);
+				return rc;
+			}
+
+
+		The concurrent counter seen above is correct, but it isn't scalable.
+
+		Ideally, you’d like to see the threads complete just as quickly on multiple processors as the single thread does on one. Achieving this end is called perfect scaling; even though more work is done, it is done in parallel, and hence the time taken to complete the task is not increased.
+
+	Scalable Counting
+
+		Many techniques have been developed to approach this problem. We'll describe one approach known as an 'approximate counter'.
+
+		The approx counter works by representing a single logical counter via numerous local physical counters, one per CPU core, as well as a single global counter. On a machine with 4 CPUs, there are 4 local counters and one global counter.
+
+		The basic idea of approximate counting is as follows:
+
+			A thread running on a local core will increment its local counter. Because each CPU has its local counter, threads across CPUs can update local counters without contention, and thus updates to the counter are scalable. To keep the global counter up to date, the local values are periodically transferred to the global counter, by acquiring the global lock and incrementing it by the local counter's value; the local counter is then reset to zero.
+
+			We use a threshold, 'S', to determine how often the local-to-global transfer occurs. The bigger the 'S', the more scalable the counter, but the global will be further off from the actual value. Acquiring all the local locks and transferring them to the global counter won't be scalable.
+
+
+		Approximate Counter:
+
+			typedef struct __counter_t {
+				int global; // global count
+				pthread_mutex_t glock; // global lock
+				int local[NUMCPUS]; // per-CPU count
+				pthread_mutex_t llock[NUMCPUS]; // ... and locks
+				int threshold; // update frequency
+			} counter_t;
+			
+			// init: record threshold, init locks, init values
+			// of all local counts and global count
+			void init(counter_t *c, int threshold) {
+				c->threshold = threshold;
+				c->global = 0;
+				pthread_mutex_init(&c->glock, NULL);
+				int i;
+				for (i = 0; i < NUMCPUS; i++) {
+					c->local[i] = 0;
+					pthread_mutex_init(&c->llock[i], NULL);
+				}
+			}
+			
+			// update: usually, just grab local lock and update
+			// local amount; once local count has risen ’threshold’,
+			// grab global lock and transfer local values to it
+			void update(counter_t *c, int threadID, int amt) {
+				int cpu = threadID % NUMCPUS;
+				pthread_mutex_lock(&c->llock[cpu]);
+				c->local[cpu] += amt;
+				if (c->local[cpu] >= c->threshold) {
+					// transfer to global (assumes amt>0)
+					pthread_mutex_lock(&c->glock);
+					c->global += c->local[cpu];
+					pthread_mutex_unlock(&c->glock);
+					c->local[cpu] = 0;
+				}
+				pthread_mutex_unlock(&c->llock[cpu]);
+			}
+			
+			// get: just return global amount (approximate)
+			int get(counter_t *c) {
+				pthread_mutex_lock(&c->glock);
+				int val = c->global;
+				pthread_mutex_unlock(&c->glock);
+				return val; // only approximate!
+			}
+
+	Concurrent Linked Lists
+
+		void List_Init(list_t *L) {
+			L->head = NULL;
+			pthread_mutex_init(&L->lock, NULL);
+		}
+		
+		void List_Insert(list_t *L, int key) {
+			// synchronization not needed
+			node_t *new = malloc(sizeof(node_t));
+			if (new == NULL) {
+				perror("malloc");
+				return;
+			}
+			new->key = key;
+		
+			// just lock critical section
+			pthread_mutex_lock(&L->lock);
+			new->next = L->head;
+			L->head = new;
+			pthread_mutex_unlock(&L->lock);
+		}
+		
+		int List_Lookup(list_t *L, int key) {
+			int rv = -1;
+			pthread_mutex_lock(&L->lock);
+			node_t *curr = L->head;
+			while (curr) {
+				if (curr->key == key) {
+					rv = 0;
+					break;
+				}
+				curr = curr->next;
+			}
+			pthread_mutex_unlock(&L->lock);
+			return rv; // now both success and failure
+		}
+
+	Scaling Linked Lists
+
+		One technique that researchers explored to make concurrent linked lists scalable is 'hand-over-hand locking'. The idea is simple, instead of having a single lock for the entire list, you add a lock per node of the list. When traversing the list, the code first grabs the next node's lock and then releases the current node's lock.
+
+		In practice, it is hard to make such a structure faster than the simple lock approach, as the overhead of acquiring the lock and releasing locks for each node of a list traversal is prohibitive.
+
+	Concurrent Queues
+
+		Michael and Scott concurrent queue
+
+			typedef struct __node_t {
+				int value;
+				struct __node_t *next;
+			} node_t;
+			
+			typedef struct __queue_t {
+				node_t *head;
+				node_t *tail;
+				pthread_mutex_t head_lock, tail_lock;
+			} queue_t;
+			
+			void Queue_Init(queue_t *q) {
+				node_t *tmp = malloc(sizeof(node_t));
+				tmp->next = NULL;
+				q->head = q->tail = tmp;
+				pthread_mutex_init(&q->head_lock, NULL);
+				pthread_mutex_init(&q->tail_lock, NULL);
+			}
+			
+			void Queue_Enqueue(queue_t *q, int value) {
+				node_t *tmp = malloc(sizeof(node_t));
+				assert(tmp != NULL);
+				tmp->value = value;
+				tmp->next = NULL;
+				
+				pthread_mutex_lock(&q->tail_lock);
+				q->tail->next = tmp;
+				q->tail = tmp;
+				pthread_mutex_unlock(&q->tail_lock);
+			}
+			
+			int Queue_Dequeue(queue_t *q, int *value) {
+				pthread_mutex_lock(&q->head_lock);
+				node_t *tmp = q->head;
+				node_t *new_head = tmp->next;
+				if (new_head == NULL) {
+					pthread_mutex_unlock(&q->head_lock);
+					return -1; // queue was empty
+				}
+				*value = new_head->value;
+				q->head = new_head;
+				pthread_mutex_unlock(&q->head_lock);
+				free(tmp);
+				return 0;
+			}
+
+	Concurrent Hash Table
+
+		#define BUCKETS (101)
+		
+		typedef struct __hash_t {
+			list_t lists[BUCKETS];
+		} hash_t;
+		
+		void Hash_Init(hash_t *H) {
+			int i;
+			for (i = 0; i < BUCKETS; i++)
+				List_Init(&H->lists[i]);
+		}
+		
+		int Hash_Insert(hash_t *H, int key) {
+			return List_Insert(&H->lists[key % BUCKETS], key);
+		}
+		
+		int Hash_Lookup(hash_t *H, int key) {
+			return List_Lookup(&H->lists[key % BUCKETS], key);
+		}
+
+	Summary
+
+		We have learned a few important lessons along the way:
+
+			1. Careful with acquisitions and release of locks around control flow.
+			2. Enabling more concurrency doesn't increase performance.
+			3. Avoid premature optimizations
