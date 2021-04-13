@@ -1,0 +1,55 @@
+Box Model
+
+	In CSS we have two kinds of boxes: block and inline boxes. 
+
+	block:
+		- The box will break onto a new line.
+		- The box will extend in the inline direction to fill the space available in its container.
+		- The width and height properties are respected.
+		- Padding, margin and border will cause other elements to be pushed away from the box.
+
+	inline 
+		- The box will not break onto a new line.
+		- The width and height property will not apply.
+		- Vertical padding, margins, and borders will apply but will not cause other inline boxes to move away from the box.
+		- Horizontal padding, margins, and borders will apply and will cause other inline boxes to move away from the box.
+
+	The type of box applied to an element is defined by the 'display' property.
+
+	A CSS box has 'inner' and 'outer' display types.
+
+	'inner' dictates how elements inside the box are laid out. By default, the elements inside are laid out in the normal flow. We can change the inner display type using display values like 'flex'. Any direct children of this box will become flex items.
+
+	Normal Flow, or Flow Layout, is the way that Block and Inline elements are displayed on a page before any changes are made to their layout. The flow is essentially a set of things that are all working together and know about each other in your layout. Once something is taken out of flow it works independently.
+
+
+	The Standard CSS Box Model
+
+		The 'width' and 'height' attribute defines the width and height of the content box. Any padding and border are then added to that width and height to get the total size taken up by the box. Though margin affects the total space taken up by the box, it isn't counted towards the actual size of the box.
+
+	The Alternate CSS Box Model
+
+		The 'width and 'height' set is the actual width and height of the box. You can use 'box-sizing: border-box to make elements follow 'alternate box model'.
+
+	Margin
+
+		The margin is the invisible space around your box. It pushes away other elements away from your box. Setting a negative margin on one side can cause it to overlap with other things on the page. Margin is always added after the visible box size has been calculated.
+
+		If you have two elements whose margins touch, those margins will combine to become one. This is called 'margin collapsing'.
+		There are a number of rules that dictate when margins do and do not collapse. For further information see the detailed page on mastering margin collapsing: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Box_Model/Mastering_margin_collapsing.
+
+	Padding
+
+		Unlike margins you cannot have negative amounts of padding, so the value must be 0 or positive. Any background applied to your element will display behind the padding, and it is typically used to push the content away from the border.
+
+	The Box Model And Inline Boxes
+
+		 Some of the properties can apply to inline boxes too, such as those created by an <span> element. For example, vertical margin, padding, and borders are respected for a span (inline-block) but they don't change the relationship of other contents to our inline box. But the horizontal margin, padding, and borders will be respected and will cause other content to move away from the box. Also, 'width' and 'height' aren't respected.
+
+	Inline-Block
+
+		Inline-blocks provide a middle ground between 'inline' and 'block'. They don't break onto a new line, and will only become larger than their content if you explicitly add width and height properties.
+
+		An inline-block has a subset of block properties:
+			- The width and height properties are respected.
+			- padding, margin and border will cause other elements to be pushed away from the box.
