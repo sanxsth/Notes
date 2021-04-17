@@ -1,0 +1,219 @@
+Common Concurrency Problems
+
+	CRUX: HOW TO HANDLE COMMON CONCURRENCY BUGS
+
+		Concurrency bugs tend to come in a variety of common patterns. Knowing which ones to look out for is the first step to writing more robust, correct concurrent code.
+
+	What Type Of Bugs Exist
+
+		Non-Deadlock Bugs
+
+			There are two major types of non-deadlock bugs.
+
+			Atomicity-Violation Bugs
+
+				Thread 1::
+				if (thd->proc_info) {
+					fputs(thd->proc_info, ...); // prints the value of proc_info
+				}
+				
+				Thread 2::
+				thd->proc_info = NULL;
+
+				If the first thread performs the check but then is interrupted before the call to "fputs", the second thread could run in-between, thus setting the pointer to NULL; when the first thread resumes, it will crash, as a NULL pointer will be dereferenced by "fputs".
+
+				A more formal definition for an atomicity violation is this: “The desired serializability among multiple memory accesses is violated (i.e. a code region is intended to be atomic, but the atomicity is not enforced during execution).”
+
+				Solution:
+
+					pthread_mutex_t proc_info_lock = PTHREAD_MUTEX_INITIALIZER;
+					
+					Thread 1::
+					pthread_mutex_lock(&proc_info_lock);
+					if (thd->proc_info) {
+						fputs(thd->proc_info, ...);
+					}
+					pthread_mutex_unlock(&proc_info_lock);
+					
+					Thread 2::
+					pthread_mutex_lock(&proc_info_lock);
+					thd->proc_info = NULL;
+					pthread_mutex_unlock(&proc_info_lock);
+
+
+			Order-Violation Bugs
+
+				Thread 1::
+				void init() {
+					mThread = PR_CreateThread(mMain, ...);
+				}
+				
+				Thread 2::
+				void mMain(...) {
+					mState = mThread->State;
+				}
+
+
+				The code in Thread 2 seems to assume that the variable mThread has already been initialized (and is not NULL); however, if Thread 2 runs immediately once created, the value of mThread will not be set when it is accessed within mMain() in Thread 2, and will likely crash with a NULL-pointer dereference.
+
+				A more formal definition for order violation is as follows:
+
+					“The desired order between two (groups of) memory accesses is flipped (i.e., A should always be executed before B, but the order is not enforced during execution)”
+
+				The fix to these types of bugs is generally to enforce ordering. 'Condition variable' is an easy and robust way to add this style of synchronization into modern codebases.
+
+
+				Solution:
+
+					pthread_mutex_t mtLock = PTHREAD_MUTEX_INITIALIZER;
+					pthread_cond_t mtCond = PTHREAD_COND_INITIALIZER;
+					int mtInit = 0;
+					
+					Thread 1::
+					void init() {
+						...
+						mThread = PR_CreateThread(mMain, ...);
+					
+						// signal that the thread has been created...
+						pthread_mutex_lock(&mtLock);
+						mtInit = 1;
+						pthread_cond_signal(&mtCond);
+						pthread_mutex_unlock(&mtLock);
+						...
+					}
+					
+					Thread 2::
+					void mMain(...) {
+						...
+						// wait for the thread to be initialized...
+						pthread_mutex_lock(&mtLock);
+						while (mtInit == 0)
+							pthread_cond_wait(&mtCond, &mtLock);
+						pthread_mutex_unlock(&mtLock);
+					
+						mState = mThread->State;
+						...
+					}
+
+
+		Deadlock Bugs
+
+			Another classic problem that arises in many concurrent systems with complex locking protocols is known as 'deadlock'. Deadlock occurs, for example:
+
+				Thread 1:				 Thread 2:
+				pthread_mutex_lock(L1); pthread_mutex_lock(L2);
+				pthread_mutex_lock(L2); pthread_mutex_lock(L1);
+
+			When T1 runs, acquires the lock (L1) and waits for lock L2 which is held by T2 (which is waiting for L1 held by T1).
+
+
+			CRUX: HOW TO DEAL WITH DEADLOCK
+
+				How should we build systems to prevent, avoid, or at least detect and recover from deadlock? Is this a real problem in systems today?
+
+
+			Why Do Deadlocks Occur?
+
+				One reason is that in large codebases, complex dependencies arise between components. Another reason is due to the nature of encapsulation. As software developers, we are taught to hide details of implementations and thus make software easier to build in a modular way. Unfortunately, such modularity does not mesh well with locking.
+
+
+			Conditions For Deadlock
+
+				Four conditions need to hold for a deadlock to occur:
+
+					- Mutual Exclusion: Threads claim exclusive control over resources they require.
+					- Hold-and-wait: Threads hold resources allocated to them while waiting for additional resources.
+					- No Preemption: Resouces cannot be forcefully removed from threads that are holding them.
+					- Circular wait: There exists a circular chain of threads such that each thread holds one or more resources that are requested by the thread next in the chain.
+
+				If any of these conditions are not met, deadlock cannot occur.
+
+
+			Prevention
+
+				Circular wait
+
+					The most straightforward way of doing this is to provide a total ordering on lock acquisition. For example, if there are only two locks (L1 and L2) in the system, you can prevent deadlocks by always acquiring L1 before L2. Total ordering may be difficult to enforce in a large, complex system. Thus, a partial ordering can be useful. Ordering is just a convention, and a sloppy programmer can easily the locking protocol and potentially cause deadlock. Lock ordering also requires a deep understanding of the code base, and how various routines are called.
+
+				Hold-and-wait
+
+					The hold-and-wait requirement can be avoided by acquiring all locks at once, atomically. In practice, this could be achieved as follows:
+
+						pthread_mutex_lock(prevention); // begin acquisition
+						pthread_mutex_lock(L1);
+						pthread_mutex_lock(L2);
+						...
+						pthread_mutex_unlock(prevention); // end
+
+					This approach has a few drawbacks:
+
+						- Encapsulation works against us; when calling a routine this approach requires us to know exactly which locks must be held and to acquire them ahead of time.
+						- This technique also decreases the concurrency of the system.
+
+
+				No Preemption
+
+					Many thread libraries provide a more flexible set of interfaces to help avoid this no-preemption situation. Specifically, the routine pthread mutex trylock() either grabs the lock (if it is available) and returns success or returns an error code indicating the lock is held; in the latter case, you can try again later if you want to grab that lock.
+
+						Code:
+
+							top:
+							pthread_mutex_lock(L1);
+							if (pthread_mutex_trylock(L2) != 0) {
+								pthread_mutex_unlock(L1);
+								goto top;
+							}
+
+					But this solution might lead to a 'livelock'. k. There are solutions to the livelock problem, too: for example, one could add a random delay before looping back and trying the entire thing over again, thus decreasing the odds of a livelock.
+
+					This approach has a few challenges as well:
+
+						- If one of these locks is buried in some routine that is getting called, the jump back to the beginning becomes more complex to implement.
+						- If the code had acquired some resources along the way, it must make sure to carefully release them as well.
+
+					This approach doesn't really add preemption, it is more like the code backing out gracefully.
+
+				Mutual Exclusion
+
+					One idea is to use lock-free (and related wait-free) approaches using powerful hardware instructions. For example, we can do atomic increment as follows:
+
+						void AtomicIncrement(int *value, int amount) {
+							do {
+							int old = *value;
+							} while (CompareAndSwap(value, old, old + amount) == 0);
+						}
+
+
+					lock-free concurrent list insertion:
+
+						void insert(int value) {
+							node_t *n = malloc(sizeof(node_t));
+							assert(n != NULL);
+							n->value = value;
+							do {
+								n->next = head;
+							} while (CompareAndSwap(&head, n->next, n) == 0);
+						}
+
+
+				Deadlock Avoidance Via Scheduling
+
+					Avoidance requires some global knowledge of which locks various threads might grab during their execution, and subsequently, schedules said threads in a way as to guarantee no deadlock can occur.
+
+					Consider the following scenario:
+
+						   T1  T2  T3  T4 (Threads)
+						L1 yes yes no  no
+						L2 yes yes yes no
+
+					A smart scheduler could thus compute that as long as T1 and T2 are not run at the same time, no deadlock could ever arise.
+
+					Such conservative scheduling lengthens the total job completion time.
+
+					One famous example of an approach like this is Djikstra's Banker's Algorithm.
+
+
+				Detection And Recover
+
+					One final general strategy is to allow deadlocks to occasionally occur, and then take some action once such a deadlock has been detected.
+					This is useful in a system where deadlocks are very rare. Many database systems employ deadlock detection and recovery techniques.
