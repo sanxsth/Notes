@@ -1,0 +1,114 @@
+Event-based Concurrency
+
+	Threads aren't the only way to build concurrent applications, a different type of concurrent programming is often used in both GUI-based applications as well as some types of internet servers. This style is known as 'event-based concurrency'.
+
+	Event-based concurrency addresses two major problems:
+
+		- Managing concurrency correctly in multi-threaded applications can be challenging; with all those, missing locks, deadlock, and other nasty problems.
+		-  The developer has little or no control over what is scheduled at a given moment in time; rather, the programmer simply creates threads.
+
+
+	THE CRUX: HOW TO BUILD CONCURRENT SERVERS WITHOUT THREADS
+
+		How can we build a concurrent server without using threads, and thus retain control over concurrency as well as avoid some of the problems that seem to plague multi-threaded applications?
+
+
+	The Basic Idea: An Event Loop
+
+		The approach is quite simple: you simply wait for something to occur; when it occurs, you check what type of work it is and do the small amount of work it requires (includes i/o requests, or scheduling other events for future handling, etc.).
+
+		Pseudocode for an event loop looks like this:
+
+			while (1) {
+				events = getEvents();
+				for (e in events)
+				processEvent(e);
+			}
+
+		The main loop simply waits for some event to occur, for each event returned, processes them, one at a time; the code that processes each event
+		is known as an event handler. When a handler processes an event, it is the only activity taking place in the system; thus, deciding which event to handle next is equivalent to scheduling.
+
+
+	An Important API: select() (or poll())
+
+		In most systems, we use 'select()' to receive events.
+
+		int select(int nfds, fd_set *restrict readfds, fd_set *restrict writefds, fd_set *restrict errorfds, struct timeval *restrict timeout);
+
+		select() examines the I/O descriptor sets whose addresses are passed in readfds, writefds, and errorfds to see if some of their descriptors are ready for reading, are ready for writing or have an exceptional condition pending, respectively. The first nfds descriptors are checked in each set, i.e., the descriptors from 0 through nfds-1 in the descriptor sets are examined. On return, select() replaces the given descriptor sets with subsets consisting of those descriptors that are ready for the requested operation. select() returns the total number of ready descriptors in all the sets.
+
+		One common usage is to set the timeout to NULL, which causes select() to block indefinitely until some descriptor is ready.
+
+		'read' lets a server determine that a new packet has arrived and requires processing, whereas 'writer' lets the service know when it is OK to reply.
+
+
+	Using Select
+
+		A simple code using select:
+
+			#include <stdio.h>
+			#include <stdlib.h>
+			#include <sys/time.h>
+			#include <sys/types.h>
+			#include <unistd.h>
+			
+			int main(void) {
+				// open and set up a bunch of sockets (not shown)
+				// main loop
+				while (1) {
+					// initialize the fd_set to all zero
+					fd_set readFDs;
+					FD_ZERO(&readFDs);
+			
+					// now set the bits for the descriptors
+					// this server is interested in
+					// (for simplicity, all of them from min to max)
+					int fd;
+					for (fd = minFD; fd < maxFD; fd++)
+						FD_SET(fd, &readFDs);
+				
+					// do the select
+					int rc = select(maxFD+1, &readFDs, NULL, NULL, NULL);
+				
+					// check which actually have data using FD_ISSET()
+					int fd;
+					for (fd = minFD; fd < maxFD; fd++)
+						if (FD_ISSET(fd, &readFDs))
+					processFD(fd);
+				}
+			}
+
+
+	Why Simpler? No Locks Needed
+
+		With a single CPU and an event-based application, the problems found in concurrent programs are no longer present. Specifically, because only one event is being handled at a time, there is no need to acquire or release locks; the event-based server cannot be interrupted by another thread because it is decidedly single-threaded. Thus, concurrency bugs common in threaded programs do not manifest in the basic event-based approach.
+
+
+	A Problem: Blocking System Calls
+
+		What happens when an event handler has to make an i/o request? This implies that if an event handler issues a call that blocks, the entire server will do just that: block until the call completes. Blocks in the event-loop lead to resource wastage, therefore we follow the rule in event-based systems: no blocking calls allowed.
+
+
+	A Solution: Asynchronous I/O
+
+		This enables an application to issue an I/O request and return control immediately to the caller before the I/O has been completed; additional interfaces enable an application to determine whether various I/Os have been completed.
+
+
+	Another Problem: State Management
+
+		In an event-based approach, code is generally more complicated to write than traditional thread-based code. The reason is: while issuing an asynchronous request, it must package some program state for the next event handler to use when the I/O finally completes, we call this 'manual stack management'. 
+
+		We use a programming construct called 'continuation' to handle asynchronous request completion. The idea is simple: basically, record the needed information to finish processing this event in some data structure; when the event happens ( when the i/o request completes), look up the needed information and process the event.
+
+		In this specific case, the solution would be to record the socket descriptor (sd) in some kind of data structure (e.g., a hash table), indexed by the file descriptor (fd). When the disk I/O completes, the event handler would use the file descriptor to look up the continuation, which will return the value of the socket descriptor to the caller. At this point (finally), the server can then do the last bit of work to write the data to the socket.
+
+
+	Why Is It Still Difficult With Events
+
+		To utilize more than one CPU, the event server has to run multiple event handlers in parallel; when doing so, the usual synchronization problems arise.
+
+		If an event-handler page faults, it will block, and thus the server will not make progress until the page fault completes. Even though the server has been structured to avoid explicit blocking, this type of implicit blocking due to page faults is hard to avoid and thus can lead to large performance problems when prevalent.
+
+		Event-based code can be hard to manage over time, as the exact semantics of various routines change.
+
+		Finally, though asynchronous disk I/O is now possible on most platforms, it has taken a long time to get there, and it never quite integrates with asynchronous network I/O in as simple and uniform a manner as you might think.
