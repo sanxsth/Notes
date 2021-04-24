@@ -1,0 +1,183 @@
+Asymptotic Analysis
+
+	 Knowing the complexity of algorithms allows you to answer questions such as:
+
+		How long will a program run on an input?
+		How much space will it take?
+		Is the problem solvable?
+
+	An understanding of algorithmic complexity provided programmers with insight into the efficiency of their code and helps us compare different algorithmic approaches to solve a problem.
+
+	Asymptotic Analysis
+
+		We evaluate the performance of an algorithm in terms of input size (we don’t measure the actual running time). We calculate, how the time (or space) taken by an algorithm increases with the input size.
+
+		Shortcomings of asymptotic analysis
+
+			In Asymptotic analysis, we always talk about input sizes larger than a constant value. It might be possible that those large inputs are never given to your software and an algorithm that is asymptotically slower, always performs better for your particular situation.
+
+			If A has a better worst-case performance than B, but the average performance of B given the expected input is better, then B could be a better choice than A. Conversely, if the worst-case performance of B is unacceptable (say for life-threatening or mission-critical reasons), A must still be used.
+
+
+	Worst-Case Analysis
+
+		In the worst-case analysis, we find the upper bound on the running time of an algorithm.
+
+	Average-Case Analysis
+
+		In average case analysis, we take all possible inputs and calculate computing time for all of the inputs. This kind of analysis is generally harder since it involves probabilistic arguments and often requires assumptions about the distribution of inputs that may be difficult to justify.
+
+		On the other hand, it can be more useful because sometimes the worst-case behavior of an algorithm is misleadingly bad. A good example of this is the popular quicksort algorithm, whose worst-case running time on an input sequence of length n is proportional to n2 but whose expected running time is proportional to n log n.
+
+	Best-Case Analysis
+
+		A good example of this is the popular quicksort algorithm, whose worst-case running time on an input sequence of length n is proportional to n2 but whose expected running time is proportional to n log n.
+
+	For some algorithms, (for example, merge sort) all three cases can be asymptotically the same.
+
+
+	Asymptotic Notations
+
+		1. Θ Notation: The theta notation bounds a function from above and below, so it defines exact asymptotic behavior. 
+		   Θ(g(n)) = {f(n): there exist positive constants c1, c2 and n0 such 
+                 that 0 <= c1*g(n) <= f(n) <= c2*g(n) for all n >= n0}
+
+		2. Big O Notation: The Big O notation defines an upper bound of an algorithm, it bounds a function only from above.
+		   O(g(n)) = { f(n): there exist positive constants c and 
+                  n0 such that 0 <= f(n) <= c*g(n) for 
+                  all n >= n0}
+
+		3. Ω Notation: Just as Big O notation provides an asymptotic upper bound on a function, Ω notation provides an asymptotic lower bound.
+		   Ω (g(n)) = {f(n): there exist positive constants c and
+                  n0 such that 0 <= c*g(n) <= f(n) for
+                  all n >= n0}. 
+
+	We have little o notation which is a strict upper bound and little omega (ω) which is a strict lower bound.
+
+
+	Recurrence Relations
+
+		Many Algorithms are recursive in nature. Often we have to solve a recurrence relation to find the time complexity of such algorithms.
+
+		There are mainly three ways of solving recurrences:
+
+			1. Substitution method:
+
+				We make a guess for the solution and then we use mathematical induction to prove the guess is correct or incorrect.
+
+				For example consider the recurrence T(n) = 2T(n/2) + n
+
+				We guess the solution as T(n) = O(nLogn). Now we use induction
+				to prove our guess.
+
+				We need to prove that T(n) <= cnLogn. We can assume that it is true
+				for values smaller than n.
+
+				T(n) = 2T(n/2) + n
+				    <= 2c(n/2)Log(n/2) + n
+				    =  cnLogn - cnLog2 + n
+				    =  cnLogn - cn + n
+				    <= cnLogn
+
+				Some approaches make use of patterns and the base case to solve, for example, https://www.youtube.com/watch?v=zVeNqLg2uUc.
+
+				To be specific, the above approach keeps substituting values with recurrence relation of some previous value until which reveals some pattern.
+
+				T(n) = 2T(n/2) + n, T(1) = 1; k = 1
+
+					 = 2[2T(n/4) + n] + n; k = 2;
+
+					 = 2[ 2 [2T(n/8) + n] n] + n; k = 3
+
+					 = (2^k) T(n/(2^k)) + kN; for some k. eq-1
+
+					we have n/(2^k) = 1 (using base case). k = logn. 
+
+					substituting 'logn' in eq-1, we get our solution.
+
+
+			2. Recurrence Tree Method
+
+				In this method, we draw a recurrence tree and calculate the time taken by every level of the tree. Finally, we sum the work done at all levels.
+
+
+			3. Master Theorem
+
+				Master Theorem/Method is a direct way to get the solution. The master method works only for the following type of recurrences or for recurrences that can be transformed to the following type.
+
+				T(n) = aT(n/b) + f(n^d) where a >= 1 and b > 1
+
+				Then,
+
+					1. T(n) = O(n^d), if d > log b a
+					2. T(n) = O(n^d logn), if d = log b a
+					3. T(n) = O(n^(log b a)), if d < log b a
+
+
+	Amortized Analysis
+
+		Amortized Analysis is used for algorithms where an occasional operation is very slow, but most of the other operations are faster. In Amortized Analysis, we analyze a sequence of operations and guarantee a worst-case average time which is lower than the worst-case time of a particular expensive operation. 
+
+		Dynamic array allocation is a classic case where we can use amortized analysis to find a tight upper bound for the algorithm.
+
+		The amortized analysis doesn’t involve probability. There is also another different notion of average-case running time where algorithms use randomization to make them faster and the expected running time is faster than the worst-case running time.
+
+		There are three ways to find the amortized time complexity:
+
+			1. Aggregate analysis determines the upper bound T(n) on the total cost of a sequence of n operations, then calculates the amortized cost to be T(n) / n.
+
+			2. Accounting method
+
+			3. Potential method
+
+
+	Space Complexity
+
+		Auxiliary Space is the temporary space allocated by your algorithm to solve the problem, with respect to the input size. 
+		Space Complexity is the total space used by your algorithm to solve the problem, with respect to the input size. Note that the Space Complexity includes input size. Space complexity includes both Auxiliary space and space used by input.
+
+		If we want to compare standard sorting algorithms on the basis of space, then Auxiliary Space would be a better criterion than Space Complexity. Merge Sort uses O(n) auxiliary space, Insertion sort, and Heap Sort uses O(1) auxiliary space. The space complexity of all these sorting algorithms is O(n) though.
+
+
+	Pseudo-polynomial Algorithms
+
+		An algorithm whose worst-case time complexity depends on the numeric value of the input (not the number of inputs) is called the Pseudo-polynomial algorithm.
+		For example, the complexity of counting sort depends on the max value rather than the number of values. Some NP-Complete problems have Pseudo Polynomial-time solutions.
+
+
+	NP-Completeness
+
+		A Turing machine is a mathematical model of computation that defines an abstract machine that manipulates symbols on a strip of tape according to a table of rules. Despite the model's simplicity, given any computer algorithm, a Turing machine capable of simulating that algorithm's logic can be constructed.
+
+		Halting problem:  The halting problem is the problem of determining, from a description of an arbitrary computer program and an input, whether the program will finish running, or continue to run forever.
+
+		Polynomial-time (P): An algorithm is said to be of polynomial-time if its running time can be upper bounded by a polynomial expression in the size of their input.
+
+		P is a set of problems that can be solved by a deterministic Turing machine in Polynomial-time.
+
+		NP (nondeterministic polynomial time) is a class of problems that are solvable by a non-deterministic Turing machine. But their solution can be verified in polynomial time. NP is a set of decision problems.
+
+		P is a subset of NP (any problem that can be solved by a deterministic machine in polynomial time can also be solved by a non-deterministic machine in polynomial time). 
+
+		Informally, NP is a set of decision problems that can be solved by a polynomial-time via a “Lucky Algorithm”, a magical algorithm that always makes a right guess among the given set of choices.
+
+		NP-complete problems are the hardest problems of the NP set.
+
+		A decision problem L is NP-complete if:
+
+			1. L is in NP (Any given solution for NP-complete problems can be verified quickly, but there is no efficient known solution).
+			2. Every problem in NP is reducible to L in polynomial time.
+
+		The interesting part is, if any one of the NP-complete problems can be solved in polynomial time, then all of them can be solved.
+
+		A problem is NP-Hard if it follows property 2, but not property one. Therefore, NP-complete is also a subset of NP-Hard.
+		NP-hard problems are as hard as the hardest NP-complete problem, but they aren't in the NP set. Therefore, they needn't be decision problems.
+
+
+	Polynomial Time Approximation Scheme
+
+		NP-complete problems don't have any polynomial-time solution.
+
+		Polynomial Time Approximation Scheme (PTAS) is a type of approximate algorithms that provide user to control over accuracy which is a desirable feature. These algorithms take an additional parameter ε > 0 and provide a solution that is (1 + ε) approximate for minimization and (1 – ε) for maximization. The running time of PTAS must be polynomial in terms of n, however, it can be exponential in terms of ε.
+
+		In PTAS algorithms, the exponent of the polynomial can increase dramatically as ε reduces, for example, if the runtime is O(n^((1/ε)!)) which is a problem. There is a stricter scheme, the Fully Polynomial Time Approximation Scheme (FPTAS). In FPTAS, the algorithm needs to be polynomial in both the problem size n and 1/ε.
