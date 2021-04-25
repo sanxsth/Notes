@@ -1,0 +1,22 @@
+Scalability
+
+	Scalability is the system's ability to cope with an increased load without requiring a redesign.
+
+	There are two ways to scale a system:
+
+		1. Vertical Scaling / Scale Up
+
+			We scale vertically by adding more resources (CPU, RAM) to an existing machine.
+
+		2. Horizontal Scaling / Scale-Out
+
+			We scale horizontally by adding more systems to our pool of resources.
+
+
+
+	Horizontal Scaling 						Vertical Scaling (single machine)
+-------------------------------------------------------------------------------
+	Requires load balancer			|			N/A
+	Highly available				|			Single point of failure
+	Scale without downtime			|			Cannot scale without downtime
+	Network Calls					|			Inter process communication
