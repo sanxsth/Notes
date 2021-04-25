@@ -1,0 +1,51 @@
+Distributed Systems
+
+	A distributed system in its simplest definition is a group of computers working together to appear as a single computer to the end-user.
+
+	Characteristics of a distributed system
+
+		1. Concurrency: All the servers operate at the same time.
+		2. Independence: Servers run and fail independently of each other.
+		3. No shared clock: Servers do not share a global clock.  	
+
+
+	Domain-Driven Design
+
+		DDD states that the application architecture should evolve around the business model and not around technology.
+
+	Centralized Systems
+
+		Centralized systems make use of client/server architecture, where we have a single server serving all the requests. In order to handle growing demands, we can vertically scale our server.
+
+		Vertical scaling works in the short run, but when the demand keeps increasing, vertical scaling won't be feasible.
+
+
+	Components Of A Distributed System
+
+		We separate our front-end layer, business logic (as web services), and data layer (database) as independent components that can individually be scaled.
+
+		Often, we make the front-end and business layers stateless. The state of the application would be handled by the data layer. Having a distributed data layer is more challenging than the front-end and business layer.
+
+		Some of the techniques we use for scaling the data layer:
+
+			- Replication
+			- Sharding
+
+	CAP Theorem
+
+		CAP theorem states that it is impossible to build a distributed system that would simultaneously guarantee Consistency, Availability, and Partition.
+
+		Monga is a CP DB, while Cassandra is an AP DB.
+
+	Handling Asynchronous Communication
+
+		There are mainly three ways to handle asynchronous operations:
+
+			- Fire and Forget: The caller doesn't care if the operation completes or not.
+			- Callback: Register a call back to be called when the operation completes.
+			- Event-based: The client emits events, subscribers react independently.
+
+
+	References:
+
+		https://www.freecodecamp.org/news/a-thorough-introduction-to-distributed-systems-3b91562c9b3c/
