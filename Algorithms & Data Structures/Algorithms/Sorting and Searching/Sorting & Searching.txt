@@ -1,0 +1,170 @@
+Sorting
+
+	Sorting is a fundamental algorithm design problem. Many efficient algorithms use sorting as a subroutine because it is often easier to process data if the elements are in sorted order.
+
+	There are two broad types of sorting algorithms: integer sorts and comparison sorts:
+
+		Comparison Sort
+
+			Comparison sorts compare elements at each step of the algorithm to determine if one element should be to the left or right of another element.
+			Comparison sorts are limited by a lower bound of O(nlogn), meaning that, on average, comparison sorts cannot be faster than O(nlogn). A lower bound for an algorithm is the worst-case running time of the best possible algorithm for a given problem.
+
+			The running time of comparison-based sorting algorithms is bounded by Ω(nlogn). A comparison sort can be modeled as a large binary tree called a decision tree where each node represents a single comparison. This is a decision tree because each of the n! permutations of the given list is represented by a leaf, and the path the algorithm must take to get to each leaf is the series of comparisons and outcomes that yield that particular ordering.
+
+
+			Proof (https://www.youtube.com/watch?v=WffUZk1pgXE)
+
+				The maximum number of leafs possible in a binary tree of height h: 2^h
+				The minimum, we know is n! (because we have n! permutations possible of the input array).
+
+					2^h >= n!
+
+					taking log on both sides, h >= log(n!)
+
+					from Stirling's approximation, n! > (n/e)^n
+
+					h >= log((n/e)^n)
+					   = nlog(n/e)
+					   = nlogn - nloge
+					   = Ω(nlogn)
+
+
+		Integer Sorts
+
+			Integer sorts are sometimes called counting sorts. Integer sorts do not make comparisons, so they are not bounded by Ω(nlogn).
+
+			Integer sorts determine for each element​ x how many elements are less than x. If there are 14 elements that are less than x, then x will be placed in the 15th slot. This information is used to place each element into the correct slot immediately—no need to rearrange lists.
+
+
+ 	A sorting algorithm is stable if it preserves the original order of elements with equal key values (where the key is the value the algorithm sorts by).
+
+ 	A useful concept when analyzing sorting algorithms is an inversion: a pair of array elements (array[a],array[b]) such that a < b and array[a] > array[b], i.e., the elements are in the wrong order.
+
+ 	The number of inversions indicates how much work is needed to sort the array. An array is completely sorted when there are no inversions. On the other hand, if the array elements are in the reverse order, the number of inversions is the largest possible: n(n-1)/2 = O(n^2)
+
+
+ 	Some Sorting Algorithms
+
+ 		1. Selection Sort:
+
+ 			The algorithm sorts an array by repeatedly finding the minimum element (considering ascending order) from the unsorted part and putting it into the sorted part. The algorithm maintains two subarrays:
+
+				i. A subarray that is already sorted.
+			   ii. Remaining subarray which is unsorted.
+
+	    	Time complexity: O(n^2)
+	    	Auxiliary space: O(1)
+	    	Stable: No, but can be made stable by using inserting (instead of swap) the selected value and pushing the others to the unsorted side.
+
+	    	Selection sort never makes more than O(n) swaps, hence is useful in situations where memory writes are costly.
+
+    	2. Bubble Sort:
+
+    		Bubble Sort is the simplest sorting algorithm that works by repeatedly swapping the adjacent elements if they are in the wrong order.
+
+    		Time complexity: O(n^2)
+    		Auxiliary space: O(1)
+    		Stable: true
+
+    	3. Insertion Sort
+
+    		To sort an array of size n in ascending order: 
+				1: Iterate from arr[1] to arr[n-1] over the array. 
+				2: Compare the current element (key) to its predecessor. 
+				3: If the key element is smaller than its predecessor, compare it to the elements before. Move the greater elements one position up to make space for the swapped element.
+
+			Time complexity: O(n^2)
+			Auxiliary space: O(1)
+			Stable: true
+
+		4. Merge Sort
+
+			Merge sort is a divide and conquer algorithm. It divides the array into two halves, recursively calls mergesort on these two sub-arrays and once they are sorted, the arrays are merges.
+
+			Time complexity: O(nlogn)
+			Auxiliary space: O(n)
+			Stable: true
+
+		5. Heap Sort
+
+			Heap Sort Algorithm for sorting in increasing order: 
+				1. Build a max heap from the input data. 
+				2. At this point, the largest item is stored at the root of the heap. Replace it with the last item of the heap followed by reducing the size of the heap by 1. Finally, heapify the root of the tree. 
+				3. Repeat step 2 while the size of the heap is greater than 1.
+
+			Time complexity: O(nlogn)
+			Auxiliary space: O(1)
+			Stable: No, but can be made stable.
+
+		6. Quick Sort
+
+			Quicksort is a divide and conquer approach. It picks an element as a pivot and partitions the given array around the picked pivot. There are many different versions of quickSort that pick pivot in different ways:
+
+				1. Always pick the first element as pivot.
+				2. Always pick the last element as the pivot (implemented below)
+				3. Pick a random element as a pivot.
+				4. Pick median as the pivot.
+
+			Time comeplexity: O(n^2)
+			Auxiliary complexity: 1
+			Stable: No, but can be made stable.
+
+			Although Merge sort and Heap sort have better worst-case complexity, QuickSort is faster in practice, because its inner loop can be efficiently implemented on most architectures, and in most real-world data.
+
+			Why Quicksort is preferred over Merge sort for sorting arrays.
+
+				Quicksort is inplace, while Merge sort requires O(n) extra memory. The average complexity is the same for them. Quick Sort is also a cache-friendly sorting algorithm as it has a good locality of reference when used for arrays. Most practical implementations of Quick Sort use randomized version. The randomized version has an expected time complexity of O(nLogn)
+
+		7. Counting Sort
+
+			Counting sort is a sorting technique based on keys between a specific range. It works by counting the number of objects having distinct key values.
+
+			Time complexity: O(n + k), n is the number of elements and k is the range of the input.
+			Space complexity: O(n + k)
+
+		8. Radix Sort
+
+			This algorithm sorts data with integer keys by grouping the keys by individual digits that share the same significant position and value (place value). Radix sort uses counting sort as a subroutine to sort an array of numbers. Because integers can be used to represent strings (by hashing the strings to integers), radix sort works on data types other than just integers.
+
+			Time complexity: O(d (n + b)); d: max digits; n: number of keys; b: the base of the given numbers
+
+Searching
+
+	Binary Search
+
+		Given a sorted array, we make use of this 'Decrease and conquer' technique to find a given value in O(logn).
+		The recurrence relation is : T(n/2) + c
+
+		Auxiliary Space: O(1) in case of iterative implementation. In the case of recursive implementation, O(Logn) recursion call stack space.
+
+	Jump Search
+
+		A Jump search or block search refers to a search algorithm for ordered lists. It works by first checking all items at (k*m), where m is the block size until an item is found larger than the search key. The optimal value for 'm' is sqrt(n).
+
+		Time complexity: O(sqrt(n))
+		Auxiliary space: O(1)
+
+		Binary search is better than Jump search, but the latter has an advantage that we traverse back only once. So a system where the binary search is costly we use Jump search.
+
+	Interpolation Search
+
+		If the given array is sorted and the values are uniformly distributed, we can use an optimized version of binary search. Instead of picking the middle element to check, Interpolation search may go to a different location according to the value of the key being searched.
+
+		We use the following formulae for selecting the position:
+
+			pos = low + ( (val - arr[low]) / (arr[high] - arr[low]) * (high - low) );
+
+		Interpolation search works better than Binary search for a sorted and uniformly distributed array. On average, the Interpolation search makes about O(log(logn)) comparison. In the worst case, it can make up to O(n) comparisons.
+
+
+	Exponential Search
+
+		The idea is to start with subarray size 1, compare its last element with the search value, then try size 2, then 4, and so on until the last element of a subarray is not greater. Once we find an index 'i' (after the repeated doubling of i), we know that the element must be present between i/2 and 'i'. We now do a binary search on the range [i/2, i].
+
+		Time complexity: O(logn)
+
+		Exponential Binary Search is particularly useful for unbounded searches, where the size of the array is infinite
+
+	Ternary Search
+
+		Ternary search is similar to binary, instead of two, we divide the range into three segments. Often, we prefer binary over ternary because the ternary search ends up making more comparisons than binary.
