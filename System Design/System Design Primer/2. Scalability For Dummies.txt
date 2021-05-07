@@ -1,0 +1,31 @@
+Scalability For Dummies
+
+	In horizontal scaling, our web servers sit behind a load balancer. This load balancer evenly distributes load onto your group/cluster of application servers. Storing state on these machines is a bad idea since a user will not always be served by the same server. We solve this by outsourcing our sessions to a centralized data store. Since the request needs to be server-independent, the same codebase should be deployed on all these servers.
+
+	Soon, we face another challenge. Since our data store is centralized, it is now a bottleneck as well as a single point of failure. We can make it scalable via
+	replication, sharding, and denormalization.
+
+	We can make our response much faster by making use of caching. Whenever your application has to read data it should first try to retrieve the data from your cache. Only if it's not in the cache should it try to get the data from the main data source.
+
+	There are two main patterns to caching
+
+		1. Caching Database queries
+
+			We store the query result in the cache using the hashed query as the key. One main issue with this approach is that when one piece of data changes (for example, a table cell) we have to delete all cached queries that may include this modified data.
+
+		2. Cached Objects
+
+			We cache object instances along with the data that relate to them. The benefit of this approach is that when a piece of data changes we can easily get rid of all the related cache entries.
+
+	We can make our applications more responsive via asynchronism. There are two paradigms to do asynchronism:
+
+		1. In this approach, we do time-consuming work in advance and serving the finished work with low response time. An example of this would be: Turning dynamic content into static content.  Pages of a website, maybe built with a massive framework or CMS, are pre-rendered and locally stored as static HTML files on every change. Often these computing tasks are done on a regular basis, maybe by a script which is called every hour by a cronjob. This pre-computing of overall general data can extremely improve websites and web apps and makes them very scalable and performant.
+
+		2. When the user submits a time-consuming job, instead of waiting for this job to complete he can continue with his work while the job is being done parallel. There will be mechanisms in place to inform the user once the job completes.
+
+References
+
+	1. https://www.lecloud.net/post/7295452622/scalability-for-dummies-part-1-clones
+	2. https://www.lecloud.net/post/7994751381/scalability-for-dummies-part-2-database
+	3. https://www.lecloud.net/post/9246290032/scalability-for-dummies-part-3-cache
+	4. https://www.lecloud.net/post/9699762917/scalability-for-dummies-part-4-asynchronism

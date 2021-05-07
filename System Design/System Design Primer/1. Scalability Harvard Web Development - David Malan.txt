@@ -1,0 +1,40 @@
+Scalability Harvard Web Development David Malan
+
+	Scalability
+
+		Scalability is the system's ability to cope with an increased load without requiring a redesign.
+
+	Vertical Scaling
+
+		We scale vertically by adding more resources (CPU, RAM) to an existing machine.
+
+	Horizontal Scaling
+
+		We scale horizontally by adding more systems to our pool of resources. The application should be designed to support horizontal scaling, therefore some redesign might be required to horizontally scale an application.
+
+		Load balancer
+
+			Now that we have multiple servers, how do we redirect a request to these? How do we distribute them efficiently? To solve these challenges, we make use of a load balancer. Now the DNS should return the IP address of the load balancer.
+
+			We have software load balancers and hardware load balancers. Sometimes load balancers can be a single point of failure, we avoid them by having multiple load balancers. There two main models: active-active and active-passive.
+
+
+
+		If we store our sessions on a server, this can lead to problems since a user can have multiple sessions across various servers. To solve this we make our servers stateless and store all the states on a server exclusively for the state. But if the hard disk of this server goes down, our whole system becomes stateless. We solve this issue using RAID. But the 'state' server is still a single point of failure. We solve this problem via distributed data storage.
+
+		Replication
+
+			Replication is a strategy used by distributed data storage which replicates data and stores them on multiple servers. Usually, in this architecture, we have 'master' DBs which we use exclusively for writing data, and a bunch of 'slave' DBs that we will use for reads. 
+
+		Partition
+
+			To reduce load, we can partition the data across multiple servers, this is called sharding.
+
+	Caching
+
+		Caching can be used to improve performance. Caches work well in a read-heavy application.
+
+
+	References:
+
+		https://www.youtube.com/watch?v=-W9F__D3oY4
