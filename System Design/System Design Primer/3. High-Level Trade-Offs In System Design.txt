@@ -1,0 +1,135 @@
+High-Level Trade-Offs In System Design
+
+	Performance v/s Scalability
+
+		Here's Steve Haines's definition of performance vs scalability:
+
+			The terms “performance” and “scalability” are commonly used interchangeably, but the two are distinct: performance measures the speed with which a single request can be executed, while scalability measures the ability of a system to maintain its performance under increasing load. For example, the performance of a request may be reported as generating a valid response within three seconds, but the scalability of the request measures the system's ability to maintain that three-second response time as the user load increases.
+
+		Scalability doesn't come out-of-the-box, systems should be designed to be scalable and sometimes this would lead to reduced performance. A scalable design is comparatively complex than a simple non-scalable one, this results in a performance drop.
+
+
+	Latency v/s Throughput
+
+		Latency: The time taken to perform some action or to produce some result.
+		Throughput: The number of such actions or results per unit of time.
+
+		Generally, you should aim for maximal throughput with acceptable latency.
+
+	
+	Availability v/s Consistency
+
+		CAP Theorem
+
+			In a distributed computer system, you can only support two of the following guarantees:
+
+				1. Consistency - Every read receives the most recent write or an error.`
+				2. Availability - Every request receives a response, without a guarantee that it contains the most recent version of the information.
+				3. Partition Tolerance - The system continues to operate despite arbitrary partitioning due to network failures.
+
+			Networks aren't reliable, so you'll need to support partition tolerance. You'll need to make a software tradeoff between consistency and availability.
+
+		Consistency and Partition Tolerance
+
+			Waiting for a response from the partitioned node might result in a timeout error. CP is a good choice if your business needs to require atomic reads and writes.
+
+		Availability and Partition Tolerance
+
+			Responses return the most readily available version of the data available on any node, which might not be the latest. Writes might take some time to propagate when the partition is resolved.
+
+			AP is a good choice if the business needs allow for eventual consistency or when the system needs to continue working despite external errors.
+
+		Consistency Patterns
+
+			With multiple copies of the same data, we are faced with options on how to synchronize them so clients have a consistent view of the data. Recall the definition of consistency from the CAP theorem - Every read receives the most recent write or an error.
+
+			1. Weak Consistency
+
+				After a write, reads may or may not see it. A best-effort approach is taken. This approach is seen in systems such as Memcached. Weak consistency works well in real-time use cases such as VoIP, video chat, and real-time multiplayer games. For example, if you are on a phone call and lose reception for a few seconds, when you regain connection you do not hear what was spoken during the connection loss.
+
+			2. Eventual Consistency
+
+				After a write, reads will eventually see it (typically within milliseconds). Data is replicated asynchronously. This approach is seen in systems such as DNS and email. Eventual consistency works well in highly available systems.
+
+			3. Strong Consistency
+
+				After a write, reads will see it. Data is replicated synchronously. This approach is seen in file systems and RDBMSes. Strong consistency works well in systems that need transactions.
+
+		Availability Patterns
+
+			There are two complementary patterns to support high availability: fail-over and replication.
+
+			Fail-over
+
+				1. Active-Passive
+
+					With active-passive fail-over, heartbeats are sent between the active and the passive server on standby. If the heartbeat is interrupted, the passive server takes over the active's IP address and resumes service. The length of downtime is determined by whether the passive server is already running in 'hot' standby or whether it needs to start up from 'cold' standby. Only the active server handles traffic. Active-passive failover can also be referred to as master-slave failover.
+
+				2. Active-Active
+
+					In active-active, both servers are managing traffic, spreading the load between them. If the servers are public-facing, the DNS would need to know about the public IPs of both servers. If the servers are internal-facing, application logic would need to know about both servers. Active-active failover can also be referred to as master-master failover.
+
+				Disadvantages of failover
+
+					1. Adds more hardware and additional complexity.
+					2. There is a potential for loss of data if the active system fails before any newly written data can be replicated to the passive.
+
+			Replication
+
+				There are two kinds of replication strategies:
+
+					1. Master-slave replication
+
+						The master serves reads and writes, replicating writes to one or more slaves, which serve only reads. Slaves can also replicate to additional slaves in a tree-like fashion. If the master goes offline, the system can continue to operate in read-only mode until a slave is promoted to a master or a new master is provisioned.
+
+						Cons: Additional logic is needed to promote a slave to a master.
+
+					2. Master-master replication
+
+						Both masters serve reads and writes, and coordinate with each other on writes. If either master goes down, the system can continue to operate with both reads and writes.
+
+						Cons:
+
+							- You'll need a load balancer or you'll need to make changes to your application logic to determine where to write.
+							- Most master-master systems are either loosely consistent (violating ACID) or have increased write latency due to synchronization.
+							- Conflict resolution comes more into play as more write nodes are added and as latency increases.
+
+				Disadvantages of replication
+
+					1. There is a potential for loss of data if the master fails before any newly written data can be replicated to other nodes.
+					2. Writes are replayed to the read replicas. If there are a lot of writes, the read replicas can get bogged down with replaying writes and can't do as many reads.
+					3. The more read slaves, the more you have to replicate, which leads to greater replication lag.
+					4. Replication adds more hardware and additional complexity.
+
+
+			Calculating Availability Of A System
+
+				Availability is often quantified by uptime (or downtime) as a percentage of time the service is available. System Availability is calculated by modeling the system as an interconnection of parts in series and parallel. The following rules are used to decide if components should be placed in series or parallel:
+
+					1. If failure of a part leads to the combination becoming inoperable, the two parts are considered to be operating in series
+					2. If failure of a part leads to the other part taking over the operations of the failed part, the two parts are considered to be operating in parallel.
+
+				Availability in series:
+
+					If componensts x and y are in series, the total availability of the systesm is:
+
+					S = avail(x) * avail(y);
+
+					Overall availability decreases when two components with availability < 100% are in sequence:
+
+				Availability in parallel:
+
+					If components x and y are in parallel, the total availability of the system is:
+
+					S = 1 - (1 - ( (1 - avail(x)) * (1 - avail(y))) )
+
+					Overall availability increases when two components with availability < 100% are in parallel
+
+
+References
+
+	https://www.allthingsdistributed.com/2006/03/a_word_on_scalability.html
+	https://blog.professorbeekums.com/performance-vs-scalability/
+	https://www.conceptatech.com/blog/application-performance-vs-scalability-are-they-mutually-exclusive
+	https://www.slideshare.net/jboner/scalability-availability-stability-patterns/21-AvailabilityvsConsistency
+	https://community.cadence.com/cadence_blogs_8/b/sd/posts/understanding-latency-vs-throughput
