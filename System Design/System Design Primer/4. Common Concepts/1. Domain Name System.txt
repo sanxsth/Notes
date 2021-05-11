@@ -1,0 +1,56 @@
+Domain Name System
+
+	DNS is a hierarchical distributed database and an associated set of protocols that define:
+
+		1. A mechanism for quering and updating data.
+		2. A mechanism for replacing the information in the database among servers.
+		3. A schema of the database.
+
+	The names in a DNS database form a heirarchical structure called the domain namespace. Domain names consists of individual labels separated by dots, for example mydomain.microsoft.com.
+
+	A fully qualified domain name (FQDM), aka absolute domain name, is a domain name that specified the exact location in the tree heirarchy of DNS. It specifies all domain levels, including the top-level domain and the root zone.
+
+	The DNS Domain namespace is based on the concept of a tree of named domains. Each level of the tree can represent either a branch or a leaf of the tree. A branch is a level where more than one name is used to identify a collection of named resources.
+
+	For example,
+
+					Root level ("")
+						|
+				 ---------------
+				 |		|	   |
+				com    org    edu
+				/				\
+			   /				 \
+		   microsoft			  \
+			   |				  mit	
+			    \
+			     \
+			     mydomain
+
+ 	Levels in DNS namespace:
+
+ 		1. Root domain: This is the top level of the tree, representing an unnamed level; it is sometimes shown as two empty quotation marks (""), indicating a null value. When used in DNS domain name, it is stated by a trailing period (.) to designate that the name is located at the root or the highest level of domain hierarchy. In this instance the domain name is considered to be complete and points to the exact location in the tree of names. For example, 'microsoft.com.'.
+
+ 		2. Top-level domain: Used to indicate the country/region or the type of organization using a name.
+
+ 		3. Second-level domain: Variable-length name registered to an individual or organization for use on the internet.
+
+ 		4. Sub-domain: Additional names that an organization can create that are derived from the registered second-level domain name.
+
+ 		5. Host or resource name: Names that represent leafs in the DNS tree of names and identify a specific resource.
+
+ 	Resource Records:
+
+ 		These are the entries in the DNS database. Some of the common RRs are:
+
+ 			1. 'A' record: IPv4 Host Record, used for mapping a Domain Name to an IPv4 address
+ 			2. 'AAAA' record (quad-A): IPv6 Host Record, used for mapping a Domain Name to an IPv6 address
+ 			3. CNAME record: Alias Record, used for mapping an alias of a DNS domain name.
+ 			4. MX record: Used for mapping a DNS domain name to the mail server.
+ 			5. PTR record: Pointer, used for reverse lookup (IP Address to Domain Name resolution) 
+
+References
+
+	https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/dd197427(v=ws.10)?redirectedfrom=MSDN
+	https://www.omnisecu.com/tcpip/what-is-dns-resource-record.php
+	https://www.digitalocean.com/community/tutorials/an-introduction-to-dns-terminology-components-and-concepts
