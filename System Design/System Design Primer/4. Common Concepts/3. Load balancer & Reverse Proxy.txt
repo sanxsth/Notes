@@ -1,0 +1,73 @@
+Load Balancer
+
+	Load balancers distribute incoming requests to computing resources such as application servers and databases. In each case, the load balancer returns the response from the computing resource to the appropriate client. Load balancers are effective at:
+
+		1. Preventing requests from going to unhealthy servers.
+		2. Preventing overloading resources.
+		3. Helping to eliminate a single point of failure.
+
+	Load balancers can be implemented with hardware (expensive) or with software such as HAProxy.
+
+	Additional benefits include:
+
+		1. SSL termination: Decryption of incoming requests and encryption of outgoing requests can be done so that the backend server doesn't have to do these expensive operations. This removes the need to install X.509 certificates on each server.
+		2. Session persistence: Issue cookies and route a specific client's request to the same instance if the web apps do not keep track of sessions.
+
+	To protect against failures, it's common to set up multiple load balancers, either in active-passive or active-active mode.
+
+	Load balancers can route traffic based on various metrics
+
+		1. Random
+		2. Least load
+		3. Session/cookies
+		4. Round robin or weighted round robin
+		5. Layer-4 load balancing
+
+			Layer 4 load balancing uses information defined at the networking transport layer (Layer 4) as the basis for deciding how to distribute client requests across a group of servers. "Layer 4 load balancing" refers to a deployment where the load balancer’s IP address is the one advertised to clients for a website or service (via DNS, for example). As a result, clients record the load balancer’s address as the destination IP address in their requests. When the Layer 4 load balancer receives a request and makes the load balancing decision, it also performs Network Address Translation (NAT) on the request packet, changing the recorded destination IP address from its own to that of the content server it has chosen on the internal network. Similarly, before forwarding the response, the source address is overwritten with the load balancers' IP.
+
+		6. Layer-7 load balancing
+
+				Layer 7 load balancers look at the application layer to decide how to distribute requests. This can involve the contents of the header, message, and cookies. Layer 7 load balancers terminate network traffic, reads the message, make a load-balancing decision, then opens a connection to the selected server. For example, a layer 7 load balancer can direct video traffic to servers that host videos while directing more sensitive user billing traffic to security-hardened servers.
+
+				At the cost of flexibility, layer 4 load balancing requires less time and computing resources than Layer 7, although the performance impact can be minimal on modern commodity hardware. Since Layer-7 has more information at its disposal, it can make efficient decisions.
+
+	Load balancers help us with horizontal scaling.
+
+	Disadvantages of a load balancer
+
+		1. The load balancer can become a performance bottleneck if it does not have enough resources or if it is not configured properly.
+		2. Introducing a load balancer to help eliminate a single point of failure results in increased complexity.
+		3. A single load balancer is a single point of failure, configuring multiple load balancers further increases complexity.
+
+Reverse Proxy (Web server)
+
+	A reverse proxy is a web server that centralizes internal services and provides unified interfaces to the public. Requests from clients are forwarded to a server that can fulfill them before the reverse proxy returns the server's response to the client.
+
+	Benefits of a reverse proxy:
+
+		1. Increased security: Hide information about backend servers, blacklist IPs, limit the number of connections per client.
+		2. Increased scalability and flexibility: Clients only see the reverse proxy's IP, allowing you to scale servers or change their configuration.
+		3. SSL termination: Decrypt incoming requests and encrypt server responses so backend servers do not have to perform these potentially expensive operations. Removes the need to install X508 certificates on internal servers.
+		4. Compression: Compress server responses
+		5. Caching
+		6. Serve static content directly
+
+	Disadvantages of a reverse proxy:
+
+		1. Introducing a reverse proxy result in increased complexity.
+		2. A single reverse proxy is a single point of failure, configuring multiple reverse proxies (ie a failover) further increases complexity.
+
+Reverse Proxy vs Load Balancer
+
+	1. Deploying a load balancer is useful when you have multiple servers. Often, load balancers route traffic to a set of servers serving the same function.
+	2. Reverse proxies can be useful even with just one web server or application server, opening up the benefits described in the previous section.
+	3. Solutions such as NGINX and HAProxy can support both layer 7 reverse proxying and load balancing.
+
+References
+	
+	https://www.nginx.com/blog/inside-nginx-how-we-designed-for-performance-scale/
+	https://en.wikipedia.org/wiki/Load_balancing_(computing)
+	https://www.nginx.com/resources/glossary/layer-4-load-balancing/
+	https://www.nginx.com/resources/glossary/layer-7-load-balancing/
+	https://www.nginx.com/resources/glossary/reverse-proxy-vs-load-balancer/
+

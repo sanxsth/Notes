@@ -12,6 +12,11 @@ Scalability Harvard Web Development David Malan
 
 		We scale horizontally by adding more systems to our pool of resources. The application should be designed to support horizontal scaling, therefore some redesign might be required to horizontally scale an application.
 
+		Disadvantage(s): horizontal scaling
+
+			1. Scaling horizontally introduces complexity and involves cloning servers. Servers should be stateless: they should not contain any user-related data like sessions or profile pictures. Sessions can be stored in a centralized data store such as a database (SQL, NoSQL) or a persistent cache (Redis, Memcached).
+			2. Downstream servers such as caches and databases need to handle more simultaneous connections as upstream servers scale out
+
 		Load balancer
 
 			Now that we have multiple servers, how do we redirect a request to these? How do we distribute them efficiently? To solve these challenges, we make use of a load balancer. Now the DNS should return the IP address of the load balancer.

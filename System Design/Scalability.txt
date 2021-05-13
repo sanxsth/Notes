@@ -1,6 +1,6 @@
 Scalability
 
-	Scalability is the system's ability to cope with an increased load without requiring a redesign.
+	Scalability is the system's ability to cope with an increased load without requiring a redesign. Another defintion we often see is: Scalability is the property of a system to handle a growing amount of work by adding resources to the system.
 
 	There are two ways to scale a system:
 
@@ -10,7 +10,7 @@ Scalability
 
 		2. Horizontal Scaling / Scale-Out
 
-			We scale horizontally by adding more systems to our pool of resources.
+			We scale horizontally by adding more systems to our pool of resources. The application should be designed to support horizontal scaling, therefore some redesign might be required to horizontally scale an application.
 
 
 

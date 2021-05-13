@@ -33,7 +33,7 @@ Distributed Systems
 
 	CAP Theorem
 
-		CAP theorem states that it is impossible to build a distributed system that would simultaneously guarantee Consistency, Availability, and Partition.
+		CAP theorem states that it is impossible to build a distributed system that would simultaneously guarantee Consistency, Availability, and Partition tolerence.
 
 		Monga is a CP DB, while Cassandra is an AP DB.
 
