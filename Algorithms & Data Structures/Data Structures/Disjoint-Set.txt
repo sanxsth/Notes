@@ -1,0 +1,52 @@
+Disjoint Set (Union-Find / Merge-Find) Data structure
+
+	A disjoint set is a data structure that stores a collection of disjoint sets. It is used in Kruskal's MST algorithm.
+
+	The two main operations on a Disjoint set are:
+
+		1. Union(s1, s2): Used for merging two sets.
+		2. Find(x): Finds the set/partition the element 'x' is part of.
+
+	Implementation
+
+		We use an array to represent our nodes, each node is mapped to an index, and arr[i] stores the parent of 'i'. Initially, arr[i] = i, meaning all the nodes are independent. When we do Union(s1, s2), we merge the smallest component into the largest.
+
+		We make use of the path compression technique to optimize the operations. The efficiency of these operations depends on the height of the tree. While doing find, we compress our path by making all the nodes in the path point to the root.
+
+		Find() with path compression
+
+			int find(int i) 
+			{
+			    // If i is the parent of itself
+			    if (Parent[i] == i) 
+			    {
+			        // Then i is the representative 
+			        return i;
+			    }
+			    else
+			    { 
+			        // Recursively find the representative.
+			        int result = find(Parent[i]);
+
+			        // We cache the result by moving i’s node 
+			        // directly under the representative of this
+			        // set
+			        Parent[i] = result;
+			       
+			        // And then we return the result
+			        return result;
+			     }
+			}
+
+		While doing union we make use of ranks to minimize the height of the resulting tree. If 'i' is a representative of a set, rank[i] is the height of the tree representing the set. Now recall that, in the Union operation, it doesn’t matter which of the two trees is moved under the other. Now what we want to do is minimize the height of the resulting tree. If we are uniting two trees (or sets), let’s call them left and right, then it all depends on the rank of left and the rank of right. If the rank of the left is less than the rank of right, then it’s best to move left under right.
+
+
+	For the naive implementation of union() and find(), the time complexity is O(n) in the worst case. With Rank, we bring down the complexity to O(logn). Proving this is easy. When we merge two nodes, we get a tree of height 2. If we merge two trees of height 2, we get a tree with a height of 3 and a minimum of 4 nodes in it. This pattern shows that with 'n' nodes, we can get a height of O(logn).
+
+	But with path compression, we can bring down the complexity further. The amortized complexity of these operations would be nearly constant. The complexity would be O(a(n)), a() is an inverse Ackermann function.
+
+References
+
+	https://www.youtube.com/watch?v=ibjEGG7ylHk&list=PLDV1Zeh2NRsBI1C-mR6ZhHTyfoEJWlxvq
+	https://www.geeksforgeeks.org/union-find/
+	https://www.geeksforgeeks.org/union-find-algorithm-set-2-union-by-rank/
