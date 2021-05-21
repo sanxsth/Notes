@@ -1,0 +1,63 @@
+ReactJS
+
+	React is a declarative, efficient, and flexible JavaScript library for building user interfaces. It lets you compose complex UIs from small and isolated pieces of code called “components”.
+
+	React.Component
+
+		class ShoppingList extends React.Component {
+		  render() {
+		    return (
+		      <div className="shopping-list">
+		        <h1>Shopping List for {this.props.name}</h1>
+		        <ul>
+		          <li>Instagram</li>
+		          <li>WhatsApp</li>
+		          <li>Oculus</li>
+		        </ul>
+		      </div>
+		    );
+		  }
+		}
+
+		// Example usage: <ShoppingList name="Mark" />
+
+		React components are used to tell React what we want to see on the screen. When our data changes, React will efficiently update and re-render our components. A component takes in parameters, called 'props' and return a hierarchy of views to display via the render method. In particular, the render method returns a 'React Element', which is a light-weigh description of what to render. Most developers use 'JSX' to describe these React elements.
+
+		You can put any JS expression within braces inside JSX. Reach Element is a JS object that you can store in a variable or pass around in your program.
+		You can have other components (in-built and custom) within your component. Each component is encapsulated and can operate independently.
+
+		We can use 'props' to pass infromation from parents to children. Component's internal informations are stored in the 'state'. React components can have state by setting 'this.state' in their constructors. 'this.state' should be considered as private to a React component that it’s defined in.
+
+		When you call setState in a component, React automatically updates the child components inside of it too.
+
+		The React Devtools extension for Chrome and Firefox lets you inspect a React component tree with your browser’s developer tools. The React DevTools let you check the props and the state of your React components.
+
+		To collect data from multiple children, or to have two child components communicate with each other, you need to declare the shared state in their parent component instead. The parent component can pass the state back down to the children by using props; this keeps the child components in sync with each other and with the parent component.
+
+		The DOM <button> element’s onClick attribute has a special meaning to React because it is a built-in component. For custom components, adding onClick would just mean adding another prop.
+
+		A 'Controlled Component' is one that takes its value through props and notifies changes through callbacks like onChange. A parent component 'controls' it by handling the callback and managing its own state and passing the new values as props to the controlled components.
+
+		Why Mutability Is Important?
+
+			- Immutability makes complex features much easier to implement.
+			- It's easier to detect changes in an immutable object. If the immuatable object being referenced is different from the previous one, then the object has changed.
+			- Immutable data makes it easy to determine if changes has been made (shallow comparision), which helps to determine when a component required re-rendering.
+
+		The main benefit of immutability is that it helps you build pure components in React. Pure Components in React are the components which do not re-renders when the value of state and props has been updated with the same values.
+
+		It's simpler to write a React component as a function component if it contains only the 'render' method and don't have their own state. For example,
+
+			function Square(props) {
+			  return (
+			    <button className="square" onClick={props.onClick}>
+			      {props.value}
+			    </button>
+			  );
+			}
+
+		Each child in an array or iterator should have a unique “key” prop. When a list is re-rendered, React takes each list item’s key and searches the previous list’s items for a matching key. If the current list has a key that didn’t exist before, React creates a component. If the current list is missing a key that existed in the previous list, React destroys the previous component. If two keys match, the corresponding component is moved. Keys tell React about the identity of each component which allows React to maintain state between re-renders. If a component’s key changes, the component will be destroyed and re-created with a new state. 'key' is a special and reserved property in React (along with ref, a more advanced feature). When an element is created, React extracts the key property and stores the key directly on the returned element. Even though key may look like it belongs in props, key cannot be referenced using this.props.key. React automatically uses key to decide which components to update. A component cannot inquire about its key. Keys do not need to be globally unique; they only need to be unique between components and their siblings.
+
+References
+
+	https://reactjs.org/tutorial/tutorial.html
