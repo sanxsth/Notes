@@ -1,0 +1,83 @@
+JSX
+
+	JSX is a syntax extension to Javascript. It is used for describing what the UI should look like, it produces 'React elements'.
+
+	Why JSX?
+
+		React embraces the fact that rendering logic is inherently coupled with other UI logic: how events are handled, how the state changes over time, and how the data is prepared for display. Instead of artificially separating technologies by putting markup and logic in separate files, React separates concerns with loosely coupled units called "components".
+
+		React doesn't require JSX, but it makes working with UI easier inside the JavaScript code. Also, it allows React to show more useful error and warning messages.
+
+	Embedding Expressions in JSX
+
+		You can put any valid JS expression inside the curly braces in JSX. For example,
+
+			const element = (
+			  <h1>
+			    Hello, {1 + 1}!
+			  </h1>
+			);
+
+		We split JSX over multiple lines for readability. While it isn’t required, when doing this, we wrap it in parentheses to avoid the pitfalls of automatic semicolon insertion.
+
+		It is safe to embed user input in JSX:
+
+			const title = response.potentiallyMaliciousInput;
+			// This is safe:
+			const element = <h1>{title}</h1>;
+
+	JSX Is Expression Too & They Represent Objects
+
+		After compilation, JSX expressions become regular JS function calls and evaluates to JS objects. This means that we can assign it to variables, accept them as arguments, and return them from functions.
+
+		Babel compiles JSX down to React.createElement() calls. The following two are the same:
+
+			const element = (
+			  <h1 className="greeting">
+			    Hello, world!
+			  </h1>
+			);
+
+			const element = React.createElement(
+			  'h1',
+			  {className: 'greeting'},
+			  'Hello, world!'
+			);
+
+			React.createElement() performs a few checks to help you write bug-free code but essentially it creates an object like this:
+
+				// Note: this structure is simplified
+				const element = {
+				  type: 'h1',
+				  props: {
+				    className: 'greeting',
+				    children: 'Hello, world!'
+				  }
+				};
+
+			These objects are called “React elements”. You can think of them as descriptions of what you want to see on the screen. React reads these objects and uses them to construct the DOM and keep it up to date.
+
+	Specifying Attributes With JSX
+
+		You may use quotes to specify string literals as attributes: const element = <div tabIndex="0"></div>;
+		You may also use curly braces to embed a JavaScript expression in an attribute: const element = <img src={user.avatarUrl}></img>;
+
+		Since JSX is closer to JavaScript than to HTML, React DOM uses camelCase property naming convention instead of HTML attribute names.
+
+	Specifying Children with JSX
+
+		If a tag is empty, you can close it immediately: const element = <img src={user.avatarUrl} />;
+		JSX tag may contain childer:
+
+			const element = (
+			  <div>
+			    <h1>Hello!</h1>
+			    <h2>Good to see you here.</h2>
+			  </div>
+			);
+
+		By default, React DOM escapes any values embedded in JSX before rendering them. Thus it ensures that you can never inject anything that’s not explicitly written in your application. Everything is converted to a string before being rendered. This helps prevent XSS (cross-site-scripting) attacks.
+
+References
+
+	https://reactjs.org/docs/introducing-jsx.html
