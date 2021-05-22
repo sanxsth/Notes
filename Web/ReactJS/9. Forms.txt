@@ -1,0 +1,60 @@
+Forms
+
+	HTML form elements work a little differently from other DOM elements in React because forms naturally keep some internal state. But it is convenient to have a JS function that handles the form submission and has access to the data that the user entered in the form. The standard way to achieve this is with a technique called 'controlled components'.
+
+	Controlled Components
+
+		In HTML, form elements such as <input>, <textarea>, and <select> typically maintain their own state and update it based on user input. In React, mutable state is typically kept in the state property of components and only updated with 'setstate()'. We can combine these two by making the React state be the 'single source of truth'. Then the React component that renders the form also controls what happens in that form on subsequent user input. An input form element that is controlled by React in this way is called 'controlled components'. For example,
+
+			class NameForm extends React.Component {
+			  constructor(props) {
+			    super(props);
+			    this.state = {value: ''};
+
+			    this.handleChange = this.handleChange.bind(this);
+			    this.handleSubmit = this.handleSubmit.bind(this);
+			  }
+
+			  handleChange(event) {
+			    this.setState({value: event.target.value});
+			  }
+
+			  handleSubmit(event) {
+			    alert('A name was submitted: ' + this.state.value);
+			    event.preventDefault();
+			  }
+
+			  render() {
+			    return (
+			      <form onSubmit={this.handleSubmit}>
+			        <label>
+			          Name:
+			          <input type="text" value={this.state.value} onChange={this.handleChange} />
+			        </label>
+			        <input type="submit" value="Submit" />
+			      </form>
+			    );
+			  }
+			}
+
+		With a controlled component, the input’s value is always driven by the React state. While this means you have to type a bit more code, you can now pass the value to other UI elements too, or reset it from other event handlers.
+
+		This way we can control the 'textarea' tag and the 'select' tag. Since the value of the 'file input' tag is read-only, it is an uncontrolled component in React.
+
+	Controlled Input Null Value
+
+		Specifying the value prop on a controlled component prevents the user from changing the input unless you desire so. If you’ve specified a value but the input is still editable, you may have accidentally set the value to undefined or null. The following code demonstrates this. The input is locked at first but becomes editable after a short delay.
+
+			ReactDOM.render(<input value="hi" />, mountNode);
+
+			setTimeout(function() {
+			  ReactDOM.render(<input value={null} />, mountNode);
+			}, 1000);
+
+
+	Uncontrolled components are an alternative technique for implementing input forms.
+
+References
+
+	https://reactjs.org/docs/forms.html
+	
