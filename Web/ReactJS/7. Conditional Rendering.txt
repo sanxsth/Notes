@@ -1,0 +1,73 @@
+Conditional Rendering
+
+	Conditional rendering in React works the same way conditions work in JS. Use JS operators like 'if' or the conditional operator to create elements representing the current state, and let React update the UI to match them. For example,
+
+		function Greeting(props) {
+		  const isLoggedIn = props.isLoggedIn;
+		  if (isLoggedIn) {
+		    return <UserGreeting />;
+		  }
+		  return <GuestGreeting />;
+		}
+
+		ReactDOM.render(
+		  // Try changing to isLoggedIn={true}:
+		  <Greeting isLoggedIn={false} />,
+		  document.getElementById('root')
+		);
+
+	You can store elements in variables, this can help you conditionally render a part of the component while the rest of the output doesn't change. For example,
+
+		render() {
+		    const isLoggedIn = this.state.isLoggedIn;
+		    let button;
+		    if (isLoggedIn) {
+		      button = <LogoutButton onClick={this.handleLogoutClick} />;
+		    } else {
+		      button = <LoginButton onClick={this.handleLoginClick} />;
+		    }
+
+		    return (
+		      <div>
+		        <Greeting isLoggedIn={isLoggedIn} />
+		        {button}
+		      </div>
+		    );
+		  }
+
+    You may embed expressions in JSX by wrapping them in curly braces. For example,
+
+    	render() {
+    		return (
+		    <div>
+		      <h1>Hello!</h1>
+		      {unreadMessages.length > 0 &&
+		        <h2>
+		          You have {unreadMessages.length} unread messages.
+		        </h2>
+		      }
+		    </div>
+		  );
+    	}
+
+	Preventing Components From Rendering
+
+		In some cases you might want a component to hide itself even though it was rendered by another component. To do this retur 'null' instead of its render output. For example,
+
+			function WarningBanner(props) {
+			  if (!props.warn) {
+			    return null;
+			  }
+
+			  return (
+			    <div className="warning">
+			      Warning!
+			    </div>
+			  );
+			}
+
+		Returning null from the component's render method does not affect the firing of the component's lifecycle methods. For instance, 'componentDidUpdate' will still be called.
+
+References
+
+	https://reactjs.org/docs/conditional-rendering.html
