@@ -1,0 +1,15 @@
+Lifting State Up
+
+	Often, several components need to reflect the same changing data. In this case, it is recommended to lift the shared state up to their closest common ancestor.
+
+	There should only be a single 'source of truth' for any data changes in React application. Then, if other components also need it, you can lift it up to their common ancestor. Instead of trying to sync the state of different components, you should rely on the 'top-down data flow'. 
+
+	Lifting state involves more 'boilerplate' code than two-way binding approaches, but as a benefit, it takes less work to find and isolate bugs. Since any state “lives” in some component and that component alone can change it, the surface area for bugs is greatly reduced.
+
+	If something can be derived from either props or state, it probably shouldn’t be in the state.
+
+	When you see something wrong in the UI, you can use React Developer Tools to inspect the props and move up the tree until you find the component responsible for updating the state.
+
+References
+
+	https://reactjs.org/docs/lifting-state-up.html
