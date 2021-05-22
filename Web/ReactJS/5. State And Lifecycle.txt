@@ -1,0 +1,21 @@
+State And Lifecycle
+
+	The 'state' is similar to props, but is private and fully controlled by the component. It's very important to free up resources taken by components when they are destroyed. We can declare special methods on the component class to run some code when the component mounts and unmounts. These methods are called "lifecycle methods". The 'componentDidMount' method runs after the component output has been rendered to the DOM. The 'componentWillUnmount' methods run right before a component is removed from the DOM.
+
+	Using State Correctly
+
+		- Do not modify 'state' directly, this can be only done inside the constructor.
+		- State updates are asynchronous, be cautious of this.
+
+	When you call setState(), React merges the object you provide into the current state. This allows us to update the state fields independently.
+
+	The Data Flows Down
+
+		Neither the parent nor the child components can know if a certain component is stateful or stateless. This is why the state is often called local or encapsulated. It's not accessible to any component other than the one that owns and sets it, but a component may choose to pass down its state as props to the child components.
+
+	Whether a component is stateful or stateless is an implementation detail of the component that may change over time. You can use stateless components inside stateful components and vice versa.
+
+References
+
+	https://reactjs.org/docs/state-and-lifecycle.html
+	
