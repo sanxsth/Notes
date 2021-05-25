@@ -1,0 +1,24 @@
+Consistent Hashing
+
+	Hash function
+
+		A hash function is a function that maps one piece of data—typically describing some kind of object, often of arbitrary size—to another piece of data, typically an integer, known as hash code, or simply hash.
+
+		Sometimes there are more possible inputs than outputs, any given number will have many different strings mapped to it, a phenomenon known as a collision. Good hash functions should somehow “chop and mix” (hence the term hash) the input data in such a way that the outputs for different input values are spread as evenly as possible over the output range.
+
+	Hash functions can be used while 'sharding' the data. We can use the hash value of the request-id to find the server on which it should be stored. If we have 'N' servers, the server to use for storing will be hash(req_id) % N. This is a simple technique, but the problem with this technique is that if a server goes down or a new server is added, all the stored requests should be rehashed. This happens since the server assignment mechanism depends on the number of servers.
+
+	We need a distribution scheme that does not depend directly on the number of servers, so that, when adding or removing servers, the number of keys that need to be relocated is minimized. We solve this problem via a technique known as 'consistent hashing'.
+
+	Consistent Hashing is a distributed hashing scheme that operates independently of the number of servers or objects in a distributed hash table by assigning them a position on an abstract circle, or hash ring. This allows servers and objects to scale without affecting the overall system.
+
+	Imagine we mapped the hash output range onto the edge of a circle. That means that the minimum possible hash value, zero, would correspond to an angle of zero, the maximum possible value (some big integer we’ll call INT_MAX) would correspond to an angle of 2𝝅 radians (or 360 degrees), and all other hash values would linearly fit somewhere in between. So, we could take a key, compute its hash, and find out where it lies on the circle’s edge. 
+
+	We find a hash for the server, usually using the server-id. Since we have the keys for both the objects and the servers on the same circle, we may define a simple rule to associate the former with the latter: Each object key will belong in the server whose key is closest, in a counterclockwise direction (or clockwise, depending on the conventions used). In other words, to find out which server to ask for a given key, we need to locate the key on the circle and move in the ascending angle direction until we find a server.
+
+	To ensure object keys are evenly distributed among servers, we need to apply a simple trick: To assign not one, but many labels (angles) to each server. The benefit of this approach is that we don't need to rehash all the hash, just a small fraction of the total hashes.
+
+References
+
+	https://www.toptal.com/big-data/consistent-hashing
+	https://www.paperplanes.de/2011/12/9/the-magic-of-consistent-hashing.html
