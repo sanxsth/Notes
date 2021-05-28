@@ -1,0 +1,96 @@
+Cache
+
+	In computing, a cache is a high-speed data storage layer that stores a subset of data, typically transient, so that future requests for that data are served up faster than possible by accessing the data's primary storage location. Caching allows you to reuse previously retrieved or computed values.
+
+	Caching can improve page load time and can reduce the load on our servers and databases. Putting a cache in front of a database can help absorb uneven loads and spikes in traffic.
+
+	Caching can be implemented at different levels.
+
+		1. Client caching: Caches can be located on the client-side (OS or browser). Modern browsers provide various types of storage mechanisms that can be used as a cache and prevent expensive network calls.
+
+		2. CDN caching: CDNs are considered as a type of cache.
+
+		3. Web server caching: Reverse proxies can be kept in front of your web application to cache static and dynamic contents. They cal also cache requests, returning responses without having to contact application servers.
+
+		4. Database caching: DBs usually have an in-built caching mechanism. Tweaking its settings for specific usage patterns can further boost performance.
+
+		5. Application caching: In-memory caches like Redis, Memcached are key-value stores between your application and data storage. Since the data is stored in RAM, it is much faster than a typical database where data is stored on a disk. RAM is more limited than disk, so cache invalidation algorithms such as LRU can help invalidate 'cold' entries and keep 'hot' data in RAM. 
+
+		There are two patterns of caching your data:
+
+			1. Caching at DB query level: The query result is cached using hashed query has the key. Cache invalidation is hard in this approach - If one piece of data changes you need to invalidate all the cached queries that include your changed value.
+
+			2. Caching at the object level: In this approach, we see our data as an object. Have your application assemble the dataset from the database into a class instance or a data structure(s):
+
+				- It is easy to remove the object if the data has changed.
+				- Allows for asynchronous processing: workers assemble objects by consuming the latest cached objects.
+
+	Types of caches:
+
+		Cache-aside
+
+			The application is responsible for reading and writing from storage. The cache does not directly interact with the storage. The application does the following:
+
+				- Look for entry in cache. In case of cache miss, do the following:
+				- Load entry from database.
+				- Add entry to cache.
+				- Return entyr.
+
+			Cache-aside is also referred to as lazy-loading. Only requested data is cached, which avoids filling up the cache with data that isn't used.
+
+			Disadvantages of cache-aside
+
+				- Cache misses are expensive
+				- Data becomes state if it is updated in the database. This issue is mitigated by setting a 'time-to-live'.
+				- When a node fails, it is replaced by an empty node, increasing latency.
+
+		Write-through cache
+
+			The application uses the cache as the main data store, reading and writing to the cache, while the cache is responsible for reading and writing to the database. The write-through operation is as follows:
+
+				- application adds/updates entry in the cache.
+				- cache synchronously writes to the data store.
+				- return
+
+			This makes write-through a bit slow compared to write in cache-aside, reads are fast. Users are more tolerant of latency when updating data than reading it. Data in the cache is not stale.
+
+			Disadvantages:
+
+				- Most data written might never be read, which can be minimized with a TTL.
+				- When a new node is created due to failure or scaling, the new node will not cache entries until the entry is updated in the database. Cache-aside in conjunction with write-through can mitigate this issue.
+
+		Write-behind cache
+
+			In write-behind the application does the following:
+
+				- Add/update entry in cache.
+				- Asychronously write data to the store, improving write performacne.
+
+			Disadvantages:
+
+				- There could be data loss if the cache goes down before writing its contents into the data store.
+				- Implementation is more complex compared to write-through and cache-aside.
+
+		Refresh-ahead
+
+			You can configure the cache to automatically refresh any recently accessed cache entry prior to its expiration. Refresh-ahead can result in reduced latency vs read-through if the cache can accurately predict which items are likely to be needed in the future.
+
+			Disadvantages:
+
+				- Not accurately predicting which items are likely to be needed in the future can result in reduced performance than without refresh-ahead.
+
+	
+	Disadvantages of cache
+
+		- Need to maintain consistency between cache and the source of truth through cache invalidation.
+		- Cache invalidation is a different problem, there's additional complexity associated with when-to and how-to invalidate.
+		- Need to make changes to the application to incorporate caches.
+
+
+References
+
+	https://aws.amazon.com/caching/
+	https://en.wikipedia.org/wiki/Cache_(computing)
+	https://www.lecloud.net/post/9246290032/scalability-for-dummies-part-3-cache
+	https://www.slideshare.net/tmatyashovsky/from-cache-to-in-memory-data-grid-introduction-to-hazelcast
+	https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/WhatIs.html
