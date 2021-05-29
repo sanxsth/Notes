@@ -1,0 +1,43 @@
+Asynchronism
+
+	Asynchronous workflows help reduce request times for expensive operations that would otherwise be performed in-line. They can also help by doing time-consuming work in advance, such as periodic aggregation of data.
+
+	Messaging Queues
+
+		Message queues receive, hold, and deliver messages. If an operation is too slow to perform in-line, you can use a message queue with the following workflow:
+
+			- An application publishes a job to the queue, then notifies the user of job status.
+			- A worker picks up the job from the queue, processes it, then signals the job is complete.
+
+		The user is not blocked and the job is processed in the background. During this time, the server might optionally do a small amount of processing to make it seem like the task has been completed. For example, if posting a tweet, the tweet could be instantly posted to your timeline, but it could take some time before your tweet is actually delivered to all of your followers.
+
+		Redis, RabbitMQ, Amazon SQS are some of the popular message brokers.
+
+	Task Queues
+
+		Tasks queues receive tasks and their related data, runs them, then delivers their results. They can support scheduling and can be used to run computationally-intensive jobs in the background.
+
+		Celery is a popular task queue
+
+	Messaging Queue vs Task Queue
+
+		Task queues can be considered as a queue Wrapper/Framework which takes away the complexity of having to manage the underlying AMQP mechanisms/architecture that come with operating a message queue directly.
+
+	Back Pressure
+
+		Sometimes you need to apply some 'pressure' to prevent a huge number of request inflow from crashing your system. There are a bunch of strategies we use:
+
+			- Control the producer, but this won't be available most of the time.
+			- Buffering is the next option, but using unbounded buffers can cause more harm than not using them.
+			- Dropping the incoming requests, not ideal in most cases.
+
+	Disadvantages of asynchronism
+
+		- Use cases such as inexpensive calculations and real-time workflows might be better suited for synchronous operations, as introducing queues can add delays and complexity.
+
+References:
+
+	https://www.youtube.com/watch?v=1KRYH75wgy4
+	http://mechanical-sympathy.blogspot.com/2012/05/apply-back-pressure-when-overloaded.html
+	https://www.quora.com/What-is-the-difference-between-a-message-queue-and-a-task-queue-Why-would-a-task-queue-require-a-message-broker-like-RabbitMQ-Redis-Celery-or-IronMQ-to-function
+
