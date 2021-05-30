@@ -1,0 +1,87 @@
+Greedy Algorithms
+
+	In mathematics, computer science, and economics, an optimization problem is a problem of finding the best solution from all feasible solutions. Usually, it's about maximizing or minimizing some function relative to some set, often representing a range of choices available in a certain situation.
+
+	A greedy algorithm is a simple, intuitive algorithm that is used in optimization problems. The algorithm makes the optimal choice at each step as it attempts to find the overall optimal way to solve the entire problem.
+
+	Structure of a Greedy algorithm
+
+		Greedy algorithms take all of the data in a particular problem, and then set a rule for which elements to add to the solution at each step of the algorithm. The solution that the algorithm builds is the sum of all of those choices.
+
+	If both of the below properties are true, a greedy algorithm can be used to solve the problem.
+
+		1. Greedy choice property: A globally optimal solution can be reached by choosing the optimal choice at each step.
+		2. Optimal substructure: A problem is said to have an optimal substructure if an optimal solution can be constructed from optimal solutions of its subproblems.
+
+	Limitations of Greedy Algorithms
+
+		Sometimes greedy algorithms fail to find the globally optimal solution because they do not consider all the data. The choice made by a greedy algorithm may depend on choices it has made so far, but it is not aware of future choices it could make.
+
+
+	Some Applications
+
+		1. Activity Selection problem
+
+			You are given n activities with their start and finish times. Select the maximum number of activities that can be performed by a single person, assuming that a person can only work on a single activity at a time.
+
+			Greedy approach
+
+				We sort the activities in non-decreasing order of finish time. We pick a compatible activity with the lowest finish time, compatible activities are the ones that don't intersect with our previous selection.
+
+		2. Kruskal's Minimum Spanning tree
+
+			1. Sort all the edges in non-decreasing order of their weight. 
+			2. Pick the smallest edge. Check if it forms a cycle with the spanning tree formed so far. If the cycle is not formed, include this edge. Else, discard it. We use a disjoint set to find cycles.
+			3. Repeat step#2 until there are (V-1) edges in the spanning tree.
+
+			Time complexity: O(ElogE), E is the number of edges.
+
+		3. Prim's Minimum Spanning tree
+
+			1. Create a set, mstSet, that keeps track of vertices already included in MST. 
+			2. Assign a key value to all vertices in the input graph. Initialize all key values as INFINITE. Assign key value as 0 for the first vertex so that it is picked first. 
+			3. While 'mstSet' doesn’t include all vertices 
+				- Pick a vertex u which is not there in mstSet and has a minimum key value. 
+				- Include u to 'mstSet'. 
+				- Update the key value of all adjacent vertices of u. To update the key values, iterate through all adjacent vertices. For every adjacent vertex v, if the weight of edge u-v is less than the previous key value of v, update the key value as the weight of u-v.
+
+			Time complexity: O(vlogv).
+
+			Since the time complexity depends on the number of vertices, Prim's is better for dense graph than Kruskal's
+
+
+		3. Huffman coding
+
+			Huffman coding is a lossless compression algorithm. We assign codes to characters based on their frequency. To assign the code, we first build a Huffman tree. The steps for building a tree are:
+
+				1. Create a leaf node for each unique character and build a min-heap of all leaf nodes.
+				2. Extract two nodes with the minimum frequency from the min-heap.
+				3. Create a new internal node with a frequency equal to the sum of the two node's frequencies. Make the first extracted node as its left child and the other extracted node as its right child. Add this node to the min-heap (the heap is an array-based heap).
+				4. Repeat steps#2 and #3 until the heap contains only one node. The remaining node is the root node and the tree is complete.
+
+			Time complexity: O(nlogn), where 'n' is the number of unique characters.
+
+		4. Djikstra's shortest path algorithm
+
+			Given a graph and a source vertex in the graph, find the shortest paths from the source to all vertices in the given graph. The algorithm is as follows:
+
+				1. Create a set, 'sptSet' (shortest path tree set) that keeps track of vertices included in the shortest-path tree, i.e whose shortest path from the source has been calculated and finalized. Initially, this set is empty.
+				2. Set the distance value to all the nodes as 'infinite, but assign '0' to the source node.
+				3. While 'sptSet' doesn't have all the nodes:
+					a. pick a vertex, that isn't in the set and has minimum distance.
+					b. update distances of all the nodes adjacent to this newly picked node.
+
+			Djikstra works well on graphs with non-negative weights. It can be modified to work with graphs with non-negative edges, but no negative cycles. We will have to allow a node to be picked multiple times. This would make the algorithm a lot slower, but it would terminate as we don't have any negative cycles that will cause an infinite loop. For handling graphs with negative cycles, we have the Bellman-ford algorithm.
+
+		5. K-centers problem
+
+			Given n cities and distances between every pair of cities, select k cities to place warehouses (or ATMs or Cloud Server) such that the maximum distance of a city to a warehouse (or ATM or Cloud Server) is minimized. There is no polynomial-time solution available for this problem as the problem is a known NP-Hard problem. There is a polynomial-time Greedy approximate algorithm, the greedy algorithm provides a solution that is never worse than twice the optimal solution. The greedy solution works only if the distance between cities follows 'Triangular inequality'.
+
+			The 2-approximate greedy algorithm:
+
+				1. Choose the first center arbitrarily.
+				2. Choose the remaining k-1 points using the following criteria:
+					- Pick the next center the city which is furthest away from currenlty choosen centers, i.e the city, p, with the maximum Min(dist(p, c1), dist(p, c2)...)
+References
+
+	- https://www.geeksforgeeks.org/fundamentals-of-algorithms/
