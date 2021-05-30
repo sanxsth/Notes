@@ -1,0 +1,146 @@
+Communication
+
+	Open Systems Interconnection
+
+		The OSI model is a conceptual framework that is used to describe how a network functions. In plain English, the OSI model helped standardize the way computer systems send information to each other.
+
+		OSI consists of 7 layers:
+
+			- Layer 7: Application layer
+			- Layer 6: Presentation layer
+			- Layer 5: Session layer
+			- Layer 4: Transport layer
+			- Layer 3: Network layer
+			- Layer 2: Data link layer
+			- Layer 1: Physical layer
+
+		Further readings:
+
+			- https://www.freecodecamp.org/news/osi-model-networking-layers-explained-in-plain-english/
+			- https://stackoverflow.com/questions/59019466/who-is-responsible-for-the-presentation-and-session-layers-in-osi
+
+	Hypertext Transfer Protocol (HTTP)
+
+		HTTP is a method for encoding and transporting data between a client and a server. It is a request/response protocol: clients issue requests and servers issue responses with relevant content and completion status info about the request. HTTP is self-contained, allowing requests and responses to flow through many intermediate routers and servers that perform load balancing, caching, encryption, and compression.
+
+		A basic HTTP request consists of a verb(method) and a resource(endpoint). Below are some common HTTP verbs:
+
+			Verb | Description					|	Idempotent*	|	Safe	|	Cacheable
+			------------------------------------------------------------------------------
+			GET		Reads a resource				Yes				Yes			Yes
+
+			POST	Creates a resource or trigger 
+					a process that handles data		No				No			Yes, if response contains freshness info
+
+			PUT		Creates or replace a resource	Yes				No			No
+
+			PATCH	Partially updates a resource	No				No			Yes, if response contains freshness info
+
+			DELETE	Deletes a resource				Yes				No			No
+
+
+		HTTP relies on lower-level protocols like TCP and UDP for establishing a connection.
+
+		Further Readings:
+
+			- https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview
+			- https://www.quora.com/What-is-the-difference-between-HTTP-protocol-and-TCP-protocol
+
+	Transmission Control Protocol
+
+		TCP is a connection-oriented protocol over an IP network. Connection is established and terminated using handshakes. All packets are guaranteed to reach in the original order and without corruption:
+
+			- Sequence numbers and checksums for each packet.
+			- Acknowledgement packets and automatic retransmission.
+
+		If the sender doesn't receive a correct response, it will resend the packets. If there are multiple timeouts, the connection will be dropped. TCP also implements flow control and congestion control. These guarantees cause delay, which makes TCP slower than UDP.
+
+		To ensure high throughput, web servers can keep a large number of TCP connections open, resulting in high memory usage. It can be expensive to have a large number of open connections between web server threads and, say, a Memcached server. Connection pooling can help in addition to switching to UDP where applicable.
+
+		TCP is useful for applications that require high reliability but are less time-critical. Some examples include web servers, database info, SMTP, FTP, and SSH.
+
+		Use TCP over UDP when:
+
+			- You need all of the data to arrive intact.
+			- You want to automatically make the best estimate use of the network throughput.
+
+	User Datagram Protocol
+
+		UDP is connectionless. Datagrams (analogous to packets) are guaranteed only at the datagram level. Datagrams might reach their destination out of order or not at all. UDP does not support congestion control. Without the guarantees that TCP support, UDP is generally more efficient.
+
+		UDP can broadcast, sending datagrams to all devices on the subnet. This is useful with DHCP because the client has not yet received an IP address, thus preventing a way for TCP to stream without the IP address.
+
+		UDP is less reliable but works well in real-time use cases such as VoIP, video chat, streaming, and real-time multiplayer games.
+
+		Use UDP over TCP when:
+
+			- You need the lowest latency.
+			- Late data is worse than loss of data.
+			- You want to implement your own error correction.
+
+
+	Further Readings: TCP and UDP
+
+		- https://en.wikipedia.org/wiki/Transmission_Control_Protocol
+		- https://en.wikipedia.org/wiki/User_Datagram_Protocol
+		- http://gafferongames.com/networking-for-game-programmers/udp-vs-tcp/
+		- http://stackoverflow.com/questions/5970383/difference-between-tcp-and-udp
+		- https://www.cs.bu.edu/~jappavoo/jappavoo.github.com/451/papers/memcache-fb.pdf
+
+
+	Remote Procedure Call (RPC)
+
+		In an RPC, a client causes a procedure to execute on a different address space, usually a remote server. The procedure is coded as if it were a local procedure call, abstracting away the details of how to communicate with the server from the client program. Remote calls are usually slower and less reliable than local calls so it is helpful to distinguish RPC calls from local calls.
+
+		RPC is a request-response protocol:
+
+			- Client program calls the stub procedure. The parameters are pushed onto the stack like a local procedure call.
+			- Client stub procedure marshalls (packs) the procedure id and arguments into a request message.
+			- Client communication module - OS sends the message from the client to the server.
+			- Server communication module - OS passes the incoming packets into the server stub procedure.
+			- Server stub procedure unmarshalls the request, calls the server procedure matching the procedure id, and passes the arguments.
+			- The server response repeats the steps in reverse order.
+
+		RPC is focused on exposing behaviors. RPCs are often used for performance reasons with internal communications. HTTP APIs following REST tend to be used more often for public APIs.
+
+		Disadvantages of RPC:
+
+			- Client becomes tightly coupled with the service implementation.
+			- It can be difficult to debug RPC
+
+	Representational State Transfer (REST)
+
+		REST is an architectural style enforcing a client/server model where the client acts on a set of resources managed by the server. The server provides a representation of resources and actions that can either manipulate or get a new representation of resources. All communication must be stateless and cacheable.
+
+		There are four qualities of a RESTful interface:
+
+			1. Identify Resources (URI in HTTP) - use the same URI regardless of the operation.
+			2. Change with representations (Verbs in HTTP) - user verbs, headers, and body.
+			3. Self-descriptive error messages (status codes in HTTP)
+			4. HATEOAS (HTML interface for HTTP) - your web service should be fully accessible in a browser. 
+
+		HATEOAS stands for 'Hypertext As The Engine Of Application State'. It means that hypertext should be used to find your way through the API.
+
+		REST is focused on exposing data. It minimizes the coupling between client/server and is often used for public HTTP APIs.
+
+		Disadvantages of REST
+
+			- With REST being focused on exposing data, it might not be a good fit if resources are not naturally organized or accessed in a simple hierarchy. For example, returning all updated records from the past hour matching a particular set of events is not easily expressed as a path. With REST, it is likely to be implemented with a combination of URI path, query parameters, and possibly the request body.
+
+			- REST typically relies on a few verbs (GET, POST, PUT, DELETE, and PATCH) which sometimes doesn't fit your use case. For example, moving expired documents to the archive folder might not cleanly fit within these verbs.
+
+			- Fetching complicated resources with nested hierarchies requires multiple round trips between the client and server to render single views.
+
+			- Over time, more fields might be added to an API response and older clients will receive all new data fields, even those that they do not need, as a result, it bloats the payload size and leads to larger latencies.
+
+		Further Readings: HATEOS
+
+			- https://restcookbook.com/Basics/hateoas/
+
+
+	Further Readings: RPC and REST
+
+		- https://apihandyman.io/do-you-really-know-why-you-prefer-rest-over-rpc/
+		- http://programmers.stackexchange.com/a/181186
+		- http://stackoverflow.com/questions/15056878/rest-vs-json-rpc
+		- http://stackoverflow.com/questions/15056878/rest-vs-json-rpc
