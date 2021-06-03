@@ -1,0 +1,70 @@
+Dynamic Programming
+
+	Dynamic Programming (DP) is an algorithmic technique for solving an optimization problem by breaking it down into simpler subproblems and utilizing the fact that the optimal solution to the overall problem depends upon the optimal solution to its subproblems.
+
+	In mathematics, computer science, and economics, an optimization problem is the problem of finding the best solution from all feasible solutions. In the simplest case, an optimization problem consists of maximizing or minimizing a real function by systematically choosing input values from within an allowed set and computing the value of the function. 
+
+	Dynamic programming can be applied to solve problems having the following characteristics:
+
+		1. Overlapping Subproblems
+
+			Subproblems are smaller versions of the original problem. Any problem has overlapping sub-problems if finding its solution involves solving the same subproblem multiple times. The recursive decomposition of the problem should visit the sub-problems multiple times. Take the example of the Fibonacci numbers; to find the fib(4), from the recursive tree it's clear that we have to evaluate a subproblem multiple times. In this case, fib(2) will be evaluated twice and fib(1) thrice.
+
+		2. Optimal Substructure property
+
+			A problem has an optimal substructure if its overall optimal substructure can be constructed from the optimal solutions of its subproblems. For example, fib(n) = fib(n-1) + fib(n-2).
+
+			In other words, there is a recursive algorithm for the problem, which would be fast if we could just skip the recursive steps.
+
+	The "Divide and Conquer" technique can be applied to problems that have non-overlapping subproblems and optimal substructure.
+
+
+	Dynamic Programming Methods
+
+		There are two ways of solving a DP problem:
+
+			1. Top-down with Memoization
+
+				In this approach, we try to solve the bigger problem by recursively finding the solution to smaller sub-problems. Whenever we solve a sub-problem, we cache its result so that we don’t end up solving it repeatedly if it’s called multiple times. Instead, we can just return the saved result. This technique of storing the results of already solved subproblems is called Memoization.
+
+				In the Top-down approach, we start from the root (original problem) of the recursive tree and evaluate the sub-problems starting from the leaves up towards the root.
+
+				Fib(n) // Solving Fibanocci using top-down approach
+				{
+				    if (cache[n]) return Fib(n); // Memoization
+
+				    cache[n] = Fib(n-1) + Fib(n-2);
+				    return cache[n];
+				}
+
+			2. Bottom-up with Tabulation
+
+				Bottom-up is the opposite of top-down and avoids recursion. In this approach, we solve the problem "bottom-up" (i.e by solving all the related subproblems first). Here, we encounter the smaller problems first and use its solution to solve larger problems. We use tables to store the solutions, and therefore this approach is also known as the "Table filling" approach or Tabulation.
+
+				Tabulation is the opposite of Memoization, as in Memoization we solve the problem and maintain a map of already solved sub-problems. In other words, in memoization, we do it top-down in the sense that we solve the top problem first (which typically recurses down to solve the sub-problems).
+
+				Fib(n) // Solving Fibanocci using bottom-up approach
+				{
+					// can be optimized to use two variables instead of an array.
+					int dp[n+1];
+					dp[0] = 0;
+					dp[1] = 1;
+					for(int i = 2; i<=n; i++)
+						dp[i] = dp[i-1] + dp [i-2];
+
+					return dp[n];
+				}
+
+		Memoization vs Tabulation
+
+			1. Memoization can be slower than tabulation because of the recursive calls.
+			2. a Large number of recursive calls in memoization can cause a stack overflow.
+			3. In, tabulation we end up solving all the subproblems. But in memoization, we only solve the ones that are required for the final solution.
+			4. Often, it's easier to write recursive solutions.
+
+References
+
+	https://www.educative.io/courses/grokking-dynamic-programming-patterns-for-coding-interviews/m2G1pAq0OO0
+	https://people.eecs.berkeley.edu/~nirkhe/cs38notes/recitation_notes/finalrec.pdf
+	https://www.geeksforgeeks.org/overlapping-subproblems-property-in-dynamic-programming-dp-1
+	https://www.geeksforgeeks.org/optimal-substructure-property-in-dynamic-programming-dp-2
