@@ -1,0 +1,22 @@
+Coin Change Problem
+
+	Problem Statement 1
+
+		Given a list of N coins, their values (V1, V2, …, VN), and the total sum S. Find the minimum number of coins the sum of which is S (we can use as many coins of one type as we want), or report that it’s not possible to select coins in such a way that they sum up to S.
+
+		Let the current state be 'i' (i.e, the sum is 'i') and dp[i] represents the minimum number of coins required to get the sum 'i'. We observe that we can reach 'i' from i-vi, where vi is a coin denomination that's less than or equal to i. So, we get the following relation
+
+			dp[i] = min(dp[i-V1], dp[i-V2], ..., dp[i-VN]), where Vi is a coin denomination less than or equal to 'i'. 
+
+	Problem Statement 2
+
+			Given a value N, if we want to make change for N cents, and we have an infinite supply of each of S = { S1, S2, .. , Sm} valued coins, how many ways can we make the change? The order of coins doesn’t matter.
+
+			Let the current state be 'i' (i.e, the sum is 'i') and dp[i] represent the number of ways to form sum 'i'. Given dp[j], where 'j' < i; and 'v', a coin denomination. If j + v = i, dp[j] can be added to d[i].
+
+			Therefore the total number of ways to form 'i', d[i] = summation of all dp[i-vi], where vi is a coin denomination less than or equal to 'i'.
+
+References
+
+	https://www.topcoder.com/thrive/articles/Dynamic%20Programming:%20From%20Novice%20to%20Advanced
+	https://www.geeksforgeeks.org/coin-change-dp-7/
