@@ -1,0 +1,17 @@
+Rod Cutting Problem
+
+	Problem Statement
+
+		Suppose you have a rod of length n, and you want to cut up the rod and sell the pieces in a way that maximizes the total amount of money you get. A piece of length i is worth pi dollars.
+
+
+	We observe that there are 'n-1' ways to cut the rod, i.e there are 2^(n-1) possible ways to cut it. Despite this exponentially large possibility space, we can use DP to solve the problem in O(n^2).
+
+	Let dp[i] be the maximum amount you can get with a rod of size 'i' and dp[0] = 0. Given a rod of length 'x', if we cut out a piece of length 'y', the maximum amount we can get is, py + dp[x-y].
+
+	Therefore, dp[i] = max(pj + dp[i-j]), where j <= i.
+
+References
+
+	https://web.stanford.edu/class/archive/cs/cs161/cs161.1168/lecture12.pdf
+	https://www.educative.io/edpresso/the-rod-cutting-problem	 
