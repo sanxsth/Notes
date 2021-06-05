@@ -1,0 +1,52 @@
+Levenshtein Distnace aka Edit Distance
+
+	The Levenshtein distance is a number that tells you how different two strings are. The higher the number, the more different the two strings are. The Levenshtein distance is also the minimum number of 'edits' you need to perform to transform one string into the other.
+
+	An 'edit' is defined by either insertion of a character, a deletion of a character, or a replacement of a character.
+
+	Problem Statement
+
+		Given two strings str1 and str2 and below operations that can be performed on str1. Find the minimum number of edits (operations) required to convert ‘str1’ into ‘str2’.  
+
+			1. Insert
+			2. Remove
+			3. Replace
+
+		All of the above operations are of equal cost. 
+
+	Solution
+
+		The idea is to process all characters one by one starting from either the left or right sides of both strings. Let us traverse from the right corner, there are two possibilities for every pair of characters being traversed.
+
+		1. If the last characters of the two strings are the same, nothing much to do. Ignore these last characters and solve for the remaining sub-strings. So we recur for lengths 'm-1' and 'n-1' .
+
+		2. Else (If the last characters are not the same), we consider all three operations on the last character of the first string, recursively compute the minimum cost for all three operations, and take the minimum of these three values.
+
+				a. Insert: Recur for m and n-1
+				b. Remove: Recur for m-1 and n
+				c. Replace: Recur for m-1 and n-1
+
+		Let dp[i][j] be the edit distance of converting a string 's1' (having 'i' characters) to a string 's2' (having 'j' characters). dp[0][0] = 0, since both are empty strings. Using the above two observations we have,
+
+			if (min(i,j) == 0)
+				dp[i][j] = max(i, j) // since the cost of transforming an empty string to a string of size 'j' is j insertions (removal for vice-versa).
+
+			if (s1[i] == s2[j]) // the last character of these two strings are the same.
+
+				dp[i][j] = dp[i-1][j-1]
+
+			else
+
+				insert_dist = dp[i][j-1] 
+				remove_dist = d[[i-1][j] 
+				replace_dist = dp[i-1][j-1] 
+
+				dp[i][j] = min(insert_dist, remove_dist, replace_dist) + 1 (cost of an operation)
+
+		Using DP and the above recurrence relation, we can find the Levenshtein distance for two strings s1 (length: m) and s2 (length: n) in O(mn).
+
+References
+
+	https://www.youtube.com/watch?v=MiqoA-yF-0M&t=742s
+	https://medium.com/@ethannam/understanding-the-levenshtein-distance-equation-for-beginners-c4285a5604f0
+	https://www.geeksforgeeks.org/edit-distance-dp-5
