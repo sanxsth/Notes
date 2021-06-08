@@ -1,0 +1,43 @@
+Word Break Problem
+
+	Problem Statement
+
+		Given an input string and a dictionary of words, find out if the input string can be segmented into a space-separated sequence of dictionary words.
+
+	Solution
+
+		There are a lot of different DP approaches to solve this problem. Assume that we make use of a hash map and check if a substring is present in the dictionary in O(1).
+
+		Approach 1 (Optimized DP)
+
+			Let dp[i] be 'true' if the sub-string '0-i' can be segmented as per the requirement, 'false' otherwise and d[0] is true. We observe the following recurrence relation:
+
+				dp[i] = dp[i-len(s1)] || dp[i-len(s2)] || dp[i-len(s2)] || ... || dp[i - len(sn)]; where 'si' is a suffix ending at 'i' that's in the dictionary.
+
+			To find all the suffixes ending at 'i', we only have to traverse till 'i - max(dict)'; where max(dict) gives us the length of the longest word in the dictionary.
+
+			The time complexity is O(n*m), where 'n' is the length of the given string and 'm' is the number of words in the dictionary.
+
+		Approach 2
+
+			The idea is simple, we consider each prefix and search it in the dictionary. If the prefix is present in the dictionary, we recur for the rest of the string. If the recursive call for suffix returns true, we return true, otherwise, we try the next prefix. If we have tried all prefixes and none of them resulted in a solution, we return false.
+
+			dp(s)
+			{
+				if (len(s) == 0) return true;
+
+				for(int i=0; i<len(s); i++)
+				{
+					if ( dict.contains(prefix(i)) && dp(suffix(i+1)) ) // prefix(i): prefix of 's' till index 'i'; suffix(i+1) suffix of 's' from 'i+1'
+						return true;
+				}
+				return false;
+			}
+
+			We can memoize dp(s), the time complexity is O(n*n) where 'n' is the size of the string.
+
+
+References
+
+	https://www.geeksforgeeks.org/word-break-problem-dp-32
+	https://www.youtube.com/watch?v=iWenZCZEBIA
