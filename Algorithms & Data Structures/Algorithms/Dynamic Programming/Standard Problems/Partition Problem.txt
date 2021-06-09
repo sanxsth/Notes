@@ -1,0 +1,57 @@
+Partition Problem
+	
+	Problem Statement
+
+		The problem is to determine whether a given set can be partitioned into two subsets such that the sum of elements in both subsets is the same.
+
+	Solution 
+
+		We make the following observations:
+
+			1. If the total sum is odd, then we can't split the set into two subsets with equal sum.
+			2. If the total sum is even, all we have to do is find a subset with a sum equal to 'totalSum/2'.
+
+		Recursive Approach
+
+			rec(arr, n, sum)
+			{
+				if(sum == 0) return true;
+
+				if(n == 0 && sum != 0) return true;
+
+				return rec(arr, n-1, sum) || rec(arr, n-1, sum - arr[n-1])
+			}
+
+			The above solution has a time complexity of O(2^n) since for all elements we try all possibilities (whether to include or exclude).
+
+		DP Approach 1
+
+			Let dp[i][j] be 'true' if it's possible to form a subset with first 'i' elements having sum 'j'. Our answer will be in the cell, dp[n][total_sum/2];
+
+			We have the following recurrence relation:
+
+				dp[i][j] = ( dp[i-1][j1 - arr[i]] || dp[i-1][j2 - arr[i]] || ... || dp[i-1][jn - arr[i]] ), where 'ji' is a sum >= arr[i];
+
+			Time complexity: O(total_sum * n).
+			Space complexity: O(total_sum * n).
+
+		DP Approach 2 (Space Complexity Optimized)
+
+			Instead of creating a 2d-array, we solve this using an array of size(sum/2 + 1). Let dp[j] be 'true' if there exists a subset of sum 'j'. We fill the array in a bottom-up manner.
+
+
+		    for (i = 0; i < n; i++) 
+		    {
+		        for (j = sum / 2; j >= arr[i]; j--) 
+		        {
+		            if (dp[j - arr[i]] == 1 || j == arr[i])
+		                dp[j] = 1;
+		        }
+		    }
+
+		    Time complexity: O(total_sum * n)
+		    Space complexity: O(total_sum)
+
+References
+
+	https://www.geeksforgeeks.org/partition-problem-dp-18
