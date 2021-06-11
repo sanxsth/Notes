@@ -1,0 +1,30 @@
+Longest Common Subsequence
+
+	Problem Statement
+
+		Given two sequences, find the length of the longest subsequence present in both of them. A subsequence is a sequence that appears in the same relative order, but not necessarily contiguous.
+
+	Solution
+
+		A string of length 'n' has 2^n subsequences. Comparing two strings of length 'n' takes O(n). Therefore, the brute force approach would be O((2^n) * n).
+
+		Let dp(s1, s2) represent the length of the longest common subsequence of strings 's1' and 's2'. We have the following recurrence relation:
+
+			dp(s1, s2)
+			{
+				let m = s1.len(), n = s2.len()
+				if (m == 0 || n == 0) return 0;
+
+				if the last characters of s1 and s2 are the same
+					return 1 + dp( remove_last_character(s1), remove_last_character(s2)); // remove_last_character(s) returns string 's' with last character removed.
+				else
+					return Max( dp(remove_last_character(s1), s2), dp(s1, remove_last_character(s2))); 
+			}
+
+		We can use the top-down or bottom-up approach to solve this recurrence relation.
+
+		Time complexity: O(mn), where 'm' is the length of the first string and 'n' is the length of the second string.
+
+References
+
+	https://www.geeksforgeeks.org/longest-common-subsequence-dp-4
