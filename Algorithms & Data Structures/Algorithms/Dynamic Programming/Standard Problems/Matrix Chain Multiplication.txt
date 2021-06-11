@@ -1,0 +1,34 @@
+Matrix Chain Multiplication
+
+		Problem Statement
+
+			Given a sequence of matrices, find the most efficient way to multiply these matrices together. The problem is not actually to perform the multiplications, but merely to decide in which order to perform the multiplications.
+
+			The given matrices are all compatible; i.e, if matrix 'i' is of dimension (x*y) then matrix 'i+1' will be of dimension (y*z).
+
+		Solution
+
+			Let dp(i,j) represent the solution for a matrix chain starting at position 'i' and ending at 'j'. Our final solution is dp(1,n), where 'n' is the total number of matrices. dp(i,i) = 0, since it's just a single matrix.
+
+			If the first matrix is of dimension 2x3 and the second matrix is 3x4, the total number of multiplications (operations) involved would be 2x3x4 (row_count(first matrix) * col_count(second matrix) * col_count(first matrix)).
+
+			Note: we can also choose the row_count(second matrix) as the third parameter in the above-mentioned formulae since they will be of equal value.
+
+			We observe that dp(i,j) = min( 
+											(dp(i,i) + dp(i+1, j) + row_count(i) * coloumn_count(j) * coloumn_count(i)),
+											(dp(i,i+1) + dp(i+2, j) + row_count(i) * coloumn_count(j) * coloumn_count(i+1)),
+											(dp(i,i+2) + dp(i+3, j) + row_count(i) * coloumn_count(j) * coloumn_count(i+2)),
+											...
+											...
+											(dp(i,j-1) + dp(j, j) + row_count(i) * coloumn_count(j) * coloumn_count(j-1)),
+										)
+
+			We can either use a top-down approach or a bottom-up approach to solve this recurrence relation. At each step, we can keep track of the optimal subproblem selected to keep track of the order of multiplication.
+
+			Time complexity: O(n^3).
+
+References
+
+	https://math.stackexchange.com/questions/1630457/how-many-ways-to-multiply-n-matrices
+	https://www.geeksforgeeks.org/matrix-chain-multiplication-dp-8/
+	https://www.youtube.com/watch?v=prx1psByp7U
