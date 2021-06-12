@@ -1,0 +1,30 @@
+Longest Increasing Subsequence
+
+	Problem Statement
+
+		The Longest Increasing Subsequence (LIS) problem is to find the length of the longest subsequence of a given sequence such that all elements of the subsequence are sorted in increasing order.
+
+	Solution
+
+		Approach 1
+
+			Let dp(i) represent the length of the LIS ending at index 'i' such that arr[i] is the last element of the LIS. We have the following recurrence relation:
+
+				dp(i) = 1 + max(dp(j)), where 'j' < 'i' and arr[j] < arr[i];
+				dp(i) = 1, if no such 'j' exists
+
+			We can use a top-down or bottom-up approach to solve this recurrence relation. Once we find the solution for all the indices of the given array, our final solution would be the max among this value.
+
+			Time complexity: O(n^2), where 'n' is the number of elements in the given array.
+
+		Approach 2
+
+			We can convert this problem into the longest common subsequence problem. For this, we create a new array and sort it. It's very easy to see that the longest increasing subsequence will the longest common subsequence of the original array and this newly sorted array.
+
+			The complexity: O(n^2), where 'n' is the number of elements in the given array.
+
+		Note: There is another approach, with a time complexity of O(nlogn), which I skip in this note.
+
+References
+
+	https://www.geeksforgeeks.org/longest-increasing-subsequence-dp-3
