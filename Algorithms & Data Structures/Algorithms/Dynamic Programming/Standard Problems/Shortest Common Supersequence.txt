@@ -1,0 +1,38 @@
+Shortest Common Supersequence
+
+	Problem Statement
+
+		Given two strings 's1' and 's2', the task is to find the length of the shortest string that has both 's1' and 's2' as subsequences.
+
+	Solution
+
+		Approach 1
+
+			The solution is similar to that of finding the longest common subsequence.
+
+			Let dp(s1, s2) represent the length of the shortest common subpersequence of strings 's1' and 's2'. We have the following recurrence relation:
+
+				dp(s1, s2)
+				{
+					let m = s1.len(), n = s2.len()
+					if (m == 0 || n == 0) return max(m, n);
+
+					if the last characters of s1 and s2 are the same
+						return 1 + dp( remove_last_character(s1), remove_last_character(s2)); // remove_last_character(s) returns string 's' with last character removed.
+					else
+						return 1 + min( dp(remove_last_character(s1), s2), dp(s1, remove_last_character(s2))); 
+				}
+
+			We can use the top-down or bottom-up approach to solve this recurrence relation.
+
+			Time complexity: O(mn), where 'm' is the length of the first string and 'n' is the length of the second string.
+
+		Approach 2
+
+			We observe that the superset should have all the characters in the strings 's1' and 's2' in the same relative order, i.e, the len(superset) = len(s1) + len(s2). But if there exists a common subsequence between these two strings, then we need not add those characters twice to the superset.
+
+			len(shortest superset) = len(s1) + len(s2) - longest_common_subsequence(s1,s2);
+
+References
+
+	https://www.geeksforgeeks.org/shortest-common-supersequence
