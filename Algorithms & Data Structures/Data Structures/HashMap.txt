@@ -1,0 +1,71 @@
+Hash Map
+
+	Insertion, lookup, and deletion are operations we come across very often. Let us look at some of the data structures that allow us to do these operations efficiently.
+
+	Direct Access Table
+
+		A direct address table is nothing but an array where each position/slot corresponds to a record we want to store. For example, if we are storing employee data, we'd use the employee id as the key. The key would be directly mapped to the index of the array. This way we have a direct 1-1 mapping between the record and the table.
+
+		All the mentioned operations will have a time complexity of O(1).
+
+		Limitations of a DAT
+
+			1. In this case, if the employee ids are between 1000000 - 9999999, a lot of array space would be wasted; i.e, space from 1-999999 would be left unused since no employee id would be mapped to it.
+
+			2. The memory usage of the DAT is very high. In this case, we are forced to declare an array of size 100000000.
+
+		We make use of a hash table to overcome both of these limitations.
+
+
+	Hash Table
+
+		Hash table consist of two components: 
+
+			1. Hash Function
+			2. Array
+
+		Hash function
+
+			Hashing is the process of converting a given value into another value. A hash function is used to generate the new value according to a mathematical algorithm. The result of a hash function is called a hash value or simply, a hash. This generated hash would be used as the array index to store the concerned record.
+
+			Properties of a good hash function
+
+				1. Should be a one-way algorithm
+				2. Should be efficiently computable
+				3. Should uniformly distribute the key among the available records.
+
+
+			The phenomenon where two keys generate the same hash value from a given hash function is called a 'collision'. A good hash function should ensure that the collisions are minimum.
+
+			There are two major methods for handling collisions.
+
+				1. Separate chaining
+
+					The idea is to make the hash table slot point to a linked list of records that have the same hash value. In the worst-case scenario, all the keys could get inserted into the same slot and the search becomes O(n). But this is very unlikely with a hash function uniformly distributing the keys.
+
+				2. Open Addressing
+
+					In this technique, we ensure that the data is stored in the table itself. The size of the table must be larger than or equal to the total number of keys available. Let's see how we handle the following operations in this technique.
+
+						1. Insert(key): When we try to insert a key to the bucket which is already occupied, we keep probing the hash table until an empty slot is found. Once we find the empty slot, we insert the key into that slot.
+
+						2. Search(key): While searching for a key in the hash table, we keep probing until the slot’s value doesn’t become equal to the key or until an empty slot is found.
+
+						3. Delete(key): While performing delete operation, when we try to simply delete the key, then the search operation for that key might fail. Hence, deleted key slots are marked as “deleted” so that we get the status of the key when searched.
+
+					The term “open addressing” tells us that the address or location of the key to be placed is not determined by its hash value.
+
+					We have multiple variations of this technique:
+
+						1. Linear Probing
+						2. Quadratic Probling
+						3. Double Hashing
+
+					Open-addressing is usually faster than chained hashing when the load factor is low because you don't have to follow pointers between list nodes. It gets very, very slow if the load factor approaches 1 because you end up usually having to search through many of the slots in the bucket array before you find either the key that you were looking for or an empty slot. Also, you can never have more elements in the hash table than there are entries in the bucket array.
+
+References
+
+	https://www.interviewbit.com/tutorial/introduction-to-hashing/#introduction-to-hashing
+	https://towardsdatascience.com/data-structures-1-hash-tables-f520cb3dc85
+	https://www.youtube.com/watch?v=yA8bDfWj0UU
+	https://stackoverflow.com/questions/2556142/chained-hash-tables-vs-open-addressed-hash-tables
