@@ -63,6 +63,13 @@ Hash Map
 
 					Open-addressing is usually faster than chained hashing when the load factor is low because you don't have to follow pointers between list nodes. It gets very, very slow if the load factor approaches 1 because you end up usually having to search through many of the slots in the bucket array before you find either the key that you were looking for or an empty slot. Also, you can never have more elements in the hash table than there are entries in the bucket array.
 
+		Load Factor
+
+			If 'n' is the number of entries in the hash table and 'm' is the size of the hash table, then the load factor is = n/m. Low load factor means less chance for collisions, and in the case of open addressing the probing would be faster. Therefore, the load factor needs to be kept low. When we find that the load factor is above a certain threshold, we do a rehashing.
+
+			In rehashing, we declare a new hash table of double the size and traverse and insert elements in the old table to the new one.
+
+
 References
 
 	https://www.interviewbit.com/tutorial/introduction-to-hashing/#introduction-to-hashing
