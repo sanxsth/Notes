@@ -1,0 +1,50 @@
+Pointers
+
+	We make use of 'pointers' while implementing most of the data structures.
+
+	Pointer
+
+		A pointer is a variable that holds the address of another variable (basically, a memory allocation). We declare a pointer as follows:
+
+			int * p1, p2; // p2 is declared as an integer varibale and not a pointer
+			int a = 10;
+			int * p = &a; // p is a pointer that stores the address of an integer variable. We use 'Address-of-operator' (&) to fetch the variable's address
+
+			generic declaration: type * name; // 'type' denotes the type of the data pointed by the pointer
+
+		Dereference operator a.k.a Indirection operator
+
+			The indirection operator (or dereferencing operator) (*) operates on a pointer and returns the value stored in the address kept in the pointer variable.
+
+			int a = 10;
+			int * p = &a;
+			*p = 20;
+			cout<<*p<<" "<<a; // prints 20 20
+
+		class Car
+		{
+			string model;
+			...
+		};
+
+		Car* p = new Car(); // creates an instance of 'Car' and assigns its address to pointer 'p'
+		(*p).model or p->model can be used for accessing class members.
+		delete p; // deallocates the object (memory allocation) pointed by the pointer 'p'
+
+		int *p = new int[10]; // allocates an array of size 10 and assign its address to pointer 'p'
+		delete [] p; // deallocates an array allocation pointed by the pointer.
+
+	Reference Variables
+
+		A reference is an alias or an alternate name to an existing variable. If a reference variable is passed into a function, the function works on the original copy (instead of a clone copy in pass-by-value). Changes inside the function are reflected outside the function.
+
+		int number = 10;
+		int & num_alias = number;
+
+		generic declaration: type & name;
+
+References
+
+	https://www.cplusplus.com/doc/tutorial/pointers/
+	https://www.cs.swarthmore.edu/~newhall/cs31/resources/C-structs_pointers.php
+
