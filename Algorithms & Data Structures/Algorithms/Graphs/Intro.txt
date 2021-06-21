@@ -1,0 +1,35 @@
+Graphs
+
+	A Graph is a non-linear data structure consisting of nodes and edges. The nodes are sometimes also referred to as vertices and edges connect 'related' nodes.
+
+	There are mainly two main graph representations:
+
+		1. Adjacency Matrix
+		2. Adjacency List
+
+	Directed Graphs and Undirected Graphs
+
+		A directed graph is a graph where the edges have a direction (they are uni-directional). In undirected graphs, the edges are bidirectional. 
+
+	Handshaking lemma
+
+		The handshaking lemma is the statement that every finite graph has an even number of vertices with an odd degree. The handshaking lemma is a consequence of the degree sum formula (also sometimes called the handshaking lemma):
+
+			Summation of degrees of all nodes = 2 * E, where 'E' is the number of edges.
+
+		It's easy to observe that for every edge we add to the graph, we increment the total degree count by 2.
+
+	Tree
+
+		A tree is an undirected graph in which any two vertices are connected by exactly one path, or equivalently a connected acyclic undirected graph. A collection of trees is known as a forest.
+
+	Polytree
+
+		A poly tree is a directed acyclic graph (DAG) whose underlying undirected graph is a tree. A 'polyforest' is a collection of DAGs.
+
+References
+
+	https://en.wikipedia.org/wiki/Graph_theory
+	https://www.geeksforgeeks.org/graph-and-its-representations
+	https://en.wikipedia.org/wiki/Handshaking_lemma
+	https://math.stackexchange.com/questions/3924034/does-eulers-handshaking-lemma-apply-to-directed-graphs
