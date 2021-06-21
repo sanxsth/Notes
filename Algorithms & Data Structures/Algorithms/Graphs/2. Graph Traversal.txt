@@ -1,0 +1,42 @@
+Graph Traversal
+
+	Graph Traversal
+
+		Breadth-First Traversal
+
+			BFT is a traversing algorithm where you should start traversing from a selected node (source or starting node) and traverse the graph layerwise thus exploring the neighbor nodes. You must then move towards the next-level neighbor nodes. We usually use a queue to explore the nodes layer by layer. BFS is also known as 'breath first search' or 'level order traversal'. We use a 'visited' array to keep track of visited nodes.
+
+			BFS can be used for finding the shortest path and MST for an unweighted graph. It's used in P2P networks for finding neighbors, crawlers in search engines, cycle detection in an unweighted graph, bipartite testing, pathfinding, and finding all nodes within a connected component.
+
+			Time complexity: O(V + E), 'V' is the number of nodes and 'E' is the number of edges in the graph.
+			Space complexity: We usually use a queue to do the level order traversal, which in the worst case will contain O(n) elements.
+
+		Depth First Traversal
+
+			The algorithm starts at the root node (selecting some arbitrary node as the root node in the case of a graph) and explores as far as possible along each branch before backtracking. It is also known as 'depth-first search'. We use a 'visited array to keep track of visited nodes.
+
+			DFS can be used for cycle detection, pathfinding, topological sorting, bipartite testing, and finding strongly connected components in a graph.
+
+			Time complexity: O(V + E), 'V' is the number of nodes in the graph and 'E' is the number of edges in the graph.
+			Space complexity: O(n) for the visited array. In the worst case, the call stack can grow in the order of O(n).
+
+		Tree Traversal
+
+			Three major tree traversals:
+
+				1. Inorder traversal: Left child, root, right child. For a BST, returns the elements in non-decreasing order.
+				2. Preorder traversal: root, left child, right child. Used for making a copy of the tree.
+				3. Postorder traversal: left child, right child, root. Used for deleting a tree.
+
+			The time complexity of these traversals is O(n). The recurrence relation is as follows:
+
+				T(n) = T(k) + T(n-k-1) + c, 'k' is the number of nodes on one side of the tree. We can use the master theorem to solve this relation.
+
+			Auxilary space: If we don't consider the stack it's O(1) otherwise O(h), where 'h' is the height of the tree.
+
+References
+
+	https://en.wikipedia.org/wiki/Breadth-first_search
+	https://en.wikipedia.org/wiki/Depth-first_search
+	https://www.geeksforgeeks.org/graph-data-structure-and-algorithms
+	https://www.geeksforgeeks.org/binary-tree-data-structure
