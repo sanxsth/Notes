@@ -1,0 +1,99 @@
+Shorted Path In A Graph
+
+	Breadth-First Search
+
+		BFS can be used to find the shorted path in a non-weighted graph.
+
+	Djikstra's Algorithm
+
+		We use Djikstra's to find the single source shortest path in a weighted graph with non-negative edges. It can be modified to work on a weighted graph with negative edges ( by finding the proper offset for each edge; this is what Johnson's algorithm does), but no negative cycles. The algorithm is as follows:
+
+			1. Create a set, 'sptSet' (shortest path tree set) that keeps track of vertices included in the shortest-path tree, i.e whose shortest path from the source has been calculated and finalized. Initially, this set is empty.
+			2. Set the distance value to all the nodes as 'infinite, but assign '0' to the source node.
+			3. While 'sptSet' doesn't have all the nodes:
+				a. pick a vertex, that isn't in the set and has minimum distance.
+				b. update distances of all the nodes adjacent to this newly picked node.
+
+		If the graph contains a negative cycle, then, clearly, the shortest path to some vertices may not exist (due to the fact that the weight of the shortest path must be equal to minus infinity)
+
+		The default implementation has a time complexity of O(V^2), where 'V' is the number of vertices in the graph. But we can make use of a priority queue to bring down the complexity to O(V + ElogV).
+
+	Bellman-Ford Algorithm
+
+		We use Bellman-Ford to find the shorted path in a weighted graph that may have negative cycles. Bellman-Ford works on graphs with negative cycles because it can detect negative cycles. Bellman-Ford makes use of dynamic programming techniques to find the shorted paths.
+
+		The algorithm is as follows:
+
+			1. Create an array of distances d[0…n−1], which after execution of the algorithm will contain the answer to the problem.
+			2. Set d[v] = 0, where 'v' is the source vertex, and all the other elements d[] equal to 'infinity'.
+			3.  Each phase scans through all edges of the graph, and the algorithm tries to produce relaxation along each edge (a,b) having weight 'c'. Relaxation along the edges is an attempt to improve the value d[b] using the value 'd[a]+c'. It means that we are trying to improve the answer for this vertex using edge (a,b) and the current response for vertex a.
+
+		It is claimed that 'n-1' phases of the algorithm are sufficient to correctly calculate the lengths of all shortest paths in the graph. For vertices, unreachable from the source node, d[] will remain 'infinity'.
+
+		Time Complexity: O(n*m), 'n' is the number of nodes, and 'm' is the number of edges.
+
+		Proof
+
+			Consider an arbitrary vertex 'a' to which there is a path from the starting vertex 'v', and consider the shortest path to it (p0=v,p1,…,pk=a). Before the first phase, the shortest path to the vertex 'p0=v' was found correctly. During the first phase, the edge (p0,p1) has been checked by the algorithm, and therefore, the distance to the vertex p1 was correctly calculated after the first phase. Repeating this statement 'k' times, we see that after the kth phase the distance to the vertex 'pk=a' gets calculated correctly, which we wanted to prove.
+
+			The last thing to notice is that any shortest path cannot have more than 'n−1' edges (It's easy to prove this via contradiction). Therefore, the algorithm sufficiently goes up to the (n−1)th phase. After that, it is guaranteed that no relaxation will improve the distance to some vertex.
+
+		Detecting Negative Cycles
+
+			After (n−1)th phase, if we run the algorithm for one more phase, and it performs at least one more relaxation, then the graph contains a negative weight cycle that is reachable from v; otherwise, such a cycle does not exist.
+
+		Shortest Path Faster Algorithm (SPFA)
+
+			SPFA is an improvement to the Bellman-Ford algorithm which takes advantage of the fact that not all attempts to relaxation would work. Only the edges from nodes relaxed in the 'k-1'th step would part of the relaxation in 'k'th step.
+
+
+	Floyd-Warshall Algorithm
+
+		The Floyd–Warshall algorithm is an algorithm for finding the shortest paths between all pairs of nodes in a weighted graph with positive or negative edge weights. The algorithm is capable of detecting negative cycles.
+
+		The algorithm is as follows:
+
+			1. Create a matrix, d[][]. Before k-th phase (k=1…n), d[i][j] for any vertices i and j stores the length of the shortest path between the vertex i and vertex j, which contains only the vertices {1,2,...,k−1} as internal vertices in the path.
+			2.  For k=0, we can fill matrix with d[i][j]=Wij if there exists an edge between 'i' and 'j' with weight 'Wij' and d[i][j]= inf, if there doesn't exist an edge. In practice, 'inf' will be some high value.
+			3. Suppose now that we are in the k-th phase, we observe two fundamental cases:
+
+				i. The shortest way from the vertex 'i' to the vertex 'j' with internal vertices from the set {1,2,…,k} coincides with the shortest path with internal vertices from the set {1,2,…,k−1}. In this case, d[i][j] will not change during the transition.
+
+		    	ii. The shortest path with internal vertices from {1,2,…,k} is shorter. This means that the new, shorter path passes through the vertex 'k'. Therefore, we can split the shortest path between 'i' and 'j' into two paths: the path between 'i' and 'k', and the path between 'k' and 'j'. It is clear that both these paths only use internal vertices of {1,2,…,k−1} and are the shortest such paths in that respect. Therefore we already have computed the lengths of those paths before, and we can compute the length of the shortest path between 'i' and 'j' as d[i][k]+d[k][j].
+
+	    	Combining these two cases we find that we can recalculate the length of all pairs (i,j) in the k-th phase in the following way:
+
+	    		d[i][j]= min(d[i][j], d[i][k]+d[k][j]), for all 'k'.
+
+	    Time Complexity: O(n^3), where 'n' is the number of nodes in the graph.
+
+	    Detecting Negative Cycles
+
+	    	After running Floyd-Warshall for a graph, if there exists a node 't' such that d[t][t] < 0 then there exists a negative cycle in this graph.
+
+	Johnson's algorithm
+
+		Johnsons' algorithm is used to find all pairs shortest paths. Floyd-Warshall finds the same, but the time complexity is O(n^3). If we apply Djistra's on all the nodes, we can find all pairs shortest path in O(V*Vlogn). But Djikstra's won't work if the graph contains a negative cycle. The idea of Johnson’s algorithm is to re-weight all edges and make them all positive, then apply Dijkstra’s algorithm for every vertex.
+
+		For a complete graph, the complexity of Johnson's becomes the same as that of the Floyd-Warshall algorithm.
+
+	Shortest Path In A DAG
+
+		We can either use Djikstra's or Bellman-Ford, but there's an approach with much better time complexity. This approach involves topological sorting.
+		The algorithm is as follows:
+
+			1. Initialize dist[] = {INF, INF, ….} and dist[s] = 0 where s is the source vertex.
+			2. Create a toplogical order of all vertices.
+			3. Do following for every vertex u in topological order.
+				For every adjacent vertex 'v' of 'u':
+					if (dist[v] > dist[u] + weight(u, v)):
+						dist[v] = dist[u] + weight(u, v)
+
+References
+
+	https://cp-algorithms.com/graph/bellman_ford.html
+	https://cp-algorithms.com/graph/all-pair-shortest-path-floyd-warshall.html
+	https://cp-algorithms.com/graph/dijkstra.html
+	https://cp-algorithms.com/graph/dijkstra_sparse.html
+	https://www.geeksforgeeks.org/johnsons-algorithm
+	https://www.geeksforgeeks.org/shortest-path-for-directed-acyclic-graphs
