@@ -1,0 +1,36 @@
+Composite Pattern
+
+	Also Known As: Object Tree
+
+	Composite is a structural design pattern that lets you compose objects into tree structures and then work with these structures as if they were individual objects. It provides a way to work with tree-like structures in a unified fashion, regardless of whether they are leaf nodes or parent nodes.
+
+	Problem
+
+		An application needs to manipulate a hierarchical collection of "primitive" and "composite" objects. Processing of a primitive object is handled one way, and processing of a composite object is handled differently. Having to query the "type" of each object before attempting to process it is not desirable.
+
+	Solution
+
+		Define an abstract base class (Component) that specifies the behavior that needs to be exercised uniformly across all primitive and composite objects. Subclass the Primitive and Composite classes off of the Component class.
+
+		Child management methods [e.g. addChild(), removeChild()] should normally be defined in the Composite class. Unfortunately, the desire to treat Primitives and Composites uniformly requires that these methods be moved to the abstract Component class. But this would violate the 'Interface Segregation Principle. So keeping these methods in the abstract Component class or moving it to the Composite class should be a choice you need to make based on your requirement and priorities (safety vs transparency).
+
+	Applicability
+
+		1. Use the Composite pattern when you have to implement a tree-like object structure. The Composite pattern provides you with two basic element types that share a common interface: simple leaves and complex containers. A container can be composed of both leaves and other containers. This lets you construct a nested recursive object structure that resembles a tree.
+
+		2. Use the pattern when you want the client code to treat both simple and complex elements uniformly. All elements defined by the Composite pattern share a common interface. Using this interface, the client doesn’t have to worry about the concrete class of the objects it works with.
+
+	Pros
+
+		1. You can work with complex tree structures more conveniently: use polymorphism and recursion to your advantage.
+		2. Open/Closed Principle. You can introduce new element types into the app without breaking the existing code, which now works with the object tree.
+
+	Cons
+
+		1.  It might be difficult to provide a common interface for classes whose functionality differs too much. In certain scenarios, you’d need to overgeneralize the component interface, making it harder to comprehend.
+
+References
+
+	C# Design Patterns: Composite by Steve Michelotti - https://app.pluralsight.com/library/courses/c-sharp-design-patterns-composite
+	https://refactoring.guru/design-patterns/composite
+	https://sourcemaking.com/design_patterns/composite
