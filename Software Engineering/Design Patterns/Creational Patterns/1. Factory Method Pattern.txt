@@ -1,0 +1,46 @@
+Factory Method Pattern
+
+	A.K.A: Virtual Constructor
+
+	'Factory Method' is a creational design pattern that provides an interface for creating objects in a superclass, but allows subclasses to decide which class to instantiate. They let the class defer instantiation to the subclasses.
+
+	Applicability
+
+		1. Use the Factory Method when you don’t know beforehand the exact types and dependencies of the objects your code should work with. The Factory Method separates product construction code from the code that actually uses the product. Therefore it’s easier to extend the product construction code independently from the rest of the code.
+
+		2. Use the Factory Method when you want to provide users of your library or framework with a way to extend its internal components.
+
+		3. Use the Factory Method when you want to save system resources by reusing existing objects instead of rebuilding them each time.
+
+	How to implement
+
+		1. Make all products follow the same interface. This interface should declare methods that make sense in every product.
+
+		2. Add an empty factory method inside the creator class. The return type of the method should match the common product interface.
+
+		3. In the creator’s code find all references to product constructors. One by one, replace them with calls to the factory method while extracting the product creation code into the factory method. You might need to add a temporary parameter to the factory method to control the type of returned product. At this point, the code of the factory method may look pretty ugly. It may have a large switch operator that picks which product class to instantiate. But don’t worry, we’ll fix it soon enough.
+
+		4. Now, create a set of creator subclasses for each type of product listed in the factory method. Override the factory method in the subclasses and extract the appropriate bits of construction code from the base method.
+
+		5. If there are too many product types and it doesn’t make sense to create subclasses for all of them, you can reuse the control parameter from the base class in subclasses.
+
+		6. If, after all of the extractions, the base factory method has become empty, you can make it abstract. If there’s something left, you can make it a default behavior of the method.
+
+	Pros:
+
+		1. Avoids tight coupling between the clients and the products.
+		2. Single Responsibility Principle: Product creation is now the responsibility of the creator class and not the client.
+		3. Open/Closed Principle: We can introduce new products without breaking existing clients.
+
+	Cons:
+
+		1. The code may become more complicated since you need to introduce a lot of new subclasses to implement the pattern.
+
+References
+
+	https://www.youtube.com/watch?v=EcFVTgRHJLM
+	https://refactoring.guru/design-patterns/factory-method
+	https://sourcemaking.com/design_patterns/factory_method
+	https://en.wikipedia.org/wiki/Factory_method_pattern
+	https://refactoring.guru/design-patterns/factory-comparison
+	https://stackoverflow.com/questions/13029261/design-patterns-factory-vs-factory-method-vs-abstract-factory
