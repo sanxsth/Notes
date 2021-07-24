@@ -1,0 +1,23 @@
+Design Patterns
+
+	In software engineering, design patterns are general, reusable solutions to commonly occurring problems in software design. The pattern is not a specific piece of code, but a general concept for solving a particular problem. You can follow the pattern details and implement a solution that suits the realities of your program.
+
+	Patterns are often confused with algorithms because both concepts describe typical solutions to some known problems. While an algorithm always defines a clear set of actions that can achieve some goal, a pattern is a more high-level description of a solution. The code of the same pattern applied to two different programs may be different.
+
+	Classification Of Patterns
+
+		The most basic and low-level patterns are often called idioms. They usually apply only to a single programming language.
+
+		The most universal and high-level patterns are architectural patterns. Developers can implement these patterns in virtually any language. Unlike other patterns, they can be used to design the architecture of an entire application.
+
+		All patterns can be categorized by their intent or purpose. Three of the main categories are:
+
+			1. Creational Patterns: Provides object creation mechanisms that increase flexibility and reuse of existing code.
+			2. Structural Patterns: Explains how to assemble objects and classes into larger structures, while keeping the structures flexible.
+			3. Behavioral Patterns: Takes care of effective communications and the assignments of responsibilities between objects.
+
+References:
+
+	https://refactoring.guru/design-patterns
+	https://sourcemaking.com/design_patterns
+	Design Patterns Overview by Steve Smith: https://app.pluralsight.com/library/courses/design-patterns-overview/table-of-contents
