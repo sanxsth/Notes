@@ -1,0 +1,45 @@
+Adapter Pattern
+
+	Also Know As: Wrapper
+
+	'Adapter' is a structural design pattern that allows objects with incompatible interfaces to collaborate.
+
+	Problem
+
+		Imagine a scenario where you deal with data in XML format, but the latest analytics library that you want to use works with data in JSON format. Since this is a third-party library, you can't modify it. Also, making changes at your end isn't trivial since this would involve a lot of changes and might break some existing functionalities.
+
+	Solution
+
+		You create an 'adapter'. This is a special object that converts the interface of one object so that another object can understand it. An adapter wraps one of the objects to hide the complexity of conversion happening behind the scenes. The wrapped object isn’t even aware of the adapter.
+
+		Sometimes it’s even possible to create a two-way adapter that can convert the calls in both directions.
+
+	Applicability
+
+		1. Use the Adapter class when you want to use some existing class, but its interface isn’t compatible with the rest of your code.
+		2. Use the pattern when you want to reuse several existing subclasses that lack some common functionality that can’t be added to the superclass. Extending each subclass with this new functionality doesn't seem like an efficient solution. The much more elegant solution would be to put the missing functionality into an adapter class. Then you would wrap objects with missing features inside the adapter, gaining needed features dynamically. For this to work, the target classes must have a common interface, and the adapter’s field should follow that interface.
+
+	How to implement
+
+		1. Declare the client interface and describe how clients communicate with the service.
+
+		2. Create the adapter class and make it follow the client interface. Leave all the methods empty for now.
+
+		3. Add a field to the adapter class to store a reference to the service object. 
+
+		4. One by one, implement all methods of the client interface in the adapter class. The adapter should delegate most of the real work to the service object, handling only the interface or data format conversion.
+
+		5. Clients should use the adapter via the client interface. This will let you change or extend the adapters without affecting the client code.
+
+	Pros
+
+		1. Single Responsibility Principle. You can separate the interface or data conversion code from the primary business logic of the program.
+		2. Open/Closed Principle. You can introduce new types of adapters into the program without breaking the existing client code, as long as they work with the adapters through the client interface.
+
+	Cons
+
+		1. The overall complexity of the code increases because you need to introduce a set of new interfaces and classes. Sometimes it’s simpler just to change the service class so that it matches the rest of your code.
+
+References
+
+	https://refactoring.guru/design-patterns/adapter
