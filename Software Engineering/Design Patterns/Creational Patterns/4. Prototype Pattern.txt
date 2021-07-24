@@ -1,0 +1,50 @@
+Prototype Pattern
+
+	A.K.A: Clone Pattern
+
+	'Prototype' is a creational design pattern that lets you copy existing objects without making your code dependent on their classes.
+
+	Problem
+
+		Say you have an object, and you want to create an exact copy of it. How would you do it?
+
+		We can create a new object of the given class and go through all the fields and populated it with the values of the source object. But, what will we do with the private fields that are hidden from the outside world? Another drawback of this direct approach is that the client code becomes dependent on the class of the object being cloned.
+
+	Solution
+
+		The Prototype pattern delegates the cloning process to the actual objects that are being cloned. The pattern declares a common interface for all objects that support cloning. This interface lets you clone an object without coupling your code to the class of that object. Usually, such an interface contains just a single 'clone' method.
+
+		An object that supports cloning is called a 'prototype'. When your objects have dozens of fields and hundreds of possible configurations, cloning them might serve as an alternative to subclassing.
+
+	Applicability
+
+		1. Use the Prototype pattern when your code shouldn’t depend on the concrete classes of objects that you need to copy.
+
+		2. Use the pattern when you want to reduce the number of subclasses that only differ in the way they initialize their respective objects. Somebody could have created these subclasses to be able to create objects with a specific configuration.
+
+	How to implement
+
+		1. Create the prototype interface and declare the clone method in it. Or just add the method to all classes of an existing class hierarchy, if you have one.
+
+		2. A prototype class must define the alternative constructor that accepts an object of that class as an argument. The constructor must copy the values of all fields defined in the class from the passed object into the newly created instance. If you’re changing a subclass, you must call the parent constructor to let the superclass handle the cloning of its private fields. If your programming language doesn’t support method overloading, you may define a special method for copying the object data. The constructor is a more convenient place to do this because it delivers the resulting object right after you call the new operator.
+
+		3. The cloning method usually consists of just one line: a 'new' operator with the prototypical version of the constructor.
+
+		4. Optionally, create a centralized prototype registry to store a catalog of frequently used prototypes.
+
+	Pros
+
+		1. You can clone objects without coupling to their concrete classes.
+		2. You can get rid of repeated initialization code in favor of cloning pre-built prototypes.
+		3. You can produce complex objects more conveniently. You only have to initialize them once, following which you only use the copies.
+		4. You get an alternative to inheritance when dealing with configuration presets for complex objects.
+
+	Cons
+
+		1. Cloning complex objects that have circular references might be very tricky.
+
+References
+
+	C# Design Patterns: Prototype by Harrison Ferrone - https://app.pluralsight.com/library/courses/c-sharp-design-patterns-prototype
+	https://refactoring.guru/design-patterns/prototype
+	https://en.wikipedia.org/wiki/Prototype_pattern
