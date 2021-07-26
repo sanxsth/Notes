@@ -1,0 +1,64 @@
+Decorator Pattern
+
+	Also Known As: Wrapper
+
+		'Decorator' is a structural design pattern that lets you attach new behaviors to objects by placing these objects inside special wrapper objects that contain the behaviors.
+
+	Problem
+
+		Often you might want to add new behaviors to an existing class. For example, you have a 'WeatherService' that gets the current weather report by making an HTTP call to a web API. Now, you are asked to log all the requests made to objects of this class. Or the new requirement can be to implement a cache so that the 'WeatherService' need not make API calls to get the weather report.
+
+	Solution
+
+		We can either make these changes directly to the 'WeatherService' class. But this would violate SRP and OCP. Our next approach would be to create subclasses that extend the 'WeatherService' class. Extending a class is the first thing that comes to mind when you need to alter an object’s behavior. However, inheritance has several serious caveats that you need to be aware of.
+
+			1. Inheritance is static. You can’t alter the behavior of an existing object at runtime. You can only replace the whole object with another one that’s created from a different subclass.
+
+			2. Subclasses can have just one parent class. In most languages, inheritance doesn’t let a class inherit behaviors of multiple classes at the same time.
+
+		One of the ways to overcome these caveats is by using Aggregation or Composition instead of Inheritance. Both of the alternatives work almost the same way: one object has a reference to another and delegates it some work, whereas, with inheritance, the object itself is able to do that work, inheriting the behavior from its superclass.
+
+
+		A 'decorator' is an object that can be linked with some target object. The decorator contains the same set of methods as the target and delegates to it all requests it receives. However, the decorator may alter the result by doing something either before or after it passes the request to the target.
+
+		Since all decorators implement the same interface as the base class, the rest of the client code won’t care whether it works with the 'pure' object or the decorated one.
+
+		In scenarios where it is difficult to share a common interface between the base class and the decorators, you can implement an adapter (sharing a common interface with the decorators) to use with the base class and then decorate this adapter.
+
+	Applicability
+
+		1. Use the Decorator pattern when you need to be able to assign extra behaviors to objects at runtime without breaking the code that uses these objects.
+
+		2. Use the pattern when it’s not natural or not possible to extend an object’s behavior using inheritance.
+
+
+	How to implement
+
+		1. Make sure your business domain can be represented as a primary component with multiple optional layers over it.
+
+		2. Figure out what methods are common to both the primary component and the optional layers. Create a component interface and declare those methods there.
+
+		3. Create a concrete component class and define the base behavior in it.
+
+		4. Create a base decorator class. It should have a field for storing a reference to a wrapped object. The field should be declared with the component interface type to allow linking to concrete components as well as decorators. The base decorator must delegate all work to the wrapped object.
+
+		5. Make sure all classes implement the component interface.
+
+		6. Create concrete decorators by extending them from the base decorator. A concrete decorator must execute its behavior before or after the call (or even both) to the parent method.
+
+		7. The client code must be responsible for creating decorators and composing them in the way the client needs.
+
+	Pros
+
+		1. Single Responsibility Principle. You can divide a monolithic class that implements many possible variants of behavior into several smaller classes.
+
+		2. You can add or remove responsibilities from an object at runtime.
+
+	Cons
+
+		1. The initial configuration code of layers might look pretty ugly. But in frameworks like DotNet, you can use IOC that supports this pattern.
+
+References
+
+	C# Design Patterns: Decorator by David Berry - https://app.pluralsight.com/library/courses/c-sharp-design-patterns-decorator
+	https://refactoring.guru/design-patterns/decorator
