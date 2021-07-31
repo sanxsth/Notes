@@ -1,0 +1,53 @@
+Mediator Pattern
+
+	Also Known As: Intermediary, Controller
+
+	'Mediator' is a behavioral design pattern that lets you reduce chaotic dependencies between objects. The pattern restricts direct communications between the objects and forces them to collaborate only via a mediator object.
+
+	Problem
+
+		Classes would have references to other classes and over time these dependencies grow and become complex. We want to design reusable components, but dependencies between the potentially reusable pieces demonstrate the "spaghetti code" phenomenon and this makes the components rigid and hard to reuse.
+
+	Solution
+
+		The Mediator pattern suggests that you should cease all direct communication between the components which you want to make independent of each other. Instead, these components must collaborate indirectly, by calling a special mediator object that redirects the calls to appropriate components. As a result, the components depend only on a single mediator class instead of being coupled to dozens of their colleagues.
+
+		This way, the Mediator pattern lets you encapsulate a complex web of relations between various objects inside a single mediator object. The fewer dependencies a class has, the easier it becomes to modify, extend or reuse that class.
+
+		A real-world example: Aircraft pilots don’t talk to each other directly when deciding who gets to land their plane next. All communication goes through the control tower.
+
+	Applicability
+
+		Use the pattern when you can’t reuse a component in a different program because it’s too dependent on other components.  After you apply the Mediator, individual components become unaware of the other components. They could still communicate with each other, albeit indirectly, through a mediator object. To reuse a component in a different app, you need to provide it with a new mediator class.
+
+	How to implement
+
+		1. Identify a group of tightly coupled classes that would benefit from being more independent.
+
+		2. Declare the mediator interface and describe the desired communication protocol between mediators and various components.
+
+		3. Implement the concrete mediator class. This class would benefit from storing references to all of the components it manages. You can go even further and make the mediator responsible for the creation and destruction of component objects. 
+
+		4. Components should store a reference to the mediator object. The connection is usually established in the component’s constructor, where a mediator object is passed as an argument.
+
+		5. Change the components’ code so that they call the mediator’s notification method instead of methods on other components. Extract the code that involves calling other components into the mediator class. Execute this code whenever the mediator receives notifications from that component.
+
+	Pros
+
+		1. Single Responsibility Principle. You can extract the communications between various components into a single place, making it easier to comprehend and maintain.
+
+		2. Open/Closed Principle. You can introduce new mediators without having to change the actual components.
+
+		3. You can reduce coupling between various components of a program.
+
+		4. You can reuse individual components more easily.
+
+	Cons
+
+		Over time a mediator can evolve into a God Object.
+
+References
+
+	https://refactoring.guru/design-patterns/mediator
+	C# Design Patterns: Mediator by Steve Michelotti - https://app.pluralsight.com/library/courses/c-sharp-design-patterns-mediator
+
