@@ -1,0 +1,60 @@
+Iterator Pattern
+
+	Iterator is a behavioral design pattern that lets you traverse elements of a collection without exposing its underlying representation.
+
+	Problem
+
+		A collection is a container for a group of objects. Most collections store their elements in simple lists. However, some of them are based on stacks, trees, graphs, and other complex data structures. But no matter how a collection is structured, it must provide some way of accessing its elements so that other code can use these elements.
+
+		Traversing simple collections like a list is trivial. But how do we traverse more complex structures like a tree? For example, one day you might be just fine with depth-first traversal of a tree. Yet the next day you might require breadth-first traversal. And the next week, you might need something else, like random access to the tree elements. And all these different approaches aren't trivial.
+
+		Adding more and more traversal algorithms to the collection gradually blurs its primary responsibility (SRP violation), which is efficient data storage.
+
+		We don't want the collections themself to handle the traversal nor do we want to burden the client with this responsibility.
+
+	Solution
+
+		The main idea of the Iterator pattern is to extract the traversal behavior of a collection into a separate object called an iterator. In addition to implementing the traversal algorithm itself, an iterator object encapsulates all of the traversal details, such as the current position and how many elements are left till the end. Because of this, several iterators can go through the same collection at the same time, independently of each other.
+
+		All iterators must implement the same interface. This makes the client code compatible with any collection type or any traversal algorithm as long as there’s a proper iterator.
+
+		The Client works with both collections and iterators via their interfaces. This way the client isn’t coupled to concrete classes, allowing you to use various collections and iterators with the same client code. Typically, clients don’t create iterators on their own, but instead, get them from collections. Yet, in certain cases, the client can create one directly;
+
+	Applicability
+
+		1. Use the Iterator pattern when your collection has a complex data structure under the hood, but you want to hide its complexity from clients.
+
+		2. Use the pattern to reduce duplication of the traversal code across your app.
+
+		3. Use the Iterator when you want your code to be able to traverse different data structures or when types of these structures are unknown beforehand.
+
+	How to implement
+
+		1. Declare the iterator interface. At the very least, it must have a method for fetching the next element from a collection.
+
+		2. Declare the collection interface and describe a method for fetching iterators. The return type should be equal to that of the iterator interface.
+
+		3. Implement concrete iterator classes for the collections that you want to be traversable with iterators. An iterator object must be linked with a single collection instance. Usually, this link is established via the iterator’s constructor.
+
+		4. Implement the collection interface in your collection classes.
+
+		5. Go over the client code to replace all of the collection traversal code with the use of iterators.
+
+	Pros
+
+		1. Single Responsibility Principle. You can clean up the client code and the collections by extracting bulky traversal algorithms into separate classes.
+
+		2. Open/Closed Principle. You can implement new types of collections and iterators and pass them to existing code without breaking anything.
+
+		3. You can iterate over the same collection in parallel because each iterator object contains its own iteration state.
+
+	Cons
+
+		1. Applying the pattern can be overkill if your app only works with simple collections.
+
+		2. Using an iterator may be less efficient than going through elements of some specialized collections directly.
+
+References
+
+	Iterator Design Pattern by Derek Banas - https://www.youtube.com/watch?v=VKIzUuMdmag
+	https://refactoring.guru/design-patterns/iterator
