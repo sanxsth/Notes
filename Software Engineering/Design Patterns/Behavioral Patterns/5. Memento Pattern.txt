@@ -1,0 +1,64 @@
+Memento Pattern
+
+	Also Known As: Snapshot or Token
+
+	Memento is a behavioral design pattern that lets you save and restore the previous state of an object without revealing the details of its implementation.
+
+	Problem
+
+		Undo/Redo, saving the current state (mostly games) are some common features you'd see in applications. In order to save the state of an object, you'd have to make all of its fields public (which isn't always safe) or give this responsibility to respective classes (this violates SRP). 
+
+		In the future, you might decide to refactor some of your classes or add or remove some of the fields. Sounds easy, but this would also require changing the classes responsible for copying the state of the affected objects. 
+
+		Now, where do we save these states? For that, we need to create a new class (let's call the snapshots for now) whose only purpose is to store the state of other objects. To allow other objects to write and read data to and from a snapshot, you’d probably need to make its fields public. That would expose all the applications’ states, private or not. Other classes would become dependent on every little change to the snapshot class, which would otherwise happen within private fields and methods without affecting outer classes.
+
+		So these are some of the problems associated with managing the state of an application.
+
+	Solution
+
+		All problems that we’ve just experienced are caused by broken encapsulation. Some objects try to do more than they are supposed to. To collect the data required to perform some action, they invade the private space of other objects instead of letting these objects perform the actual action.
+
+		The Memento pattern delegates creating the state snapshots to the actual owner of that state, the 'originator' object. The pattern suggests storing the copy of the object’s state in a special object called 'memento'. The contents of the memento aren’t accessible to any other object except the one that produced it. Other objects must communicate with mementos using a limited interface which may allow fetching the snapshot’s metadata (creation time, the name of the performed operation, etc.), but not the original object’s state contained in the snapshot.
+		
+		Such a restrictive policy lets you store mementos inside other objects, usually called caretakers. Since the caretaker works with the memento only via the limited interface, it’s not able to tamper with the state stored inside the memento. At the same time, the originator has access to all fields inside the memento, allowing it to restore its previous state at will.
+
+		There are multiple implementations for the memento pattern depending upon the level of encapsulation you prefer.
+
+	Applicability
+
+		Use the Memento pattern when you want to produce snapshots of the object’s state to be able to restore a previous state of the object without violating the object's encapsulation. The Memento pattern lets you make full copies of an object’s state, including private fields, and store them separately from the object. While most people remember this pattern thanks to the “undo” use case, it’s also indispensable when dealing with transactions.
+
+	How to implement
+
+		1. Determine what class will play the role of the originator. It’s important to know whether the program uses one central object of this type or multiple smaller ones.
+
+		2. Create the memento class. One by one, declare a set of fields that mirror the fields declared inside the originator class.
+
+		3. Make the memento class immutable. A memento should accept the data just once, via the constructor. The class should have no setters.
+
+		4. If your programming language supports nested classes, nest the memento inside the originator. If not, extract a blank interface from the memento class and make all other objects use it to refer to the memento. You may add some metadata operations to the interface, but nothing that exposes the originator’s state.
+
+		5. Add a method for producing mementos to the originator class. The originator should pass its state to the memento via one or multiple arguments of the memento’s constructor. The return type of the method should be of the interface you extracted in the previous step. Under the hood, the memento-producing method should work directly with the memento class.
+
+		6. Add a method for restoring the originator’s state to its class. It should accept a memento object as an argument. If you extracted an interface in the previous step, make it the type of the parameter. In this case, you need to typecast the incoming object to the memento class, since the originator needs full access to that object.
+
+		7. The caretaker, whether it represents a command object, a history, or something entirely different, should know when to request new mementos from the originator, how to store them and when to restore the originator with a particular memento.
+
+		8. Optional: The link between caretakers and originators may be moved into the memento class. In this case, each memento must be connected to the originator that had created it. The restoration method would also move to the memento class. However, this would all make sense only if the memento class is nested into the originator or the originator class provides sufficient setters for overriding its state.
+
+	Pros
+
+		1. You can produce snapshots of the object’s state without violating its encapsulation.
+
+		2. Single Responsibility: You can simplify the originator’s code by letting the caretaker maintain the history of the originator’s state.
+
+	Cons
+
+		1. The app might consume lots of RAM if clients create mementos too often.
+		2. Caretakers should track the originator’s lifecycle to be able to destroy obsolete mementos.
+		3. Most dynamic programming languages, such as PHP, Python, and JavaScript, can’t guarantee that the state within the memento stays untouched.
+
+References
+
+	C# Design Patterns: Memento by Steve Smith - https://app.pluralsight.com/library/courses/c-sharp-design-patterns-memento
+	https://refactoring.guru/design-patterns/memento
