@@ -1,0 +1,58 @@
+State Pattern
+
+	'State' is a behavioral design pattern that lets an object alter its behavior when its internal state changes. It appears as if the object changed its class.
+
+	Problem
+
+		The State pattern is closely related to the concept of a Finite-State Machine. The main idea is that, at any given moment, there’s a finite number of states in which a program can be. Within any unique state, the program behaves differently, and the program can be switched from one state to another instantaneously. However, depending on the current state, the program may or may not switch to certain other states. These switching rules, called transitions, are also finite and predetermined.
+
+		State machines are usually implemented with lots of conditional operators that select the appropriate behavior depending on the current state of the object. The biggest weakness of a state machine based on conditionals reveals itself once we start adding more and more states and state-dependent behaviors to our program. Most methods will contain complex conditionals that pick the proper behavior of a method according to the current state. A code like this is very difficult to maintain because any change to the transition logic may require changing state conditionals in every method.
+
+		The problem tends to get bigger as a project evolves. It’s quite difficult to predict all possible states and transitions at the design stage. Hence, a lean state machine built with a limited set of conditionals operators can grow into a bloated mess over time.
+
+	Solution
+
+		The State pattern suggests that you create new classes for all possible states of an object and extract all state-specific behaviors into these classes. Instead of implementing all behaviors on its own, the original object, called 'context', stores a reference to one of the state objects that represents its current state, and delegates all the state-related work to that object.
+
+		To transition the context into another state, replace the active state object with another object that represents that new state. This is possible only if all state classes follow the same interface and the context itself works with these objects through that interface.
+
+	Applicability
+
+		1. Use the State pattern when you have an object that behaves differently depending on its current state, the number of states is enormous, and the state-specific code changes frequently.
+
+		2. Use the pattern when you have a class polluted with massive conditionals that alter how the class behaves according to the current values of the class’s fields.
+
+	How to implement
+
+		1. Decide what class will act as the context. It could be an existing class that already has the state-dependent code; or a new class, if the state-specific code is distributed across multiple classes.
+
+		2. Declare the state interface. Although it may mirror all the methods declared in the context, aim only for those that may contain state-specific behavior.
+
+		3. For every actual state, create a class that derives from the state interface. Then go over the methods of the context and extract all code related to that state into your newly created class.
+
+		4. In the context class, add a reference field of the state interface type and a public setter that allows overriding the value of that field.
+
+		5. Go over the method of the context again and replace empty state conditionals with calls to corresponding methods of the state object.
+
+		6. To switch the state of the context, create an instance of one of the state classes and pass it to the context.
+
+	Pros
+
+		1. Single Responsibility Principle. Organize the code related to particular states into separate classes.
+
+		2. Open/Closed Principle. Introduce new states without changing existing state classes or the context.
+
+		3. Simplify the code of the context by eliminating bulky state machine conditionals.
+
+	Cons
+
+		1. Applying the pattern can be overkill if a state machine has only a few states or rarely changes.
+
+	State vs Strategy
+
+		State pattern may look similar to the Strategy pattern, but there’s one key difference. In the State pattern, the particular states may be aware of each other and initiate transitions from one state to another, whereas strategies almost never know about each other.
+
+References
+	
+	C# Design Patterns: State by Marc Gilbert - https://app.pluralsight.com/library/courses/c-sharp-design-patterns-state
+	https://refactoring.guru/design-patterns/state
