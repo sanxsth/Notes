@@ -1,0 +1,57 @@
+Template Method Pattern
+
+	Template Method is a behavioral design pattern that defines the skeleton of an algorithm in the superclass but lets subclasses override specific steps of the algorithm without changing its structure.
+
+	Problem
+
+		Imagine that you’re creating a data mining application that analyzes corporate documents. Users feed the app documents in various formats (PDF, DOC, CSV), and it tries to extract meaningful data from these docs in a uniform format.
+
+		You create classes for processing each file type and you noticed that all three classes have a lot of similar code. While the code for dealing with various data formats was entirely different in all classes, the code for data processing and analysis is almost identical. Wouldn’t it be great to get rid of the code duplication, leaving the algorithm structure intact?
+
+		Also, you have a set of operations that you would like to make sure that various sub-classes (PdfMiner, DocMiner, CsvMiner) execute them in a particular order (read, analyze, persist). How can we enforce this programmatically?
+
+	Solution
+
+		The Template Method pattern suggests that you break down an algorithm into a series of steps, turn these steps into methods, and put a series of calls to these methods (in the order you want to enforce) inside a single template method. The steps may either be 'abstract' or have some default implementation. To use the algorithm, the client is supposed to provide its own subclass, implement all abstract steps, and override some of the optional ones if needed (but not the template method itself).
+
+		In our case, the abstract class would have 'read', 'analyze', and 'persist' as abstract methods (forcing the subclasses to provide their own implementations for these methods). It will also have a 'template' method that would be making calls to read(), analyze(), and persist() in this given order.
+
+		As you can see, we’ve got two types of steps:
+
+			1. 'abstract steps' must be implemented by every subclass
+			2. 'optional steps' already have some default implementation, but still can be overridden if needed.
+
+		There’s another type of step, called 'hooks'. A hook is an optional step with an empty body. A template method would work even if a hook isn’t overridden. Usually, hooks are placed before and after crucial steps of algorithms, providing subclasses with additional extension points for an algorithm.
+
+	Applicability
+
+		1. Use the Template Method pattern when you want to let clients extend only particular steps of an algorithm, but not the whole algorithm or its structure.
+
+		2. Use the pattern when you have several classes that contain almost identical algorithms with some minor differences. As a result, you might need to modify all classes when the algorithm changes. When you turn such an algorithm into a template method, you can also pull up the steps with similar implementations into a superclass, eliminating code duplication. Code that varies between subclasses can remain in subclasses.
+
+	How to implement
+
+		1. Analyze the target algorithm to see whether you can break it into steps. Consider which steps are common to all subclasses and which ones will always be unique.
+
+		2. Create the abstract base class and declare the template method and a set of abstract methods representing the algorithm’s steps. Outline the algorithm’s structure in the template method by executing corresponding steps. Consider making the template method 'final' to prevent subclasses from overriding it.
+
+		3. It’s okay if all the steps end up being abstract. However, some steps might benefit from having a default implementation. Subclasses don’t have to implement those methods.
+
+		4. Think of adding hooks between the crucial steps of the algorithm.
+
+		5. For each variation of the algorithm, create a new concrete subclass. It must implement all of the abstract steps, but may also override some of the optional ones.
+
+	Pros
+
+		Promotes OCP and DRY principles.
+	
+	Cons
+
+		1. Some clients may be limited by the provided skeleton of an algorithm.
+		2. You might violate the Liskov Substitution Principle by suppressing a default step implementation via a subclass.
+		3. Template methods tend to be harder to maintain the more steps they have.
+
+References
+
+	C# Design Patterns: Template Method by Steve Smith - https://app.pluralsight.com/library/courses/c-sharp-design-patterns-template-method
+	https://refactoring.guru/design-patterns/template-method
