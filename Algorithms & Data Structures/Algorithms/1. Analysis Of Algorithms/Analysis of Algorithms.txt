@@ -159,7 +159,7 @@ Asymptotic Analysis
 
 		P is a subset of NP (any problem that can be solved by a deterministic machine in polynomial time can also be solved by a non-deterministic machine in polynomial time). 
 
-		Informally, NP is a set of decision problems that can be solved by a polynomial-time via a “Lucky Algorithm”, a magical algorithm that always makes a right guess among the given set of choices.
+		Informally, NP is a set of decision problems that can be solved in polynomial-time via a “Lucky Algorithm”, a magical algorithm that always makes a right guess among the given set of choices.
 
 		NP-complete problems are the hardest problems of the NP set.
 

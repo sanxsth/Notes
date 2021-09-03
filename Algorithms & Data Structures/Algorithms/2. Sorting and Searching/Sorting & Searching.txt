@@ -7,7 +7,7 @@ Sorting
 		Comparison Sort
 
 			Comparison sorts compare elements at each step of the algorithm to determine if one element should be to the left or right of another element.
-			Comparison sorts are limited by a lower bound of O(nlogn), meaning that, on average, comparison sorts cannot be faster than O(nlogn). A lower bound for an algorithm is the worst-case running time of the best possible algorithm for a given problem.
+			Comparison sorts are limited by a lower bound of O(nlogn), meaning that, on average, comparison sorts cannot be faster than O(nlogn). A lower bound for a problem is the worst-case running time of the best possible algorithm the given problem.
 
 			The running time of comparison-based sorting algorithms is bounded by Ω(nlogn). A comparison sort can be modeled as a large binary tree called a decision tree where each node represents a single comparison. This is a decision tree because each of the n! permutations of the given list is represented by a leaf, and the path the algorithm must take to get to each leaf is the series of comparisons and outcomes that yield that particular ordering.
 
@@ -33,7 +33,7 @@ Sorting
 
 			Integer sorts are sometimes called counting sorts. Integer sorts do not make comparisons, so they are not bounded by Ω(nlogn).
 
-			Integer sorts determine for each element​ x how many elements are less than x. If there are 14 elements that are less than x, then x will be placed in the 15th slot. This information is used to place each element into the correct slot immediately—no need to rearrange lists.
+			Integer sorts determine for each element​ x how many elements are less than x. If there are 14 elements that are less than x, then x will be placed in the 15th slot. This information is used to place each element into the correct slot immediately — no need to rearrange lists.
 
 
  	A sorting algorithm is stable if it preserves the original order of elements with equal key values (where the key is the value the algorithm sorts by).

@@ -1,0 +1,95 @@
+Graph Connectivity
+
+	A connected graph is an undirected graph where a path exists between every pair of vertices.
+
+	A strongly connected graph is a directed graph where a path exists between every pair of vertices. For a directed graph, a strongly connected component is a partition or a subgraph, which is not a subgraph of another strongly connected component. This means that a strongly connected component has to be the maximal subgraph satisfying the condition. Henceforth, we will refer to strongly connected components using the abbreviated term SCC.
+
+	Directed Graphs
+
+		A directed graph is strongly connected if there is a path between any two pairs of vertices.
+
+		In order to check if a given directed graph is strongly connected, we can do 'V' DFS traversals starting from each vertex. If any of these traversals don't visit all the other vertices, then the given directed graph isn't a strongly connected graph. This approach has a time complexity of O(V * (V + E)).
+
+		Kosaraju's Algorithm
+
+			Kosaraju's algorithm can be used to check if a given directed graph is strongly connected in O(V + E). The algorithm is as follow:
+
+				1. Initialize all vertices as not visited.
+				2. Do a DFS traversal on the graph starting from any arbitrary vertex 'v'. If DFS traversal doesn’t visit all vertices, then return 'false'.
+				3. Reverse all edges (or find transpose or reverse of the graph) 
+				4. Mark all vertices as not-visited in the reversed graph.
+				5. Do a DFS traversal of the reversed graph starting from the same vertex 'v' (Same as step 2). If DFS traversal doesn’t visit all vertices, then return 'false'. Otherwise, return 'true'.
+
+			The idea is if every node can be reached from a vertex 'v', and every node can reach 'v', then the graph is strongly connected since at least one path exists between every pair of vertices via 'v'.
+
+		Tarjan's Strongly Connected Algorithm
+
+			Tarjan's algorithm helps us to find the number of SCCs in a directed graph in O(V + E) (i.e, a single DFS traversal). We observe that if the number of SCCs in a graph is 1, then the given directed graph is a Strongly connected graph.
+
+			Here's a nice video that explains the algorithm: https://www.youtube.com/watch?v=wUgWX0nc4NY
+
+		Transitive Closure
+
+			The reach-ability matrix of a graph is called the transitive closure of the graph. Given a directed graph, we can find its transitive closure using a modified Floyd-Warshall.
+
+	Undirected Graph
+
+		Articulation Point
+
+			A vertex in an undirected connected graph is an articulation point (or cut vertex) iff removing it (and edges through it) disconnects the graph. Articulation points represent vulnerabilities in a connected network (single point of failure).
+
+			How to find all the articulation points in a given graph?
+
+				In O(V * (V+E)), we can apply a brute force solution where we delete a vertex a check if that splits the graph into multiple components.
+
+				A more efficient approach would be as follows:
+
+					The idea is to use DFS (Depth First Search). In DFS, we follow vertices in tree form called DFS tree. In the DFS tree, a vertex 'u' is the parent of another vertex 'v', if 'v' is discovered by 'u' (obviously 'v' is adjacent to 'u' in the graph). In the DFS tree, a vertex 'u' is an articulation point if one of the following two conditions is true. 
+					1. 'u' is the root of the DFS tree and it has at least two children. 
+					2. 'u' is not the root of the DFS tree and it has a child 'v' such that no vertex in the subtree rooted with 'v' has a back edge to one of the ancestors (in the DFS tree) of 'u'.
+
+		Biconnected Graph
+
+			A biconnected graph is a connected and "nonseparable" graph, meaning that if any one vertex were to be removed, the graph will remain connected. Therefore a biconnected graph has no articulation vertices.
+
+			Given a graph, it is a biconnected graph if it is a connected graph without any articulation points.
+
+		Biconnected Components in a graph
+
+			A biconnected component is a maximal biconnected subgraph.
+
+			The Algorithm
+
+				Idea is to store visited edges in a stack while doing a DFS on a graph and keep looking for Articulation Points. As soon as an articulation point 'u' is found, all edges visited while DFS from node 'u' onwards will form one biconnected component. When DFS completes for one connected component, all nodes present in the stack will form a biconnected component. If there are no articulation points in the graph, then the graph is a biconnected graph.
+
+		Bridges in a Graph
+
+			An edge in an undirected connected graph is a bridge iff removing it disconnects the graph. In order to find all the bridges in a graph, we do a DFS traversal of the given graph. In the DFS tree, an edge (u, v) ('u' is the parent of 'v' in the DFS tree) is a bridge if there does not exist any other alternative to reach u or an ancestor of u from subtree rooted with v. The time complexity of the above approach is O(V+E).
+
+		
+		Hamiltonian Path and Cycle
+
+			Hamiltonian Path in an undirected or directed graph is a path that visits each vertex exactly once. A Hamiltonian cycle (or Hamiltonian circuit) is a Hamiltonian Path such that there is an edge (in the graph) from the last vertex to the first vertex of the Hamiltonian Path. Determining whether such paths and cycles exist in graphs is the Hamiltonian path problem, which is NP-complete.
+
+		Eulerian Path and Cycle
+
+			Eulerian Path is a path in a graph that visits every edge exactly once. Eulerian Circuit is an Eulerian Path that starts and ends on the same vertex. A graph is called Eulerian if it has an Eulerian Cycle and called Semi-Eulerian if it has an Eulerian Path.
+
+			We can find whether a given graph has an Eulerian Path or not in O(V + E). The algorithm is as follows:
+
+				First, we can check if there is an Eulerian path. We can use the following theorem. An Eulerian cycle exists if and only if the degrees of all vertices are even. And an Eulerian path exists if and only if the number of vertices with odd degrees is two (or zero, in the case of the existence of an Eulerian cycle). In addition, of course, the graph must be sufficiently connected (i.e., if you remove all isolated vertices from it, you should get a connected graph).
+
+				Given a graph with an eulerian path - in order to find the path, start processing edges from the vertex with odd degree. For finding a cycle, you can start from any vertex since a cycle doesn't have a start nor an end.
+
+References
+
+	https://www.geeksforgeeks.org/connectivity-in-a-directed-graph/
+	https://www.geeksforgeeks.org/strongly-connected-components/
+	https://www.geeksforgeeks.org/tarjan-algorithm-find-strongly-connected-components/
+	https://www.geeksforgeeks.org/transitive-closure-of-a-graph/
+	https://www.geeksforgeeks.org/articulation-points-or-cut-vertices-in-a-graph/
+	https://www.geeksforgeeks.org/biconnectivity-in-a-graph/
+	https://www.geeksforgeeks.org/bridge-in-a-graph/
+	https://www.geeksforgeeks.org/eulerian-path-and-circuit/
+	https://en.wikipedia.org/wiki/Hamiltonian_path
+	https://cp-algorithms.com/graph/euler_path.html

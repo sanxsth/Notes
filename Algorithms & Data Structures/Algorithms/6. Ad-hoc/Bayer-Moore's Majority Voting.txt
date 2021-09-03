@@ -1,0 +1,25 @@
+Boyer-Moore Majority Voting Algorithm
+
+The Boyer–Moore majority vote algorithm is an algorithm for finding the majority of a sequence of elements using linear time and constant space.
+
+Problem Statement
+
+	Given a non-sorted list of 'n' numbers, one of the numbers appears more than n/2 times. Find this number in O(n) time and O(1) space.
+
+Algorithm
+
+	candidate = 0
+	count = 0
+	for value in input:
+	  if count == 0:
+	    candidate = value
+	  if candidate == value:
+	    count += 1
+	  else:
+	    count -= 1
+
+Proof can be found in the reference
+
+References
+
+	https://gregable.com/2013/10/majority-vote-algorithm-find-majority.html

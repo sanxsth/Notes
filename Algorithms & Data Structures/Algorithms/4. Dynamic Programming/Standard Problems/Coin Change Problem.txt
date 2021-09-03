@@ -6,9 +6,11 @@ Coin Change Problem
 
 		Let the current state be 'i' (i.e, the sum is 'i') and dp[i] represents the minimum number of coins required to get the sum 'i'. We observe that we can reach 'i' from i-vi, where vi is a coin denomination that's less than or equal to i. So, we get the following relation
 
-			dp[i] = min(dp[i-V1], dp[i-V2], ..., dp[i-VN]), where Vi is a coin denomination less than or equal to 'i'. 
+			dp[i] = min(dp[i-V1], dp[i-V2], ..., dp[i-VN]) + 1, where Vi is a coin denomination less than or equal to 'i'. 
 
 	Problem Statement 2
+
+		Wrong Logic!!!!
 
 			Given a value N, if we want to make change for N cents, and we have an infinite supply of each of S = { S1, S2, .. , Sm} valued coins, how many ways can we make the change? The order of coins doesn’t matter.
 

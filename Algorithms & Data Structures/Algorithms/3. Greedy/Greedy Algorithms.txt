@@ -71,7 +71,7 @@ Greedy Algorithms
 					a. pick a vertex, that isn't in the set and has minimum distance.
 					b. update distances of all the nodes adjacent to this newly picked node.
 
-			Djikstra works well on graphs with non-negative weights. It can be modified to work with graphs with non-negative edges, but no negative cycles. We will have to allow a node to be picked multiple times. This would make the algorithm a lot slower, but it would terminate as we don't have any negative cycles that will cause an infinite loop. For handling graphs with negative cycles, we have the Bellman-ford algorithm.
+			Djikstra works well on graphs with non-negative weights. It can be modified to work with graphs with non-negative edges ( by finding a proper offset for each edges), but no negative cycles. We will have to allow a node to be picked multiple times. This would make the algorithm a lot slower, but it would terminate as we don't have any negative cycles that will cause an infinite loop. For handling graphs with negative cycles, we have the Bellman-ford algorithm.
 
 		5. K-centers problem
 
@@ -81,7 +81,8 @@ Greedy Algorithms
 
 				1. Choose the first center arbitrarily.
 				2. Choose the remaining k-1 points using the following criteria:
-					- Pick the next center the city which is furthest away from currenlty choosen centers, i.e the city, p, with the maximum Min(dist(p, c1), dist(p, c2)...)
+					- Pick the next center the city which is furthest away from currently choosen centers, i.e the city, p, with the maximum Min(dist(p, c1), dist(p, c2)...)
 References
 
+	- https://people.eecs.berkeley.edu/~nirkhe/cs38notes/recitation_notes/finalrec.pdf
 	- https://www.geeksforgeeks.org/fundamentals-of-algorithms/
