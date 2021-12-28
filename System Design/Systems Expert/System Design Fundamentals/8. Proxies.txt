@@ -1,0 +1,13 @@
+Proxies
+
+	Forward proxy
+
+		The forward proxy is a server that sits between the client and the application server and acts on behalf of the client. A VPN can be considered as a forward proxy. Forward proxies often hide the source IP address (client's IP address) from the server (the server doesn't know that it's talking to a proxy) and thereby allows the clients to access services that might not be available otherwise.
+
+	Reverse proxy
+
+		Reverse proxies are configured and managed by the application server. When a client makes a request to the application server, it would be the reverse proxy that'd be receiving this request. The proxy might server the request on its own or will forward it to the application server. The client would be aware of this reverse proxy and would be thinking that it's directly communicating with the application server. The DNS query made by the client would return the IP address of the reverse proxy instead of the application server.
+
+		Reverse proxies are very useful as they provide a lot of functionalities such as filtering requests, caching, logging, authentication, SSL termination, load balancing, etc.
+
+		Eg: Nginx

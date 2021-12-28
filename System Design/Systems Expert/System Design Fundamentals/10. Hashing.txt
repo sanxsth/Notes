@@ -1,0 +1,29 @@
+Hashing
+
+	Hashing is a technique of mapping one value to another (preferably of a fixed length or property). A good hashing function would have uniformity.
+	Some popular hashing algorithms are MD5, SHA1, etc.
+
+	One use case of hashing is to map requests (based on source IP address) to application servers. If we use a simple hashing technique, for example, taking mod of the number of servers - this causes problems. These techniques aren't scalable. Once we change the number of servers (which will often happen in large systems), our previous mappings become void.
+
+	This is where consistent hashing and rendezvous hashing come into play.
+
+	Consistent hashing
+
+		A hashing technique that minimizes the number of keys that need to be remapped when the hash table gets resized. 
+
+		We imagine the application servers to be placed circularly (we can consider the values on the circle to go from 0 - 360 (can extendent to 720, 1440, etc)). We hash the application servers and place them on this circle (if the hashing is uniform, the servers would be equidistant from each other). We then hash the clients (or the incoming requests) and place them on the same circle. The clients would then be mapped to the server closest to it in the clockwise direction.
+
+		The benefit of this technique is that when we add or remove servers not all the previous mappings become void, only a small subset of them gets affected.
+
+		One way to increase uniform distribution on your servers is to hash them using multiple hash functions and have multiple copies of each server distributed on the circle. You can create more hashes for a powerful server and thereby have more clients associated with it.
+
+	Rendevous hashing a.k.a highest random weight hashing
+
+		We map clients to servers using the following technique:
+
+			1. Assign scores to the given servers in the context of the client.
+			2. Map the client to the server with the highest score.
+
+		Rendevous hashing uniformly distributes the clients, therefore if the number of servers changes - only a subset of the clients would be affected.
+
+	Consistent and Rendevous can be used interchangeably.

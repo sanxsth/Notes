@@ -1,0 +1,17 @@
+Security And HTTPS
+
+	HTTP is susceptible to man-in-the-middle attack (MITM). A malicious actor can hijack the data in transit, read it, and can even alter it.
+
+	Encryption is the technique of converting the data into a secret code that hides the true meaning of the data.
+
+	There are two main ways to encrypt data.
+
+	1. Symmetric encryption (1 key) relies on symmetric key algorithms - they are a type of encryption algorithm that relies on a single key to encrypt and decrypt the data. AES (Advanced Encryption Standard) is a popular symmetric encryption algorithm. Symmetric encryption and decryption are very fast compared to asymmetric encryption. It's not desirable to use this to secure client-server communication, because the initial key exchange needs to be done through an unsecured medium.
+
+	2. Asymmetric encryption (2 key) relies on asymmetric key algorithms - they are a type of encryption algorithm that relies on a pair of keys known as 'public key - private key pair. These keys are mathematically bound such that any data that has been encrypted using the public key can only be decrypted using the private key.
+
+	HTTPS is an extension of HTTP, it runs on top of TLS (transport layer security). TLS has a predecessor called SSL (secure socket layer).
+
+	When a client establishes a connection with the server, it first does a TLS handshake. In a TLS handshake, the client would send a random string of bytes called 'client hello'. The server responds with a 'server hello' and its SSL certificate. This SSL certificate would contain the public key. Once the client obtains the public key, it would send the 'pre-master' secret, that's encrypted using the public key, to the server. Now, the client and server would generate a session key using the 'client hello', the 'server hello', and the 'pre-master' secret. Now this session key would be used as a symmetric key to encrypt and decrypt the data transferred between the client and server. We use symmetric encryption since it's faster than asymmetric encryption. The server shares an SSL certificate instead of just sharing its public-key, is to authenticate itself with the client. This way the client would know that the public key came from the server and not from any malicious attacker.
+
+	SSL certificates are granted by a trusted third-party authority. The certificate would contain the server's public key, the server name, the CA's signature. The SSL certificate in transit would be encrypted by the CA's private key. The client would then use the public key of the CA to decrypt it. This way we prevent any malicious attacker from modifying our server's public key. Most browsers would already have the public keys of popular CAs.

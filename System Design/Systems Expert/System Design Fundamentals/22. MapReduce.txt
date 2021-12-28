@@ -1,0 +1,29 @@
+MapReduce
+
+	A File System is an abstraction over a storage medium that defines how you manage data. Most file systems follow a hierarchical structure that consists of directories and files, like the Unix file system.
+
+	The distributed file system is an abstraction over a cluster of machines that allows them to act like one large file system. Two popular examples are the Google file system and the Hadoop distributed file system. Most of the DFS offers guarantees on availability and replication.
+
+	Processing very very large data (big) is not possible via vertical scaling. But once you horizontally scale, you have to process data using distributed systems, which is hard.
+
+	This is where MapReduce comes into play, it helps to process big data efficiently, quickly, and in a fault-tolerant manner.
+
+	MapReduce is a popular framework for processing big data in a distributed environment. MapReduce was designed on the key observation that most data processing pipelines can be split into two steps: Map and Reduce. It has mainly three jobs: Map, Shuffle and Reduce.
+
+	The shuffling step reorganizes the intermediate key-value pairs such that the pairs of the same key get routed to the same machine in the final step.
+
+	
+
+	Let's see what MapReduce does:
+
+		Initially, the data exists on a distributed file system (files are stored on different machines). We then apply a map function to these files, this would give us a key-value pair for each file. These key-value pairs would then be re-ordered in some way before being consumed by the reduce step. The 'reduce' step would then give us our output.
+
+		There exist a central control plane that knows where all the files reside, it knows how to communicate with various machines. Since the datasets are very large, we don't want them to be moved for processing. So, instead, we send the map program to the servers on which these datasets reside. The key-value pairs help us in aggregating relation pieces of data.
+
+		The MapReduce system has a bunch of strategies in place to handle failure (it has fault tolerance). In case of faults like machine failure or network partition, the system would just redo the failed step. In order to make this possible, our steps need to be idempotent.
+
+		As an administrator for a MapReduce system, all you need to know is what your map function does, what kind of input and output it has, how the key-value pairs are re-ordered, what your reduce function does, and what output it generates.
+
+	Some sample problems: getting word count from a big data set (official MapReduce whitepaper example).
+
+	Hadoop is a popular open-source framework that supports MapReduce and many other data-processing pipelines. Its central component is HDFS, on top of which other features have been developed.

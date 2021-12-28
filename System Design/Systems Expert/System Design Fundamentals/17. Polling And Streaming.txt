@@ -1,0 +1,9 @@
+Polling And Streaming
+
+	Polling is a technique by which the client sends requests in regular intervals to the severs to fetch data that often changes.
+
+	Polling isn't viable in some cases, like a chat application when the messages need to be received instantly. This is where we can apply streaming.
+
+	The client opens a long-lived connection with the server, typically this is done through a socket. A socket is basically a file that lives on your computer that your computer can write to and read from to communicate with another computer. Once the connection is established, the client can simply listen and the server would then send data whenever it wants. This paradigm, where the server is actively sending data instead of passively waiting for requests is called 'pushing'.
+
+	Streaming: In networking, it usually refers to the act of continuously getting a feed of information from a server by keeping an open connection between the two machines or processes.

@@ -1,0 +1,15 @@
+Logging and Monitoring
+
+	Logging is the act of generating, collecting, and storing logs (useful information about events in your system).
+
+	logging is very crucial for large systems as they give you information about the events that transpired and this will be helpful while you are debugging bugs in production.
+
+	There are mainly two log formats: sys logs and JSON.
+
+	Your system would generate logs, but you need to have a service that would aggregate and store these logs, and also provide you with insights and capability to perform analytics on the stored logs.
+
+	Monitoring is the process of having visibility into a system's key metrics.
+
+	Monitoring makes managing the system a lot easier. We often monitor metrics like health, latency, etc. One way to collect metrics is via the logs that get generated in your system. But you need to make sure that you are logging necessary information in the right format expected by your monitoring system.
+
+	Another way is to make use of time series databases like Prometheus and your system would now periodically send data to this DB. You can then have an alerting system on top of this monitoring system, this allows you to alert your team if something goes wrong in your system.

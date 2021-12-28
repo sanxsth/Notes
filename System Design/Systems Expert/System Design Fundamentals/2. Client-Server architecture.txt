@@ -1,0 +1,15 @@
+Client-Server Model/Architecture.
+
+	A client is a machine that speaks (requests some service) to a server. And a server is a machine that listens to requests from clients and renders some data/service once it receives a request.
+
+	Example, your browser requesting data from algoexpert. When you type in 'www.algoexpert.com', your browser would make a dns query to get the ip address. After obtaining the ip address, the browser makes an HTTP request to the server. The request would have the source ip address, so that the server can send data back to the client. Servers listen via ports (it's actually the programs that listen to these ports). When clients are sending the request, it also needs to specify the port number. Based on the protocol in use, the clients would know what port to use. For example, while making HTTP requests - port 80 would be used.
+
+	Key terms
+
+		client-server model: A paradigm by which modern systems are designed.
+		ip address: An address given to each machine connected to the internet. localhost: 127.0.0.1
+		port: A communication endpoint, where a software listens for incoming requests.
+		DNS (Domain Name System): It describes the entities and protocols involved in the translation of domain names to ip addresses.
+
+
+

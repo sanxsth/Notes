@@ -1,0 +1,6 @@
+Storage
+
+	Almost all the systems you design requires data storage. A DB is a software/server that you can use for storing and retrieving data. Persistance is a DB property that ensures that the stored data is available even after a power failure or system crash. Persistence is often achieved by writing data to disk.
+
+	We store data in memory since it's easier to read and write from memory. But memory is volatile and therfore, we store data in disk for persistence. Frequently used (hot) data is stored on SSD, cold data is stored on HDD.
+

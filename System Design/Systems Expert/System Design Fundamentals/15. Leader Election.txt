@@ -1,0 +1,9 @@
+Leader Election
+
+	When you have a bunch of servers that perform the same service (we usually have them keeping redundancy in mind), and we don't want them all to perform duplicate action (we only want one of them to perform these services one at a time). In such scenarios, these servers elect a leader and only the leader would actively perform services.
+
+	When the elected leader goes down, a new leader would be elected and it would take over. We perform the elections using some kind of consensus algorithm. These algorithms allow nodes in a cluster to reach a consensus (or agree on some single data value).
+
+	We can use Zookeeper and Etcd to implement leader election in our systems. Etcd is a highly available and strongly consistent key-value store, we utilize these properties to implement a simple leader election algorithm.
+
+	Two most popular consensus algorimths are Paxos and Raft.

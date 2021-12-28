@@ -1,0 +1,21 @@
+Replication & Sharding
+
+	Replication is a strategy in which we maintain secondary databases. Having a single database creates a single point of failure. Keeping the data in sync is an additional overhead.
+
+	There are two strategies in keeping the DBs in sync
+
+		1. synchronously: When a write happens to the main database, it gets immediately written to the secondary DB. If the sync fails, the primary DB write should also fail.
+
+		2. asynchronously: When a write happens to the main database, it isn't immediately propagated to the secondary DBs. This means that the DBs would be out of sync for some period of time. This might be applicable in some use cases: for example, you can maintain two DBs - one for American users and the other for Indian users. The users would write to their respective DB and hence the latency would be small. These changes would be synced in regular intervals.
+
+	Replication can also be used to increase the system performance. Instead of having one single DB that may get overloaded during peak times. You may maintain multiple DBs and hence your load can be distributed and hence increasing throughput and latency.
+
+	Assigning certain DBs for writes and others for reading is also a good strategy (in some cases) for improving system performance.
+
+	Over time it gets difficult to maintain all your data on a single server, and this is where 'sharding' (data partitioning) comes in. Sharding is a technique of splitting your data and storing them on different DBs instead of a single DB. There are multiple sharding techniques that you can use
+
+		1. Based on some property like the user name or region. These techniques are simple, but are weak and may create hotspots.
+		2. Hashing: The data can be hashed and we can use the hash value to determine the DB to store it in.
+
+	Though you can implement the sharding logic in your application, it would be better to create a reverse proxy to handle this. Or have your DB handle it if it comes with sharing out-of-the-box.
+

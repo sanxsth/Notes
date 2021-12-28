@@ -1,0 +1,22 @@
+Availability
+
+	Availability can be defined in a couple of ways
+
+		- How resilient the system is to failures, for example, what happens to your system when your DB goes down or the server goes down. Will your system will still be operational? This is often called fault tolerance.
+
+		- The percentage of time in a given period of time your system is operational enough to satisfy incoming requests.
+
+	There are variant degrees of availability that you can expect depending on the type of system. For a normal website like Algoexpert, it's okay to go down for a few hours. But for a critical system like air traffic control or a cloud platform, even a minor outage can be catastrophic.
+
+	Availability is measured as the percentage of the system's uptime in a given year. So availability of 90% isn't great - it's pretty bad. It would mean that the system was down for around 36 days a year. Therefore, we usually assess availability in terms of 'nines'. For example, 99% is 2 nines, 99.9% is 3 nines, etc.
+
+	5 nines (99.999) means your system is highly available. Availability is so crucial that some services have an explicit guarantee of availability. These would be part of the SLAs (Service level agreement).
+
+	Achieving high availability is hard. You might have to make other trade-offs, eg: high latency or throughput. So it's crucial to analyze if your system actually requires high availability. And sometimes, only some components of your system might require high availability. For example, in the case of stripe - their payment system should be highly available, but not their reporting and monitoring (dashboard) system.
+
+	How can you achieve high availability?
+
+		Make sure you don't have any single points of failure. We eliminate these using redundancy. There are mainly two kinds of redundancy
+
+			- Passive redundancy: is the excessive replication components, such that if one fails the others continue to work without any issues.
+			- Active redundancy: is such that only a subset of the replicated components does the actual work, and when such 'active' component goes down, others will know this and they will take over the failed machines spot.

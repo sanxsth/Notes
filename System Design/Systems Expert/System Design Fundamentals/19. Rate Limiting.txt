@@ -1,0 +1,7 @@
+Rate Limiting
+
+	Rate limiting is of limiting the number of work (requests) that can be completed in some given amount of time.
+
+	One benefit of rate limiting is to defend against DOS attacks. You can rate-limit at the user level, region, whole system, etc.
+
+	Keeping rate-limiting information at the machine level might not be efficient in a distributed system that horizontally scales. In such scenarios, we may use of central Redis server to store this information.

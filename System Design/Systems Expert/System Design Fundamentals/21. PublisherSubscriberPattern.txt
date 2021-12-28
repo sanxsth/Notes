@@ -1,0 +1,15 @@
+Publish/Subscribe Pattern AKA Pub/Sub
+
+	Pub/Sub is a popular messaging pattern.
+
+	Use cases for pub/sub pattern: asynchronous processing, critical systems where we want the data to persist even during a network partition.
+
+	The four entities of the pub/sub pattern: producer, consumer, topic (aka channels), message. Publishers and subscribers don't know about each other, they just know about the topics.
+
+	Publishers publish messages to the topics, these messages are then consumed by the subscribers subscribed to the topic. The topics we use are essentially database solutions (similar to queues like RabbitMQ, Redis, etc). The topics would guarantee certain things like at least once delivery (might end up sending duplicates) of messages to subscribers, persistent storage, ordering, etc.
+
+	Exactly-once delivery is nearly impossible to achieve in a distributed system. Given these, it's desirable to have the messages (operations represented by them) be idempotent.
+
+	Topics also provide ordering of messages, also the ability to replay messages, i.e to reset the topic to some past point in time. We can also have a message filter (based on some criteria) per subscriber at the topic level.
+
+	Apache Kafka is a very popular pub/sub system, another one is Google's Cloud Pub/Sub.

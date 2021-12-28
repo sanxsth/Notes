@@ -1,0 +1,11 @@
+Configuration
+
+	Configurations are a set of parameters or constants that are critical to your system. They are usually written in JSON or Yaml.
+
+	There are two kinds of configs: 
+
+		static: These are the configurations bundled or packaged with your application code. Static config files would be deployed along with your code and therefore any change would require redeployment of your system.
+
+		dynamic configurations: The config files aren't coupled with your code. They exist elsewhere like on servers or DBs that your system can communicate with. This gives us the flexibility to change the configs without redeploying your system. 
+
+		While making config changes, it's recommended to have a review process in place to make sure that your config changes are good. With static, this is easier compared to dynamic configuration changes.

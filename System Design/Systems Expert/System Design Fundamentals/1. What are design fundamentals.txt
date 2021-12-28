@@ -1,0 +1,14 @@
+What are design fundamentals?
+
+	How sys design inteviews actually work?
+
+		sys design questions are made intentionally vague. For example, design uber, design youtube, etc. It's upto the inteviewee to ask questions, investigate and find clarity so that we can have a 45 minute long conversation.
+
+		Algo solutions are objectively correct or incorrect, but sys design solutions are subjective. It's the intervee's job to confidently justify the solution, rationalize why you made certain choices.
+
+	System design fundamentals can be classified into 4 categories:
+
+		1. Foundational System design knowledge. Eg: client-server model, network protocols (how machines communicate)
+		2. Key characteristics of systems. Eg: availability, throughput, latency, redundancy, consistency
+		3. Actual components of the system, these are the tangible things that you can either have or implement in your systems. Eg: load-balancers, proxies, caches, etc. These are the key components that gives you the key characterstics.
+		4. Actual tech. These are the real, existing product or services that you can use in your system to give you some characterstics. Eg: Zookeeper, Nginx, Redis, S3, etc.

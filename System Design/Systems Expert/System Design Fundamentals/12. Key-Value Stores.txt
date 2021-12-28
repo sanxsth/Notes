@@ -1,0 +1,9 @@
+Key-Value Stores
+
+	A key-value store is a database that stores key-value pairs. The values are often strings, but some DBs allow us to store other data types.
+
+	Key-value stores are flexible (as they don't have that imposed structure) and are very simple. Redis, DynamoDB, Zookeeper, etc. Some of these key-value stores persist data, others just hold them in memory.
+
+	Etcd: Is a strongly consistent and highly available distributed key-value store that can be used in your system for leader election.
+	Redis: Is an in-memory key-value store (offers some persistent storage option), since it's fast - we mostly use it for caching. They can be used in your system to implement rate-limiting.
+	Zookeeper: This is a strongly consistent, highly available key-value store. Often used for configuration management or leader election in systems.

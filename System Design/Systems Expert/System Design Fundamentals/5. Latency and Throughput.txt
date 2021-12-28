@@ -1,0 +1,14 @@
+Latency and Throughput
+
+	Latency is the time taken to perform some work. Latency can also be defined as the time taken to transfer data from one point to another. For example, network requests, reading data from disk, etc.
+
+	Reading 1MB from :
+
+		memory (RAM) - 250 micro sec
+		SSD          - 1000 micro sec
+		1Gbps n/w    - 10 000 micro sec
+		HDD          - 20 000 micro sec
+
+	Throughput is the amount of work that can be done per unit time. In networking, it's the amount of data that can be transferred in unit time.
+
+	Note: Latency and Throughput are not necessarily correlated.

@@ -1,0 +1,38 @@
+Caching
+
+	Caching is the technique of storing values for future use so that we don't have to recalculate or retrieve them again. It helps us to reduce the latency of the system. Caching can be done at multiple levels - client, server, DB, etc.
+
+	A 'cache' is a high-speed data storage layer (hardware or software) that stores a subset of data so that we can retrieve them faster than otherwise.
+
+	It's trivial to cache static contents. But it's not the case for dynamic content. We have two techniques to address this
+
+		Write-through cache
+
+			The application uses the cache as the main data store, reading and writing to the cache, while the cache is responsible for reading and writing to the database. The write-through operation is as follows:
+
+				- application adds/updates entry in the cache.
+				- cache synchronously writes to the data store.
+				- return
+
+			This makes write-through a bit slow compared to write in cache-aside, reads are fast. Users are more tolerant of latency when updating data than reading it. Data in the cache is not stale.
+
+			Disadvantages:
+
+				- Most data written might never be read, which can be minimized with a TTL.
+				- When a new node is created due to failure or scaling, the new node will not cache entries until the entry is updated in the database. Cache-aside in conjunction with write-through can mitigate this issue.
+
+		Write-behind cache
+
+			In write-behind the application does the following:
+
+				- Add/update entry in cache.
+				- Asychronously write data to the store, improving write performacne.
+
+			Disadvantages:
+
+				- There could be data loss if the cache goes down before writing its contents into the data store.
+				- Implementation is more complex compared to write-through and cache-aside.
+
+	Another challenge in caching is addressing stale data. Depending on your system it might be tolerable to have stale data, and hence you don't have to worry about fixing this issue. These are the questions you have to ask your interviewer and make a call accordingly.
+
+	We have various eviction policies: LRU, LFU, FIFO, random.

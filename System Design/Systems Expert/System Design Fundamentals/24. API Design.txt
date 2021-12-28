@@ -1,0 +1,51 @@
+API Design
+
+	API's that are made public would be consumed by a lot of client, which makes it very difficult to modify the interface (number and order of parameters, etc) and in some cases impossible. Therefore, we have to be very careful while designing APIs.
+
+	Sameple API Design questions: Design Twitter APIs, Design Youtube APIs, etc.
+
+	As an interviewie you should ask questions to get more details - what functionalities do you want, who should access what, etc.
+
+	These interviews are just like normal work that you'd do as a software engineer - you ask questions like you'd do to a client, you take feedbacks like how you'd get them from your teammate whose reviewing your design.
+
+	Question: Design stripe API
+
+		API Definition
+
+			Enitity Definition
+
+				Charge:
+					id: uuid
+					customer_id: uuid
+					amount: int
+					currency: string or enum
+					status: enum [completed, failed, pending]
+
+				Customer:
+					id: uuid
+					name: string
+					address: string
+					email: string
+					card: Card
+
+				Card:
+					serial: string
+
+			Endpoint Definition
+
+				Charges
+					CreteCharge(charge: Charge)
+						-> Charge
+					GetCharge(id: uuid)
+						-> Charge
+					// list endpoints should be paginated.
+
+				Customer
+					CreateCustomer(customer: Customer)
+						-> Customer
+					GetCustomer(id: uuid)
+						-> Customer
+					DeleteCustomer(id: uuid)
+						-> Status
+
+	One way to define APIs is via Swagger which is an API description language.

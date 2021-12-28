@@ -1,0 +1,21 @@
+Relational Databases
+
+	We have mainly two kinds of databases based on the structure that's imposed on the data being stored: relational and non-relational databases.
+
+	In relational databases data is stored in tabular form, with clear attributes (columns). The records (rows) adhere to this structure. Therefore, the structure of the data in a relational DB is very well-defined.
+
+	Therefore, you won't be able to have special attributes for some records. Either all of them should have this attribute or none.
+
+	Most of the relational DBs support SQL (and for this reason they are used interchangeably). SQL is used to perform queries (or interact) with the data stored in these relational DBs.
+
+	Non-relational DBs are often called NoSQL DBs. Most of the non-relational DBs come with their own query language, but they aren't as powerful as SQL. This forces us to do the query at an application level, which won't be feasible in large systems with tons of data.
+
+	The unit of work performed by a DB is called a transaction. Transactions in relational DBs have ACID property.
+
+	DB indexes are auxiliary data structures that have some order and help us search faster. They hold references back to the records. You can think of them as an ordered map. Indexes use extra storage, and while updating records, you need to update the index as well. Therefore, your writes would become a lot slower, but reads would be faster. This is acceptable in most systems because we usually have more reads over writes.
+
+	Some of the factors that you should look at while selecting the type of DB for your system:
+
+		1. The structure of data, should it be strict or if it's frequently changing - we will have to keep it flexible.
+		2. The kind of relationships between the entities (simple or complex) and the kind of queries you'd perform on them (if the queries are going to be complex, you'd need a powerful query language).
+		3. Kind of properties you need for your transactions: consistency (strong consistency) or is it fine to be consistent eventually?

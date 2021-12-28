@@ -185,6 +185,14 @@ Database
 				Very data intensive workload
 				Very high throughput for IOPS
 
+			We prefer NoSQL for horizontal scaling because of the following reasons:
+
+				1. Due to Normalization, you have to often rely on 'JOIN's to fetch the required information. 'JOIN' becomes a bottleneck when you have your DB shared across multiple instances. NoSQL DBs don't have 'JOIN's, we have to do that in the application code.
+
+				2. NoSQL DBs are created with keeping partition as the basic design principle. Most NoSQL flavors have some sort of capability of this horizontal scaling, and this happens out of the box with only a little bit of configuration required.
+
+				3. RDBMS you expect constraints and 'ACID' transactions, these make horizontal scaling a challenge. On the other hand, most of the NoSQL DBs have 'BASE' instead of 'ACID.'
+
 			Further Reading: 
 
 				https://www.sitepoint.com/sql-vs-nosql-differences/

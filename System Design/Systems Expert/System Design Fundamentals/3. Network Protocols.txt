@@ -1,0 +1,25 @@
+Network Protocols
+
+	Protocols are agreed upon set of rules for an interaction between two parties. Network protocols defines how machines can communicate with each other - it defines the format of the message, the order of messages (if any), how the response should be, etc.
+
+	IP (Internet Protocol)
+
+		Machines on the internet communicate using this protocol. The messages are sent as 'IP-packets', they are the fundametal unit of data transfer. Packets has two main sections: IP header and the data. The header section contains: source IP address, destination IP address, the packet size, the version of the Internet Protocol used for communication, etc. The two most popular versions are IPv4 and IPv6. The packets are limited in size, they can upto 2^16 bytes.
+
+		In most scenarios, the data we send won't fit into a single packet and therefore we require multiple IP packets. This leads to some challenges, how do we guarantee that all the packets (representing some data) reaches in the correct order (sometimes the order is crucial). IP doesn't acknowledge these challenges.
+
+	TCP (Transmission Control Protocol)
+
+		TCP is built on top of IP, they are used for sending packets in an ordered, reliable, and error free way. The IP packets will have a TCP header in the data portion. In the TCP header we will have informations like - sequence number, checksum, etc. When a machine wants to communicate with another machine over TCP, it would first establish a connection via handshake. In a nutshell, it's a more powerful and functional wrapper around IP.
+
+	HTTP (Hyper Text Transfer Protocol)
+
+		HTTP is built on top of TCP. HTTP brings in a request-response paradigm, where machines communicate via requests and responses. It describes a format for the 'request' and 'response'. It also provides 'method' that has various intends.
+
+		HTTP is an abstraction on top of TCP and software engineers while designing web applications works at this level. You design various interfaces (APIs) that can be accessed via HTTP request by specifing the 'path' and 'method'.
+
+References
+
+	https://www.khanacademy.org/computing/computers-and-internet/xcae6f4a7ff015e7d:the-internet/xcae6f4a7ff015e7d:transporting-packets/a/transmission-control-protocol--tcp
+
+	

@@ -1,0 +1,23 @@
+Specialized Storage Paradigms
+
+	Blob (Binary large object) storage
+
+		Blob refers to an arbitrary piece of unstructured data. Some popular blobs are videos, images, text files, etc. A blob store specializes in storing massive amounts of unstructured data aka blobs.
+
+		Some of the popular blob storage services are GCS, S3, Azure blob store, etc.
+
+	Time Series Database
+
+		A time-series database is a DB that's specialized in storing and retrieving data records that are part of a 'time series, which is a set of data points that are associated with timestamps.
+
+		Some popular time series DBs are InfluxDB, Prometheus.
+
+	Graph Database
+
+		Graph databases specialize in storing and navigating relationships. Relationships are first-class citizens in a graph database. In a relational database, relations are implicit and not explicit. Though we can model relations in a relational database, querying these relations is complex. This is because, unlike a graph database, relationships aren't first-class citizens in a relational DB, we must use special properties like foreign keys to link related pieces of data. Neo4j is a popular graph DB.
+
+	Spatial DB
+
+		Spatial DBs specialize in storing and retrieving geo-points (spatial data). They allow you to perform complex queries on the stored data. Spatial DBs rely on spatial indexes which are usually implemented using a Quad-tree, quadtrees are like binary trees, but internal nodes would have exactly 4 children.
+
+		Most of the popular databases like Postgres support storing and retrieving spatial data, and therefore you wouldn't need a specialized Spatial DB.

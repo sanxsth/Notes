@@ -1,0 +1,19 @@
+Load Balancers
+
+	Load balancers are servers that have the responsibility of distributing the load on the downstream servers by forwarding the requests accordingly.
+
+	Load balancers not only help us manage the load but also makes it easy to scale horizontally. Load balancers can sit between clients and servers, application servers, and databases. They can also be used at the DNS layer (DNS round-robin).
+
+	There are two kinds of load balancers: hardware and software. Software load balancers offer more functionality, they are more flexible and cheaper. Nginx is a software load balancer.
+
+	There are various load balancing techniques
+
+		1. Random
+		2. Round-robin and Weighted Round-robin (powerful servers will have more weight)
+		3. Based on existing load (this can be inferred via health checks, allocated resources, time taken to complete previous requests, etc)
+		4. Based on client IP. The client IP would be hashed to map to a specific server. This is very useful if caching is done per server.
+		5. Functionality or API-based routing strategy.
+
+	The load balancing algorithm to use and how many load balancers to use (with what topology) will depend on your use case. You should have multiple load balancers to avoid having a high load on a single load balancer and avoiding a single point of failure.
+
+	If your load balancing strategy is sub-optimal, you'll end up having a server with a high load. Such servers are called 'hot spots'.

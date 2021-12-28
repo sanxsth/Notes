@@ -1,0 +1,18 @@
+Peer-to-Peer Networks
+
+	Use case: Designing a system where you need to deploy or transfer some number of large files from one machine to 1000s of machines in your network.
+
+	Imagine your network has a throughput of 5GB and the file that needs to be transferred is of size 5GB. We can transfer 1 file in 1 sec, therefore it would take 1000s to transfer the file to all the machines.
+
+	It's easy to observe that the bottleneck is the single server serving the files. We can improve this by having more dedicated servers serving the files. This approach isn't scalable. One, we now need to have copies of the file on all these dedicated machines. Also, we can't keep increasing the number of dedicated machines as the number of client machines increases.
+
+	We can use a p2p network to solve this problem. We'd chop the 5GB file into small 5MB chunks and then distribute them among the peers in the network. The peers can talk among themselves and collect the rest of the chucks that they need. This way our 5GB files get distributed among the peers faster since a lot of parallel file transfer takes place.
+
+	Peer-to-peer (P2P) computing or networking is a distributed application architecture that partitions tasks or workloads between peers. Peers are equally privileged, equipotent participants in the application. They are said to form a peer-to-peer network of nodes.
+
+	But orchestrating such a network is very complicated. We have two ways to approach this
+
+		1. Tracker server: This is the server that's responsible for orchestrating the file transfer among peers.
+		2. Gossip protocol: The peers often maintain a hash table that maps file chunks to other machines on the network. The peers update and distribute this hash table so that each machine will know where to find a particular file. Such hash tables are called distributed hash tables. It's a protocol by which machines talk to each other in an uncoordinated manner in a cluster to spread information through a system without requiring a central source of data.
+
+	Kraken is a real-life example of a p2p network that solves the above use case. Another use case of the p2p network is torrenting.
