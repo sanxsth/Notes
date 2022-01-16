@@ -1,0 +1,5 @@
+You can practice your skills doing katas, here are some of them.
+
+	https://www.codewars.com/collections/design-patterns
+	https://github.com/delbertlegg/Design-pattern-katas
+	https://github.com/ardalis/kata-catalog
