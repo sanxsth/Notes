@@ -1,0 +1,45 @@
+WSGI - Web Server Gateway Interface
+
+	It is a specification that describes how a web server communicates with web applications.
+
+	Imagine you have built a Django web application, and you have an Nginx web server into which you are going to deploy your app.
+
+	Now, the requests made by your clients (users) would reach the Nginx server which now needs to know how to interact with your application in order to satisfy the incoming requests. This is so since web servers are designed to serve static files and know nothing about hosting python applications.
+
+	Hence a mediator is required to carry out the interaction between the web servers and the python applications - the standard for carrying out communication is WSGI.
+
+	Now, upon receiving a request, the webserver would communicate with a WSGI container (applications implementing the WSGI spec) which would then talk to the Python application.
+
+	uWSGI, Gunicorn are some WSGI implementations.
+
+	Why should we need all these abstractions? Why can't we, say, directly run our Django application on a machine without using Nginx and a WSGI container?
+
+		1. Assuming that we are planning to host our Django application using the development server - 'python manage.py runserver'. Here's 	why we should not do so:
+
+			The following excerpt is taken from Django's documentation:
+
+				"Now’s a good time to note: don’t use this server in anything resembling a production environment. It’s intended only for use while developing.
+
+				DO NOT USE THIS SERVER IN A PRODUCTION SETTING. It has not gone through security audits or performance tests. (And that’s how it’s gonna stay. We’re in the business of making Web frameworks, not Web servers, so improving this server to be able to handle a production environment is outside the scope of Django.)".
+
+		2. Some benefits for using WSGI and application servers like NGINX:
+
+			1. WSGI allows the separation of the web server and web application code. Thus, gives you the flexibility of changing web stack components for alternatives without changing the application that runs with WSGI.
+
+			2. WSGI servers are designed to handle many requests concurrently. Web Frameworks are not made to process thousands of requests and determine how to best route them from the server.
+
+			3. Reverse proxies like Nginx offers a lot of features that wouldn't be available if we expose our Django application directly to the outside world.
+
+	There are other web servers <-> application communication specifications available other than WSGI - CGI, FastCGI, etc.
+
+
+References
+
+	1. https://medium.com/analytics-vidhya/what-is-wsgi-web-server-gateway-interface-ed2d290449e
+	2. https://stackoverflow.com/questions/47385352/should-you-deploy-django-with-wsgi/47385443
+	3. https://stackoverflow.com/questions/63481823/can-i-use-nginx-as-web-server-without-using-any-wsgi-library-like-uwsgi-or-gunic
+	4. https://stackoverflow.com/questions/1813394/why-should-i-use-wsgi
+	5. https://www.loadbalancer.org/blog/why-should-businesses-use-reverse-proxy/
+	6. https://www.appdynamics.com/blog/engineering/an-introduction-to-python-wsgi-servers-part-1/
+	7. https://docs.python.org/2/howto/webservers.html
+	8. https://www.toptal.com/python/pythons-wsgi-server-application-interface

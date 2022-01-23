@@ -86,3 +86,4 @@ References
 
 	- https://people.eecs.berkeley.edu/~nirkhe/cs38notes/recitation_notes/finalrec.pdf
 	- https://www.geeksforgeeks.org/fundamentals-of-algorithms/
+	- https://jeremykun.com/2014/08/26/when-greedy-algorithms-are-perfect-the-matroid/

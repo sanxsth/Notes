@@ -130,7 +130,7 @@ Solid Principles
 
 		Benefits:
 
-			The code that follows LSP tends to be loosely coupled and encourages code reusability. The that violates this, are usually tightly coupled and created unnecessary entanglements.
+			The code that follows LSP tends to be loosely coupled and encourages code reusability. The classes that violates this, are usually tightly coupled and creates unnecessary entanglements.
 
 
 	4. Interface Segregation Principle
@@ -230,3 +230,8 @@ Solid Principles
 		Benefits:
 
 			The DIP reduces coupling between different pieces of code.
+
+References
+
+	https://www.freecodecamp.org/news/solid-principles-explained-in-plain-english
+	https://www.thoughtworks.com/en-in/insights/blog/composition-vs-inheritance-how-choose

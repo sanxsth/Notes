@@ -1,0 +1,97 @@
+Introduction To CSS Layouts
+
+	CSS layout techniques allow us to take elements contained in a web page and control where they are positioned relative to their default position in normal layout flow, the elements around them, their parent container, or the main viewport/window.
+
+	There are various layout techniques, each with its advantages and disadvantages.
+
+	Normal flow is how the browser lays out HTML pages by default when you do nothing to control page layout.
+
+	Block elements appear one below the other, in contrast to inline elements, which appear one beside the other.
+
+	Note: The block direction and inline direction vary with the writing mode.
+
+	Methods that can change how elements are laid out in CSS are as follows:
+
+		1. The display property: Standard values such as 'block', 'inline' can change how elements behave in normal flow.
+
+		2. Floats
+
+			Floating an element changes the behavior of that element and the block-level elements that follow it in normal flow. Float is used to push a block-level element to the left or right, taking it out of the flow in relation to other block elements. This allows naturally flowing content to wrap around the floated element. Before Flexbox and Grid layout, floats were used for creating column layouts.
+
+		3. Position
+
+			Positioning allows you to move an element from where it would be placed when in normal flow to another location. Positioning isn’t a method for creating your main page layouts, it is more about managing and fine-tuning the position of specific items on the page.
+
+		4. Table layout 
+
+			Features designed for styling the parts of an HTML table can be used on non-table elements using display: table and associated properties.
+
+		5. Multi-column layout
+
+			The Multi-column layout properties can cause the content of a block to layout in columns, as you might see in a newspaper.
+
+
+
+	Normal Flow
+
+		How are elements laid out by default?
+
+			Individual element boxes are laid out by taking the elements' content, then adding any padding, border, and margin around them. Block element's content fills the available inline space of the parent containing it and grows in the block direction to accommodate its content. Inline elements are the size of their content. You can't set width or height on inline elements.
+
+			Block-level elements are laid out in the block direction, based on the parent's writing mode, each appears on a new line and will be separated by the margin set on them.
+
+			Inline elements don't appear on a new line; they sit on the same line as one another. If it doesn't have space on the current line, the overflowing element will move down to a new line.
+
+	FlexBox
+
+		Flexbox is a one-dimensional layout method for laying out items in rows and columns. Items flex to fill additional spaces or shrink to fit into smaller spaces.
+
+		For long, floats and positioning were used for creating CSS layouts, but they are limiting in some ways.
+
+		Giving an element the 'display' value 'flex' makes it a 'flex container' and its children become 'flex items'. The default values given to flex items are set up to solve some common problems. The flex container behaves like a block element in terms of how it interacts with rest of the page. We can use the display value 'inline-flex' to make the container behave like an inline element.
+
+		Flex elements are laid out along two axes:
+
+			1. The main axis: The axis running in the direction the flex items are being laid out. The start and end of the main axis are called 'main start' and 'main end'.
+
+			2. The cross axis: The axis running perpendicular to the direction the flex items are being laid out in. The start and end of the cross axis are called 'cross start' and 'cross end'.
+
+
+		Flexbox provides a property called 'flex-direction' that specifies what direction the main axis runs in -- by default this is set to 'row' (the direction the browser's default language works in). We can also layout items in the reverse direction using the row-reverse and column-reverse.
+
+		Having a fixed height and width for the container will lead to the overflow of the flex items. We can fix this by setting 'flex-wrap: warp;' on the container. We can set 'flex: 200px' on the children to set their width to 200px.
+
+		Flexible sizing of flex items
+
+			Imagine a flex container with 3 flex items.
+
+			item {
+				flex: 1;
+			}
+
+			This unitless proportion value determines how much of the available space (sparse space left after things like padding, margin have been set) along the main axis each flex item will take up compared to other flex items. Value of '1' means each will take up the same space.
+
+			Setting the third element to 2 means that there will be four units in total, i.e (1 + 1 + 2). The first two will take up 1/4 of the available space, while the last takes up 1/2.
+
+			article {
+			  flex: 1 200px;
+			}
+
+			This states "Each flex item will first be given 200px of the available space. After that, the rest of the available space will be shared out according to the proportion units".
+
+			The real value of the flexbox can be seen in its flexibility/responsiveness upon resizing the browser window.
+
+			Flex is a shorthand value that specifies three different properties:
+
+				1. flex-grow
+				2. flex-shrink
+				3. flex-basis
+
+			We can also align flex items along the main or cross axis. 
+
+			'align-items' control where the flex items sit on the cross axis. We can override align-items by specifying align-self on individual items. 'justify-content' controls where the flex sits on the main axis.
+
+			Use 'order' to change the layout order of flex items without changing the source order. The default value of 'order' on an item is 0. Items with higher values will appear later, we use source order for breaking ties.
+
+
+			We can nest flex boxes, i.e flex items can be a flex container having items in it.

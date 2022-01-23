@@ -1,0 +1,28 @@
+Writing Modes
+
+	A writing mode in CSS refers to whether the next is running horizontally or vertically. Block and inline are tied to the writing mode of the document, and not the physical screen. In a "horizontal-tb" mode the block direction runs from top to bottom; in a "vertical-rl" writing mode the block runs from right-to-left horizontally. The 'block' dimension is always the direction blocks are displayed on the page in the writing mode in use. The 'inline dimension' is always the direction a sentence flows.
+
+	It's desirable to swap height and width along with writing mode. When we are in vertical writing mode we want the box to expand in the block dimension just like it does in the horizontal mode. To make this easier, we have a set of mapped properties. These essentially replace 'height' and 'width' width logical or flow relative versions.
+
+Overflowing Content
+
+	Overflow happens when you have too much content to fit in a box.
+
+	Whenever possible CSS does not hide content. This would cause data loss. In case of too much content, CSS overflows in visible ways. But as developers, we can control how the overflow behaves. We use the 'overflow' property for this. The default value of overflow is 'visible'. To crop content when it overflows, you can set "overflow: hidden". This can make some content invisible. A better approach would be to add scroll bars, we can do this by using
+	'overflow: scroll'."
+	When you use an overflow value of 'scroll' or 'auto', you create a 'Block Formatting Context'.
+
+Sizing items in CSS
+
+	We can use lengths (absolute and relative) to size elements. When you load an image, the height and width defined in the image file are its intrinsic size. The height of a div is the height of its content. Therefore, this is its intrinsic size. We use 'height' and 'width properties to set extrinsic sizes.
+
+	We can use percentages to size elements. When using percentages you need to be aware of what it is a percentage of.
+
+Replaced Elements
+
+	Images and videos are described as 'replaced elements'. This means that CSS cannot affect the internal layout of these elements -- only their position on the page amongst other elements.
+
+Form Elements
+
+	Form elements can be a tricky issue when it comes to styling with CSS.
+	You can refer to this for a more detailed guide: https://developer.mozilla.org/en-US/docs/Learn/Forms
