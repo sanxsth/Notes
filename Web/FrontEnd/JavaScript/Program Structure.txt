@@ -1,0 +1,68 @@
+Program Structure
+
+	Expressions and Statements
+
+		A fragment of code that produces value is called an 'expression', for example ( 2* 3, -4, 'some string', typeof 2, etc).
+
+		If an expression corresponds to a sentence, a JavaScript statement corresponds to a full sentence.
+
+		A statement stands on its own, so it amounts to something only if it affects the world. It could display something on the screen—that counts as changing the world—or it could change the internal state of the machine in a way that will affect the statements that come after it. These changes are called side effects.
+
+		In some cases, JavaScript allows you to omit the semicolon at the end of a statement. In other cases, it has to be there, or the next line will be treated as part of the same statement.
+
+	Bindings
+
+		To catch and hold values, JavaScript provides a thing called a binding or variable: let a = (2 * 2);
+
+		After a binding has been defined, its name can be used as an expression. The value of such an expression is the value the binding currently holds. The '=' operator can be used on the existing bindings to disconnect them from their existing value and have them point to a new one.
+
+		You should imagine bindings as tentacles, rather than boxes. They do not contain values; they grasp them—two bindings can refer to the same value.
+
+		A binding that is defined without giving it a value would evaluate as 'undefined'.
+
+		The words 'var' and 'const' can also be used to create bindings, in a way similar to 'let'. The word 'const' stands for constant. It defines a constant binding, which points at the same value for as long as it lives.
+
+		Binding Names
+
+			Binding names can be any word. Digits can be part of binding names, but the name must not start with a digit. A binding name may include dollar signs ($) or underscores (_) but no other punctuation or special characters.
+
+			Words with a special meaning, such as let, are keywords, and they may not be used as binding names. There are also a number of words that are “reserved for use” in future versions of JavaScript, which also can’t be used as binding names.
+
+	The Environment
+
+		The collection of bindings and their values that exist at a given time is called the environment. When a program starts up, this environment is not empty. It always contains bindings that are part of the language standard, and most of the time, it also has bindings that provide ways to interact with the surrounding system. For example, in a browser, there are functions to interact with the currently loaded website and to read mouse and keyboard input.
+
+	Functions
+
+		A function is a piece of program wrapped in a value. Such values can be applied in order to run the wrapped program. Executing a function is called invoking, calling, or applying it. You can call a function by putting parentheses after an expression that produces a function value. Usually, you’ll directly use the name of the binding that holds the function. Values given to functions are called arguments. Different functions might need a different number or different types of arguments.
+
+		The Console.Log Function
+
+			Most JavaScript systems (including all modern web browsers and Node.js) provide a console.log function that writes out its arguments to some text output device.
+
+			let x = 30;
+			console.log("the value of x is", x);
+
+		Return Values
+
+			Function calls may also produce values upon invocation. When a function produces a value, it is said to return that value. Anything that produces a value is an expression in JavaScript, which means function calls can be used within larger expressions.
+
+	Control Flow
+
+		The following conditional constructs are available in JavaScript: if, if-else, if-'else if'-else, switch, while loop, do-while loop, for loop.
+
+		The 'break' statement terminates the current loop and switch statements and transfers program control to the statement following the terminated statement.
+
+		Note: The behavior of a switch statement, by design, is that it will start executing statements at the case label which matches the argument, and then continue until the end of the block.
+
+	Comments
+
+		A comment is a piece of text that is part of a program but is completely ignored by the computer. JavaScript has two ways of writing comments.
+
+		Single-line comments can be written using the two slash characters, for example: // This is a comment
+		Multi-line comments can be written by enclosing them within /* The comment goes here... */
+
+
+References
+	https://eloquentjavascript.net/02_program_structure.html
+	https://dev.to/adriennemiller/semicolons-in-javascript-to-use-or-not-to-use-2nli
