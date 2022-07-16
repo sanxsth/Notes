@@ -1,0 +1,125 @@
+Data Structures: Objects And Arrays
+
+	'Objects' allow us to group values—including other objects—to build more complex structures.
+
+	JavaScript provides a data type specifically for storing sequences of values. It is called an array and is written as a list of values between square brackets, separated by commas.
+
+		let arr = [1, 2, 3];
+
+	The notation for getting at the elements inside an array also uses square brackets. A pair of square brackets immediately after an expression, with another expression inside of them, will look up the element in the left-hand expression that corresponds to the index given by the expression in the brackets.
+
+		console.log(arr[1]); // 2
+
+	Properties
+
+		Almost all JavaScript values have properties. The exceptions are null and undefined. If you try to access a property on one of these nonvalues, you get an error (TypeError: null has no properties).
+
+		The two main ways to access properties in JavaScript are with a dot and with square brackets. When using a dot, the word after the dot is the literal name of the property. When using square brackets, the expression between the brackets is evaluated to get the property name.
+
+			arr.length and arr['length'] refer to the same property.
+
+		Property names are strings. They can be any string, but the dot notation works only with names that look like valid binding names.
+		The elements in an array are stored as the array’s properties, using numbers (index) as property names.
+
+	Methods
+
+		Properties that contain functions are generally called methods of the value they belong to, as in “toUpperCase is a method of a string”. For example, console.log('some string'.toUpperCase()) // SOME STRING
+
+	Objects
+
+		Values of the type 'object' are arbitrary collections of properties.
+
+			let ob1 = {
+				squirrel: false,
+				events: ["work", "touched tree", "pizza", "running"]
+			};
+
+		Reading a property that doesn’t exist will give you the value 'undefined'. It is possible to assign a value to a property expression with the = operator. This will replace the property’s value if it already existed or create a new property on the object if it didn’t.
+
+		The 'delete' operator, is a unary operator that, when applied to an object property, will remove the named property from the object.
+
+		The binary 'in' operator, when applied to a string and an object, tells you whether that object has a property with that name. The difference between setting a property to 'undefined' and actually deleting it is that, in the first case, the object still has the property (it just doesn’t have a very interesting value), whereas in the second case the property is no longer present and 'in' will return 'false'.
+
+			let anObject = {left: 1, right: 2};
+			console.log(anObject.left); // -> 1
+
+			delete anObject.left;
+			console.log(anObject.left); // -> undefined
+
+			console.log("left" in anObject); // -> false
+			console.log("right" in anObject); // -> true
+
+		To find out what properties an object has, you can use the Object.keys function. You give it an object, and it returns an array of strings—the object’s property names. The Object.assign function copies all properties from one object into another.
+
+		Arrays, then, are just a kind of object specialized for storing sequences of things. If you evaluate typeof [], it produces "object".
+
+	Mutability
+
+		Primitive values such as 'numbers', 'strings', and 'booleans' are immutable - it is impossible to modify the values.
+
+			var str = 'abc';
+			str[1] = 'a'; // since strings are immutable, this statment has no effect on the value.
+
+		Objects work differently. You can change their properties, causing a single object value to have different content at different times. You could also change the values associated with these properties as well.
+
+		Primitive values, say, 120 and 120, we can consider them, precisely, the same number, whether or not they refer to the same physical bits. With objects, there is a difference between having two references to the same object and having two different objects that contain the same properties.
+
+		let object1 = {value: 10};
+		let object2 = object1;
+		let object3 = {value: 10};
+
+		console.log(object1 == object2); // -> true; object1 and object2 bindings points to the same object.
+		console.log(object1 == object3); // -> false; thought the set of properties and their values are the same, they don't point to the same object
+		
+		object1.value = 15;
+		console.log(object2.value); // -> 15
+		console.log(object3.value); // -> 10
+
+		When you compare objects with JavaScript’s == operator, it compares by identity: it will produce 'true' only if both objects are precisely the same value. Comparing different objects will return 'false', even if they have identical properties. There is no “deep” comparison operation built into JavaScript, which compares objects by contents.
+
+	Rest Parameters
+
+		Rest parameters allow a function to accept an indefinite number of arguments as an array.
+
+		function sum(...arr) {
+			// iterates arr's elements and calculates the total sum.
+		}
+
+		console.log(sum(1, 2, 3)); // 6
+
+		A function definition can have only one 'rest' parameter and it must be the last parameter in the function definition.
+
+	Spread Syntax
+
+		Spread syntax (...) allows an iterable such as an array expression or string to be expanded in places where zero or more arguments (for function calls) or elements (for array literals) are expected, or an object expression to be expanded in places where zero or more key-value pairs (for object literals) are expected.
+
+		function sum(a, b, c) {
+			return a+b+c;
+		}
+
+		arr = [1, 2, 3];
+		console.log(sum(...arr)); // 6
+
+	Destructuring Assignment
+
+		The destructuring assignment syntax is a JavaScript expression that makes it possible to unpack values from arrays, or properties from objects, into distinct variables.
+
+		let a, b;
+		[a, b] = [10, 20];
+		console.log(a); // 10
+
+		let ob1 = {'a': 1, 'b': 2};
+		{a, b} = ob1;
+		console.log(b); //2
+
+	JSON
+
+		Because properties only grasp their value, rather than contain it, objects and arrays are stored in the computer’s memory as sequences of bits holding the addresses—the place in memory—of their contents. If you want to save data in a file for later or send it to another computer over the network, you have to somehow convert these tangles of memory addresses to a description that can be stored or sent. We achieve this through 'serialization'. A popular serialization format is called JSON (pronounced “Jason”), which stands for JavaScript Object Notation. It is widely used as a data storage and communication format on the Web, even in languages other than JavaScript.
+
+		JSON looks similar to JavaScript’s way of writing arrays and objects, with a few restrictions. All property names have to be surrounded by double quotes, and only simple data expressions are allowed—no function calls, bindings, or anything that involves actual computation. Comments are not allowed in JSON.
+
+		JavaScript gives us the functions JSON.stringify and JSON.parse to convert data to and from this format.
+
+References
+
+	https://eloquentjavascript.net/04_data.html
