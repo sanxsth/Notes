@@ -1,0 +1,11 @@
+Higher-Order Functions
+
+	Higher-Order functions are functions that operate on other functions, either by taking them as arguments or by returning them. Higher-order functions allow us to abstract over actions, not just values.
+
+	Arrays provide a number of useful higher-order methods. You can use 'forEach' to loop over the elements in an array. The 'filter' method returns a new array containing only the elements that pass the predicate function. Transforming an array by putting each element through a function is done with 'map'. You can use 'reduce' to combine all the elements in an array into a single value. The 'some' method tests whether any element matches a given predicate function. And 'findIndex' finds the position of the first element that matches a predicate.
+
+	High-Order functions allow us to compose 'actions' and build pipelines of these actions in a readable and maintainable way.
+
+References
+
+	https://eloquentjavascript.net/05_higher_order.html
