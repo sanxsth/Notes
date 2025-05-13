@@ -6,7 +6,7 @@ Shorted Path In A Graph
 
 	Djikstra's Algorithm
 
-		We use Djikstra's to find the single source shortest path in a weighted graph with non-negative edges. It can be modified to work on a weighted graph with negative edges ( by finding the proper offset for each edge; this is what Johnson's algorithm does), but no negative cycles. The algorithm is as follows:
+		We use Djikstra's to find the single source shortest path in a weighted graph with non-negative edges. The algorithm is as follows:
 
 			1. Create a set, 'sptSet' (shortest path tree set) that keeps track of vertices included in the shortest-path tree, i.e whose shortest path from the source has been calculated and finalized. Initially, this set is empty.
 			2. Set the distance value to all the nodes as 'infinite, but assign '0' to the source node.
